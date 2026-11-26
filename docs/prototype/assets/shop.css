@@ -1,9 +1,8 @@
 /* ============================================================
-   Ponagar storefront — class riêng .shop-* (KHÔNG thuộc dmcl-shared).
-   Chỉ dùng var() từ tokens.css. CẤM hardcode hex ở đây.
-   Màu thương hiệu: ponagar-theme.css (đỏ logo #BB2E30) — nạp sau tokens.css.
+   Ponagar storefront — class .shop-* / .tk-* của website.
+   Nạp sau ponagar.css. Chỉ dùng var(), CẤM hardcode hex ở đây.
    ============================================================ */
-body.shop{background:var(--bg)}
+body.shop{background:var(--bg);--font-family:var(--font-display)}   /* cả website dùng font dáng logo */
 .shop-wrap{max-width:1240px;margin:0 auto;padding:0 16px}
 .ti{line-height:1}
 
@@ -262,10 +261,9 @@ body.shop{background:var(--bg)}
 
 /* ===== Bổ sung cho nhận diện Ponagar (túi da vẽ tay) ===== */
 .shop h1,.shop h2,.shop-banner h1,.shop-sec-h h2,.shop-pdp h1{font-family:var(--font-display);letter-spacing:-.01em}
-.shop-logo img{width:40px;height:40px;border-radius:8px;box-shadow:0 0 0 2px var(--surface)}
-.shop-logo .wm{display:flex;flex-direction:column;line-height:1.05}
-.shop-logo .wm b{font-family:var(--font-display);font-size:23px;letter-spacing:.08em}
-.shop-logo .wm small{font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+.shop-logo{flex-direction:column;align-items:flex-start;gap:5px}
+.shop-logo img{height:21px;width:auto;display:block}
+.shop-logo small{font-size:10px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;opacity:.85}
 .shop-header .lang-toggle{border-color:color-mix(in srgb,var(--surface) 35%,transparent)}
 .shop-header .lang-toggle button{color:var(--surface);padding:4px 9px}
 .shop-header .lang-toggle button.active{background:var(--surface);color:var(--brand)}
@@ -315,7 +313,8 @@ body.shop{background:var(--bg)}
 @media (max-width:860px){
   .shop-custom,.shop-story,.shop-store{grid-template-columns:1fr}
   .shop-steps{grid-template-columns:1fr}
-  .shop-logo .wm small{display:none}
+  .shop-logo img{height:16px}
+  .shop-logo small{display:none}
   .shop-header .lang-toggle{display:none}
 }
 
@@ -323,11 +322,10 @@ body.shop{background:var(--bg)}
 /* ============================================================
    v0.3 — Bố cục theo thienkimhome.com (header 1 thanh, menu trái + slider + 3 banner,
    khối sản phẩm theo ngành hàng, thẻ SP có "Tặng thêm", footer nền trắng).
-   Màu vẫn lấy từ ponagar-theme.css. Các rule dưới đây ghi đè phần cũ ở trên.
+   Màu và font lấy từ ponagar.css. Các rule dưới đây ghi đè phần cũ ở trên.
    ============================================================ */
 /* ---- Header 1 thanh ---- */
 .shop-header .shop-wrap{height:76px;gap:10px}
-.shop-header .shop-logo .wm small{font-size:9.5px}
 .tk-hbtn{display:flex;align-items:center;gap:6px;height:50px;padding:0 12px;border:0;border-radius:10px;background:color-mix(in srgb,var(--surface) 16%,transparent);color:var(--surface);font:600 13.5px var(--font-family);cursor:pointer;white-space:nowrap;flex:none}
 .tk-hbtn:hover{background:color-mix(in srgb,var(--surface) 26%,transparent)}
 .tk-hbtn>i{font-size:21px}

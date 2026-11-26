@@ -4,8 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ponagar — 04 · Design system</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="../prototype/assets/tokens.css">
-<link rel="stylesheet" href="../prototype/assets/ponagar-theme.css">
+<link rel="stylesheet" href="../prototype/assets/ponagar.css">
 <style>
 body{background:var(--bg)}
 .doc-top{background:var(--brand);color:var(--surface);position:sticky;top:0;z-index:10}
@@ -40,131 +39,66 @@ body{background:var(--bg)}
 </style>
 </head>
 <body>
-<header class="doc-top"><div class="in"><b><img src="https://cdn.hstatic.net/themes/1000360703/1001524369/14/ponagar-mark.png?v=535" alt="" style="width:30px;height:30px;border-radius:6px;box-shadow:0 0 0 2px var(--surface)">Ponagar · Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class=""><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class=""><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class="on"><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class=""><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
+<header class="doc-top"><div class="in"><b><img class="logo-w" src="../prototype/assets/logo.png" alt="Ponagar" style="height:15px;width:auto">· Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class=""><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class=""><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class="on"><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class=""><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
 <main class="doc"><article class="panel guide">
 <h1>04 — Design system</h1>
-<h2>1. Màu lấy từ logo</h2>
-<p>Logo <code>ponagar-mark.png</code> (160×158): ô vuông <strong>đỏ #BB2E30</strong>, nét chữ <strong>trắng</strong>. Đo trực tiếp trên file logo.</p>
-<div class="table-scroll"><table class="data">
-<thead>
-<tr>
-<th>Token</th>
-<th>Giá trị</th>
-<th>Dùng cho</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--brand</code></td>
-<td><strong>#BB2E30</strong> (đỏ logo)</td>
-<td>Header, nút chính, giá, nhãn, menu admin</td>
-</tr>
-<tr>
-<td><code>--brand-dark</code> / <code>--brand-deeper</code> / <code>--brand-tint</code></td>
-<td>tự suy từ <code>--brand</code> (color-mix)</td>
-<td>Hover, nền banner, nền nhạt</td>
-</tr>
-<tr>
-<td><code>--accent</code></td>
-<td>#F3E6CF (kem da thuộc)</td>
-<td>Nút phụ, khối đặt làm riêng, nhãn nổi</td>
-</tr>
-<tr>
-<td><code>--ink</code></td>
-<td>#231F1C (nâu đen)</td>
-<td>Chữ chính</td>
-</tr>
-<tr>
-<td><code>--muted</code></td>
-<td>#76695E</td>
-<td>Chữ phụ</td>
-</tr>
-<tr>
-<td><code>--bg</code></td>
-<td>#FAF7F2 (nền giấy ấm)</td>
-<td>Nền trang</td>
-</tr>
-<tr>
-<td><code>--border</code> / <code>--gray-bg</code></td>
-<td>#ECE4D8 / #F2ECE3</td>
-<td>Viền, nền chip</td>
-</tr>
-<tr>
-<td><code>--font-display</code></td>
-<td>Playfair Display (có tiếng Việt)</td>
-<td>Tiêu đề, tên thương hiệu</td>
-</tr>
-</tbody>
-</table></div>
-<p>Nền kem + chữ nâu đen + đỏ logo gợi chất <strong>da thuộc thủ công</strong>, khác hẳn tông xanh/vàng của DMCL.
-<strong>Màu da sản phẩm</strong> (bò sáp, nâu bò, đỏ đô, xanh rêu…) là <strong>dữ liệu sản phẩm</strong> do admin nhập, không phải màu giao diện.</p>
-<h2>2. Cách áp dụng kit <code>dmcl-shared</code></h2>
-<ol>
-<li><code>tokens.css</code> của <code>@dmcl/design-tokens</code> là nền. <strong>Không sửa kit.</strong></li>
-<li>File <strong><code>ponagar-theme.css</code></strong> nạp ngay sau, chỉ override các <strong>anchor token</strong> ở trên → cả kit (nút, badge, bảng, sidebar admin) tự đổi sang đỏ Ponagar. Đây là cơ chế "núm chỉnh tone" mà kit thiết kế sẵn.</li>
-<li><strong>Cấm hardcode mã màu</strong> trong view; mọi màu dùng <code>var(--…)</code>. Màu Ponagar chỉ nằm trong <code>ponagar-theme.css</code>.</li>
-<li>Không Tailwind/Bootstrap; icon Tabler (<code>ti ti-*</code>) như kit.</li>
-</ol>
-<h2>3. Hai phần giao diện</h2>
-<div class="table-scroll"><table class="data">
-<thead>
-<tr>
-<th>Phần</th>
-<th>Dùng từ kit</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Admin</strong> (<code>/admin</code>)</td>
-<td>Nguyên trạng: <code>AppShell</code>, <code>BasePanel</code>, <code>Toolbar</code>, <code>BaseButton</code>, <code>BaseBadge</code>, <code>BaseModal persistent</code>, <code>FormSection</code>, <code>FormField</code>, <code>BaseCombobox</code>, <code>FilterableCheckboxList</code>, <code>StatCard</code>, <code>Skeleton</code>, <code>ErrorState</code>, <code>EmptyState</code>, <code>table.data</code></td>
-</tr>
-<tr>
-<td><strong>Website</strong></td>
-<td>Tokens + class base (<code>.btn</code>, <code>.badge</code>, <code>.chip</code>, <code>.field</code>, <code>.modal</code>, <code>.toast</code>, <code>.skeleton</code>) + component riêng <code>Shop*</code> / class <code>.shop-*</code></td>
-</tr>
-</tbody>
-</table></div>
 <blockquote>
-<p>Không dùng <code>StatusBadge</code>/<code>STATUS_META</code> cho trạng thái đơn bán lẻ (trùng khoá với dmcl.delivery). Tạo <code>SHOP_ORDER_META</code> riêng trong app.</p>
+<p>Bản 26/11/2026. Giao diện dùng <strong>một bộ riêng của Ponagar</strong> (<code>ponagar.css</code>): màu đỏ, chữ và logo lấy từ logo PONAGAR. Không phụ thuộc bộ giao diện bên ngoài.</p>
 </blockquote>
-<h2>4. Component riêng của website</h2>
+<h2>1. Logo</h2>
+<p><img src="../prototype/assets/logo.png" alt="PONAGAR" style="height:26px;width:auto;margin:6px 0"></p>
+<ul>
+<li>Logo chữ <strong>PONAGAR</strong>, file <code>prototype/assets/logo.png</code> (1737×135, nền trong suốt, màu đỏ #BB2E30). Lưu ngay trong mã nguồn, không dẫn link CDN Haravan (sẽ mất khi rời Haravan).</li>
+<li><strong>Nền sáng</strong> (footer, trang mục lục, hoá đơn): dùng logo đỏ nguyên bản.</li>
+<li><strong>Nền đỏ</strong> (header website, menu quản trị, bìa tài liệu): thêm class <code>logo-w</code> để logo thành chữ trắng. Không đặt logo đỏ lên nền đỏ.</li>
+<li>Chiều cao gợi ý: header website 21px (điện thoại 16px), menu quản trị 17px, tiêu đề tài liệu 26–30px. Không kéo giãn, không đổi màu khác.</li>
+<li>Bản thật nên xin file gốc dạng SVG để logo nét ở mọi cỡ.</li>
+</ul>
+<h2>2. Màu</h2>
 <div class="table-scroll"><table class="data">
-<thead>
-<tr>
-<th>Component</th>
-<th>Dùng ở</th>
-</tr>
-</thead>
+<thead><tr><th>Biến</th><th>Giá trị</th><th>Dùng cho</th></tr></thead>
 <tbody>
-<tr>
-<td><code>ShopHeader</code> (logo, tìm kiếm, ngôn ngữ, giỏ) · <code>ShopMegaMenu</code></td>
-<td>Mọi trang</td>
-</tr>
-<tr>
-<td><code>ShopProductCard</code> (ảnh, chủ đề, tên, chấm màu da, giá)</td>
-<td>Trang chủ, danh mục, liên quan</td>
-</tr>
-<tr>
-<td><code>ShopFacetPanel</code> (bộ lọc + số đếm từ Meilisearch)</td>
-<td>Danh mục, tìm kiếm</td>
-</tr>
-<tr>
-<td><code>ShopSwatches</code> (chọn màu da) · <code>ShopPaintName</code> (vẽ tên miễn phí)</td>
-<td>Chi tiết SP</td>
-</tr>
-<tr>
-<td><code>ShopCountdown</code> · <code>ShopContactBar</code> (Gọi/Zalo/Messenger)</td>
-<td>Trang chủ, mọi trang</td>
-</tr>
-<tr>
-<td><code>ShopCustomOrder</code> (đặt làm riêng 3 bước)</td>
-<td>Trang chủ, trang đặt làm</td>
-</tr>
+<tr><td><code>--brand</code></td><td><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--brand);vertical-align:-2px"></span> <strong>#BB2E30</strong> (đỏ logo)</td><td>Header, nút chính, nhãn giảm giá, menu quản trị</td></tr>
+<tr><td><code>--brand-dark</code> / <code>--brand-deeper</code> / <code>--brand-tint</code></td><td>tự suy từ <code>--brand</code></td><td>Hover, nền banner, nền nhạt</td></tr>
+<tr><td><code>--accent</code></td><td><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--accent);box-shadow:0 0 0 1px var(--border);vertical-align:-2px"></span> #F3E6CF (kem da thuộc)</td><td>Nút phụ, banner phụ, mục đang chọn trong menu quản trị</td></tr>
+<tr><td><code>--ink</code></td><td>#231F1C (nâu đen)</td><td>Chữ chính</td></tr>
+<tr><td><code>--muted</code></td><td>#76695E</td><td>Chữ phụ</td></tr>
+<tr><td><code>--bg</code> / <code>--surface</code></td><td>#FAF7F2 (nền giấy ấm) / #FFFFFF</td><td>Nền trang / thẻ, bảng</td></tr>
+<tr><td><code>--border</code> / <code>--gray-bg</code></td><td>#ECE4D8 / #F2ECE3</td><td>Viền, nền chip</td></tr>
+<tr><td><code>--ok</code> <code>--warn</code> <code>--danger</code> <code>--info</code></td><td>xanh lá / vàng nâu / đỏ / xanh dương</td><td>Chỉ cho trạng thái (đơn, MISA, tồn kho), không dùng trang trí</td></tr>
 </tbody>
 </table></div>
-<h2>5. Prototype</h2>
-<p><code>docs/prototype/</code>: mở <code>index.html</code>. Thứ tự nạp CSS: <code>tokens.css</code> (bản sao từ <code>dmcl-shared</code>) → <code>ponagar-theme.css</code> → <code>shop.css</code> (website) hoặc <code>admin.css</code> (quản trị).
-Logo dùng trực tiếp từ CDN của ponagar.co.</p>
+<p><strong>Màu da sản phẩm</strong> (bò sáp, nâu bò, đỏ đô, xanh rêu…) là <strong>dữ liệu sản phẩm</strong> do admin nhập, không phải màu giao diện. Giá bán dùng <code>--danger</code>.</p>
+<h2>3. Font chữ</h2>
+<div class="table-scroll"><table class="data">
+<thead><tr><th>Biến</th><th>Font</th><th>Dùng cho</th></tr></thead>
+<tbody>
+<tr><td><code>--font-display</code></td><td><strong style="font-family:var(--font-display);font-size:17px">Chakra Petch — Túi da vẽ tay</strong></td><td>Toàn bộ website và trang quản trị; tiêu đề trong tài liệu</td></tr>
+<tr><td><code>--font-family</code></td><td>Segoe UI / font hệ thống</td><td>Đoạn văn dài trong tài liệu (dễ đọc hơn)</td></tr>
+</tbody>
+</table></div>
+<p>Chữ trong logo là kiểu hình học rộng, góc vuông bo tròn. Đã so các font cùng dáng trên Google Fonts: <em>Orbitron</em>, <em>Oxanium</em>, <em>Michroma</em> giống logo hơn nhưng <strong>không có dấu tiếng Việt</strong> (dấu bị vỡ). <strong>Chakra Petch</strong> là font gần dáng logo nhất mà vẫn hiển thị đúng tiếng Việt, miễn phí, dùng được cho web.</p>
+<h2>4. Quy tắc</h2>
+<ol>
+<li>Thứ tự nạp CSS: <code>ponagar.css</code> → <code>shop.css</code> (website) hoặc <code>admin.css</code> (quản trị).</li>
+<li><strong>Cấm hardcode mã màu</strong> trong trang; mọi màu dùng <code>var(--…)</code>. Đổi <code>--brand</code> là cả họ màu đỏ đổi theo.</li>
+<li>Không Tailwind/Bootstrap; icon Tabler (<code>ti ti-*</code>).</li>
+<li>Thành phần dùng chung trong <code>ponagar.css</code>: nút <code>.btn</code>, nhãn <code>.badge</code>, <code>.chip</code>, ô nhập <code>.field</code>, bảng <code>table.data</code>, <code>.panel</code>, <code>.stat-card</code>, <code>.tabs</code>, <code>.modal</code>, <code>.timeline</code>, <code>.toast</code>, khung quản trị <code>.app-shell</code>.</li>
+</ol>
+<h2>5. Thành phần riêng của website</h2>
+<div class="table-scroll"><table class="data">
+<thead><tr><th>Thành phần</th><th>Dùng ở</th></tr></thead>
+<tbody>
+<tr><td>Header một thanh (logo, danh mục, tìm kiếm, gọi mua hàng, giỏ) · menu danh mục nhiều tầng</td><td>Mọi trang</td></tr>
+<tr><td>Đầu trang chủ: menu trái + banner chạy có tab + 3 banner phải</td><td>Trang chủ</td></tr>
+<tr><td>Thẻ sản phẩm: nhãn "Giảm x%", giá, giá cũ, ô "Tặng thêm", số sao, chấm màu da</td><td>Trang chủ, danh mục, liên quan</td></tr>
+<tr><td>Bộ lọc có số đếm (chủ đề tranh, màu da, giá, kích thước, tình trạng)</td><td>Danh mục, tìm kiếm</td></tr>
+<tr><td>Chọn màu da · Vẽ tên miễn phí · Đặt làm theo mẫu</td><td>Chi tiết sản phẩm</td></tr>
+<tr><td>Nút nổi Gọi / Zalo / Messenger · footer 4 cột + showroom</td><td>Mọi trang</td></tr>
+</tbody>
+</table></div>
+<h2>6. Prototype</h2>
+<p><code>docs/prototype/</code>: mở <code>index.html</code>. Dữ liệu sản phẩm là dữ liệu mẫu; ảnh sản phẩm tạm thay bằng nền màu da + biểu tượng.</p>
 </article></main>
 </body>
 </html>

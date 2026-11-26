@@ -1,10 +1,10 @@
 /* ============================================================
-   Admin Ponagar — bổ sung nhỏ trên .app-shell của tokens.css.
-   Chỉ dùng var(); màu thương hiệu ở ponagar-theme.css.
+   Admin Ponagar — bổ sung trên .app-shell của ponagar.css.
+   Chỉ dùng var(); màu và font ở ponagar.css.
    ============================================================ */
-body.admin{background:var(--bg)}
-.app-brand .logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:.08em}
-.app-brand .logo img{width:36px;height:36px;border-radius:8px;background:var(--surface)}
+body.admin{background:var(--bg);--font-family:var(--font-display)}
+.app-brand .logo{display:block;padding:4px 0}
+.app-brand .logo img{height:17px;width:auto;display:block}
 .app-nav a.on{background:var(--accent);color:var(--accent-ink)}
 .app-nav a .n{margin-left:auto;background:var(--accent);color:var(--accent-ink);border-radius:var(--radius-full);font-size:11px;padding:0 7px}
 .app-nav a .n.bad{background:var(--surface);color:var(--danger)}

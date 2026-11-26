@@ -1,5 +1,5 @@
 /* Khung admin dùng chung — menu theo 6 khối của Tài liệu chức năng v0.3.
-   Bản thật: AppShell của @dmcl/ui-kit. Cần nạp proto.js trước (LOGO, toast). */
+   Cần nạp proto.js trước (LOGO, toast). */
 const ADMIN_NAV = [
   ['Bán hàng', [['ti-layout-dashboard', 'Tổng quan'], ['ti-receipt', 'Đơn hàng', 'admin-orders.html', '6'], ['ti-building-store', 'Bán tại quầy'], ['ti-arrow-back-up', 'Đổi trả'], ['ti-users', 'Khách hàng']]],
   ['Sản phẩm', [['ti-shopping-bag', 'Sản phẩm', 'admin-products.html'], ['ti-discount-2', 'Khuyến mãi'], ['ti-photo', 'Banner & bài viết']]],
@@ -11,7 +11,7 @@ const ADMIN_NAV = [
 
 function renderAdmin(active) {
   document.getElementById('side').innerHTML = `
-    <div class="app-brand"><a class="logo" href="../prototype/home.html"><img src="${LOGO}" alt="">PONAGAR</a>
+    <div class="app-brand"><a class="logo" href="home.html"><img class="logo-w" src="${LOGO}" alt="Ponagar"></a>
       <span class="portal-pill"><span class="dot"></span>Quản trị</span></div>
     <nav class="app-nav">${ADMIN_NAV.map(([g, items]) => `
       <div class="app-nav-group"><span>${g}</span></div>

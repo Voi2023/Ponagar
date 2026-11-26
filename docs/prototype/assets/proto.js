@@ -2,7 +2,7 @@
    Bố cục header / thẻ sản phẩm / footer tham chiếu thienkimhome.com, màu theo logo Ponagar.
    Sản phẩm/giá là dữ liệu mẫu. Bản thật là component Nuxt Shop*. */
 
-const LOGO = 'https://cdn.hstatic.net/themes/1000360703/1001524369/14/ponagar-mark.png?v=535';
+const LOGO = 'assets/logo.png';   // logo chữ PONAGAR màu đỏ; nền đỏ thì thêm class logo-w
 const COMPANY = {
   name: 'Công ty TNHH ART 868', mst: '0319090382',
   addr: '166 Hoa Lan, P. Cầu Kiệu, TP.HCM',
@@ -81,7 +81,7 @@ function cardHTML(p, opt = {}) {
 function renderChrome(active) {
   const header = `
   <header class="shop-header"><div class="shop-wrap">
-    <a class="shop-logo" href="home.html"><img src="${LOGO}" alt="Ponagar"><span class="wm"><b>PONAGAR</b><small>Handmade leather</small></span></a>
+    <a class="shop-logo" href="home.html"><img class="logo-w" src="${LOGO}" alt="Ponagar"><small>Handmade leather</small></a>
     <button class="tk-hbtn shop-cat-btn" onclick="toggleMega()"><i class="ti ti-menu-2"></i>Danh mục<i class="ti ti-chevron-down dd"></i></button>
     <button class="tk-hbtn tk-lang"><i class="ti ti-world"></i><span class="t"><small>Ngôn ngữ</small>Tiếng Việt<i class="ti ti-chevron-down dd"></i></span></button>
     <div class="shop-search">

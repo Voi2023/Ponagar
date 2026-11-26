@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ponagar — Tài liệu chức năng</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,500;0,600;0,700;1,600;1,700&display=swap">
 <style>
-/* Màu theo ponagar-theme.css (đỏ logo + kem da thuộc). File tự đủ, không cần CSS ngoài. */
+/* Màu, font theo ponagar.css (đỏ logo + kem da thuộc, Chakra Petch). File tự đủ, không cần CSS ngoài. */
 :root{
   --brand:#BB2E30; --brand-dark:#89222A; --brand-tint:#FBF0EF;
   --accent:#F3E6CF; --bg:#FAF7F2; --surface:#fff; --border:#ECE4D8; --gray-bg:#F2ECE3;
@@ -15,7 +15,7 @@
   --ok:#0a7d3c; --ok-bg:#e6f4ea; --warn:#9a6212; --warn-bg:#fbf1de; --info:#1a5fb4; --info-bg:#e8f0fb;
   --violet:#6b3fa0; --violet-bg:#f1eafa; --teal:#0b6e6e; --teal-bg:#e2f3f2;
   --font:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
-  --font-display:"Playfair Display",Georgia,"Times New Roman",serif;
+  --font-display:"Chakra Petch","Segoe UI",system-ui,sans-serif;
   --mono:"SF Mono",Consolas,Menlo,monospace;
   --side:288px; --top:56px;
 }
@@ -29,6 +29,7 @@ code{font-family:var(--mono);font-size:.86em;background:var(--gray-bg);border-ra
 /* ---------- thanh trên ---------- */
 .top{position:sticky;top:0;z-index:30;height:var(--top);background:var(--brand);color:#fff;display:flex;align-items:center;gap:14px;padding:0 16px}
 .top .logo{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:.06em;white-space:nowrap}
+.top .logo img{height:15px;width:auto;filter:brightness(0) invert(1)}
 .top .logo span{width:30px;height:30px;border-radius:7px;background:#fff;color:var(--brand);display:grid;place-items:center;font-size:18px;letter-spacing:0}
 .top .logo small{font:600 12px var(--font);letter-spacing:0;opacity:.85}
 .roles{display:flex;align-items:center;gap:6px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
@@ -134,7 +135,8 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);font-
 @media(max-width:520px){
   .top{gap:8px;padding:0 10px}
   .top .logo{font-size:0;gap:0}
-  .top .logo span{font-size:18px}
+  .top .logo img{height:15px;width:auto;filter:brightness(0) invert(1)}
+.top .logo span{font-size:18px}
 }
 @media print{
   .top,.side{display:none}.wrap{display:block}.main{padding:0}.ft{break-inside:avoid}
@@ -145,7 +147,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);font-
 <body>
 <header class="top">
   <button class="burger" id="burger" aria-label="Mở mục lục">☰ Mục lục</button>
-  <a class="logo" href="#dau-trang"><span>P</span>PONAGAR <small>· tài liệu chức năng</small></a>
+  <a class="logo" href="#dau-trang"><img src="../prototype/assets/logo.png" alt="Ponagar"><small>· tài liệu chức năng</small></a>
   <nav class="roles" id="roles" aria-label="Lọc theo vai trò">
     <i>Tôi là:</i>
     <button data-v="all" class="on">Tất cả</button>
