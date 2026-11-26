@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ponagar — 04 · Design system</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="../prototype/assets/tokens.css">
+<link rel="stylesheet" href="../prototype/assets/ponagar-theme.css">
+<style>
+body{background:var(--bg)}
+.doc-top{background:var(--brand);color:var(--surface);position:sticky;top:0;z-index:10}
+.doc-top .in{max-width:1100px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:6px;height:56px;overflow-x:auto}
+.doc-top b{font-size:17px;margin-right:12px;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.doc-top b i{background:var(--accent);color:var(--accent-ink);border-radius:7px;padding:4px}
+.doc-top a{white-space:nowrap;font-size:13px;font-weight:600;padding:7px 11px;border-radius:8px;display:flex;gap:6px;align-items:center}
+.doc-top a:hover{background:color-mix(in srgb,var(--surface) 14%,transparent)}
+.doc-top a.on{background:var(--accent);color:var(--accent-ink)}
+.doc{max-width:1100px;margin:22px auto 60px;padding:0 16px}
+.doc .panel{padding:28px 32px}
+.guide{max-width:none}
+.guide h1{font-size:28px;margin:0 0 14px;color:var(--brand-dark);font-family:var(--font-display)}
+.guide h2{font-family:var(--font-display)}
+.guide h2:first-of-type{margin-top:18px}
+.guide ul,.guide ol{padding-left:22px;line-height:1.65}
+.guide li{margin:3px 0}
+.guide blockquote{margin:12px 0;background:var(--brand-tint);border-left:4px solid var(--brand);border-radius:0 9px 9px 0;padding:10px 14px;font-size:13.6px}
+.guide blockquote p{margin:4px 0}
+.guide table{margin:10px 0 16px}
+.guide table td,.guide table th{vertical-align:top}
+.guide table tr td:not(:first-child){font-variant-numeric:tabular-nums}
+.guide pre{background:var(--ink);color:var(--gray-bg);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:12.4px;line-height:1.5}
+.guide code{font-family:var(--font-mono);font-size:12.4px}
+.guide :not(pre)>code{background:var(--gray-bg);border-radius:5px;padding:1px 6px}
+.guide a{color:var(--brand);font-weight:600}
+.guide hr{border:none;border-top:1px solid var(--border);margin:20px 0}
+.guide tr.sum td{background:var(--brand-tint);font-weight:800}
+.guide tr.grp td{background:var(--bg)}
+@media(max-width:700px){.doc .panel{padding:18px 16px}}
+@media print{.doc-top{display:none}.doc .panel{box-shadow:none;border:none}}
+</style>
+</head>
+<body>
+<header class="doc-top"><div class="in"><b><img src="https://cdn.hstatic.net/themes/1000360703/1001524369/14/ponagar-mark.png?v=535" alt="" style="width:30px;height:30px;border-radius:6px;box-shadow:0 0 0 2px var(--surface)">Ponagar · Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class=""><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class=""><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class="on"><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class=""><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
+<main class="doc"><article class="panel guide">
+<h1>04 — Design system</h1>
+<h2>1. Màu lấy từ logo</h2>
+<p>Logo <code>ponagar-mark.png</code> (160×158): ô vuông <strong>đỏ #BB2E30</strong>, nét chữ <strong>trắng</strong>. Đo trực tiếp trên file logo.</p>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>Token</th>
+<th>Giá trị</th>
+<th>Dùng cho</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--brand</code></td>
+<td><strong>#BB2E30</strong> (đỏ logo)</td>
+<td>Header, nút chính, giá, nhãn, menu admin</td>
+</tr>
+<tr>
+<td><code>--brand-dark</code> / <code>--brand-deeper</code> / <code>--brand-tint</code></td>
+<td>tự suy từ <code>--brand</code> (color-mix)</td>
+<td>Hover, nền banner, nền nhạt</td>
+</tr>
+<tr>
+<td><code>--accent</code></td>
+<td>#F3E6CF (kem da thuộc)</td>
+<td>Nút phụ, khối đặt làm riêng, nhãn nổi</td>
+</tr>
+<tr>
+<td><code>--ink</code></td>
+<td>#231F1C (nâu đen)</td>
+<td>Chữ chính</td>
+</tr>
+<tr>
+<td><code>--muted</code></td>
+<td>#76695E</td>
+<td>Chữ phụ</td>
+</tr>
+<tr>
+<td><code>--bg</code></td>
+<td>#FAF7F2 (nền giấy ấm)</td>
+<td>Nền trang</td>
+</tr>
+<tr>
+<td><code>--border</code> / <code>--gray-bg</code></td>
+<td>#ECE4D8 / #F2ECE3</td>
+<td>Viền, nền chip</td>
+</tr>
+<tr>
+<td><code>--font-display</code></td>
+<td>Playfair Display (có tiếng Việt)</td>
+<td>Tiêu đề, tên thương hiệu</td>
+</tr>
+</tbody>
+</table></div>
+<p>Nền kem + chữ nâu đen + đỏ logo gợi chất <strong>da thuộc thủ công</strong>, khác hẳn tông xanh/vàng của DMCL.
+<strong>Màu da sản phẩm</strong> (bò sáp, nâu bò, đỏ đô, xanh rêu…) là <strong>dữ liệu sản phẩm</strong> do admin nhập, không phải màu giao diện.</p>
+<h2>2. Cách áp dụng kit <code>dmcl-shared</code></h2>
+<ol>
+<li><code>tokens.css</code> của <code>@dmcl/design-tokens</code> là nền. <strong>Không sửa kit.</strong></li>
+<li>File <strong><code>ponagar-theme.css</code></strong> nạp ngay sau, chỉ override các <strong>anchor token</strong> ở trên → cả kit (nút, badge, bảng, sidebar admin) tự đổi sang đỏ Ponagar. Đây là cơ chế "núm chỉnh tone" mà kit thiết kế sẵn.</li>
+<li><strong>Cấm hardcode mã màu</strong> trong view; mọi màu dùng <code>var(--…)</code>. Màu Ponagar chỉ nằm trong <code>ponagar-theme.css</code>.</li>
+<li>Không Tailwind/Bootstrap; icon Tabler (<code>ti ti-*</code>) như kit.</li>
+</ol>
+<h2>3. Hai phần giao diện</h2>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>Phần</th>
+<th>Dùng từ kit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Admin</strong> (<code>/admin</code>)</td>
+<td>Nguyên trạng: <code>AppShell</code>, <code>BasePanel</code>, <code>Toolbar</code>, <code>BaseButton</code>, <code>BaseBadge</code>, <code>BaseModal persistent</code>, <code>FormSection</code>, <code>FormField</code>, <code>BaseCombobox</code>, <code>FilterableCheckboxList</code>, <code>StatCard</code>, <code>Skeleton</code>, <code>ErrorState</code>, <code>EmptyState</code>, <code>table.data</code></td>
+</tr>
+<tr>
+<td><strong>Website</strong></td>
+<td>Tokens + class base (<code>.btn</code>, <code>.badge</code>, <code>.chip</code>, <code>.field</code>, <code>.modal</code>, <code>.toast</code>, <code>.skeleton</code>) + component riêng <code>Shop*</code> / class <code>.shop-*</code></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Không dùng <code>StatusBadge</code>/<code>STATUS_META</code> cho trạng thái đơn bán lẻ (trùng khoá với dmcl.delivery). Tạo <code>SHOP_ORDER_META</code> riêng trong app.</p>
+</blockquote>
+<h2>4. Component riêng của website</h2>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>Component</th>
+<th>Dùng ở</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ShopHeader</code> (logo, tìm kiếm, ngôn ngữ, giỏ) · <code>ShopMegaMenu</code></td>
+<td>Mọi trang</td>
+</tr>
+<tr>
+<td><code>ShopProductCard</code> (ảnh, chủ đề, tên, chấm màu da, giá)</td>
+<td>Trang chủ, danh mục, liên quan</td>
+</tr>
+<tr>
+<td><code>ShopFacetPanel</code> (bộ lọc + số đếm từ Meilisearch)</td>
+<td>Danh mục, tìm kiếm</td>
+</tr>
+<tr>
+<td><code>ShopSwatches</code> (chọn màu da) · <code>ShopPaintName</code> (vẽ tên miễn phí)</td>
+<td>Chi tiết SP</td>
+</tr>
+<tr>
+<td><code>ShopCountdown</code> · <code>ShopContactBar</code> (Gọi/Zalo/Messenger)</td>
+<td>Trang chủ, mọi trang</td>
+</tr>
+<tr>
+<td><code>ShopCustomOrder</code> (đặt làm riêng 3 bước)</td>
+<td>Trang chủ, trang đặt làm</td>
+</tr>
+</tbody>
+</table></div>
+<h2>5. Prototype</h2>
+<p><code>docs/prototype/</code>: mở <code>index.html</code>. Thứ tự nạp CSS: <code>tokens.css</code> (bản sao từ <code>dmcl-shared</code>) → <code>ponagar-theme.css</code> → <code>shop.css</code> (website) hoặc <code>admin.css</code> (quản trị).
+Logo dùng trực tiếp từ CDN của ponagar.co.</p>
+</article></main>
+</body>
+</html>

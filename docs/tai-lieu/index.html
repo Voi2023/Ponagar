@@ -1,0 +1,1549 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ponagar — Tài liệu chức năng</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap">
+<style>
+/* Màu theo ponagar-theme.css (đỏ logo + kem da thuộc). File tự đủ, không cần CSS ngoài. */
+:root{
+  --brand:#BB2E30; --brand-dark:#89222A; --brand-tint:#FBF0EF;
+  --accent:#F3E6CF; --bg:#FAF7F2; --surface:#fff; --border:#ECE4D8; --gray-bg:#F2ECE3;
+  --ink:#231F1C; --muted:#76695E;
+  --ok:#0a7d3c; --ok-bg:#e6f4ea; --warn:#9a6212; --warn-bg:#fbf1de; --info:#1a5fb4; --info-bg:#e8f0fb;
+  --violet:#6b3fa0; --violet-bg:#f1eafa; --teal:#0b6e6e; --teal-bg:#e2f3f2;
+  --font:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  --font-display:"Playfair Display",Georgia,"Times New Roman",serif;
+  --mono:"SF Mono",Consolas,Menlo,monospace;
+  --side:288px; --top:56px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--top) + 14px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.62 var(--font);-webkit-text-size-adjust:100%}
+a{color:var(--brand);text-decoration:none;font-weight:600}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono);font-size:.86em;background:var(--gray-bg);border-radius:5px;padding:1px 6px}
+
+/* ---------- thanh trên ---------- */
+.top{position:sticky;top:0;z-index:30;height:var(--top);background:var(--brand);color:#fff;display:flex;align-items:center;gap:14px;padding:0 16px}
+.top .logo{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:.06em;white-space:nowrap}
+.top .logo span{width:30px;height:30px;border-radius:7px;background:#fff;color:var(--brand);display:grid;place-items:center;font-size:18px;letter-spacing:0}
+.top .logo small{font:600 12px var(--font);letter-spacing:0;opacity:.85}
+.roles{display:flex;align-items:center;gap:6px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.roles::-webkit-scrollbar{display:none}
+.roles i{font-style:normal;font-size:12.5px;opacity:.85;white-space:nowrap}
+.roles button{font:600 12.5px var(--font);color:#fff;background:rgba(255,255,255,.14);border:0;border-radius:999px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.roles button:hover{background:rgba(255,255,255,.26)}
+.roles button.on{background:var(--accent);color:var(--brand-dark)}
+.burger{display:none;background:rgba(255,255,255,.16);border:0;color:#fff;border-radius:8px;padding:7px 10px;font:600 13px var(--font);cursor:pointer;white-space:nowrap}
+
+/* ---------- khung ---------- */
+.wrap{display:grid;grid-template-columns:var(--side) minmax(0,1fr)}
+.side{position:sticky;top:var(--top);height:calc(100vh - var(--top));overflow-y:auto;background:var(--surface);border-right:1px solid var(--border);padding:14px 10px 40px}
+.side input{width:100%;font:14px var(--font);padding:8px 11px;border:1px solid var(--border);border-radius:9px;background:var(--bg);margin-bottom:8px}
+.side input:focus{outline:2px solid var(--brand);outline-offset:1px}
+.side .grp{margin-top:10px}
+.side .gh{display:flex;gap:9px;align-items:center;font-weight:700;font-size:13.5px;color:var(--ink);padding:6px 8px;border-radius:8px}
+.side .gh b{flex:none;width:22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:12px}
+.side .gh:hover{background:var(--gray-bg);text-decoration:none}
+.side a.it{display:block;font-weight:500;font-size:13.2px;color:var(--muted);padding:4px 8px 4px 39px;border-radius:7px;line-height:1.4}
+.side a.it:hover{background:var(--gray-bg);color:var(--ink);text-decoration:none}
+.side a.it.on{background:var(--brand-tint);color:var(--brand-dark);font-weight:700}
+.main{min-width:0;padding:26px 34px 90px}
+.page{max-width:900px;margin:0 auto}
+
+/* ---------- chữ ---------- */
+h1{font:800 32px/1.2 var(--font-display);color:var(--brand-dark);margin:0 0 10px;text-wrap:balance}
+h2{font:700 25px/1.25 var(--font-display);margin:52px 0 6px;padding-top:22px;border-top:2px solid var(--border);display:flex;gap:12px;align-items:center}
+h2 b{flex:none;width:36px;height:36px;border-radius:10px;background:var(--brand);color:#fff;display:grid;place-items:center;font:700 17px var(--font)}
+h2+p.sub{color:var(--muted);margin:0 0 6px}
+h3{font:700 18.5px/1.35 var(--font);margin:0 0 6px;display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+h4{font:700 14.5px var(--font);margin:16px 0 4px;color:var(--brand-dark)}
+p{margin:8px 0}
+ul,ol{padding-left:22px;margin:8px 0}
+li{margin:3px 0}
+.lead{font-size:16px;color:var(--muted);max-width:70ch}
+.meta{font-size:13px;color:var(--muted)}
+.cap{font-style:italic;color:var(--muted);margin:2px 0 8px}
+
+/* ---------- khối chức năng ---------- */
+.ft{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin:14px 0}
+.ft>:last-child{margin-bottom:0}
+.tg{font:700 11px var(--font);border-radius:999px;padding:2.5px 9px;letter-spacing:.01em;white-space:nowrap}
+.tg.chu{background:var(--brand-tint);color:var(--brand-dark)}
+.tg.ql{background:var(--info-bg);color:var(--info)}
+.tg.bh{background:var(--warn-bg);color:var(--warn)}
+.tg.kho{background:var(--teal-bg);color:var(--teal)}
+.tg.kt{background:var(--violet-bg);color:var(--violet)}
+.tg.nv{background:var(--ok-bg);color:var(--ok)}
+.tg.ph{background:var(--gray-bg);color:var(--muted);margin-left:auto}
+.tg.ph.new{background:var(--ink);color:#fff}
+.note{background:var(--brand-tint);border-left:4px solid var(--brand);border-radius:0 10px 10px 0;padding:10px 14px;margin:12px 0;font-size:14px}
+.note.q{background:var(--warn-bg);border-color:var(--warn)}
+.note>:first-child{margin-top:0}.note>:last-child{margin-bottom:0}
+
+/* ---------- bảng ---------- */
+.ts{overflow-x:auto;margin:10px 0 14px;border:1px solid var(--border);border-radius:11px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.8px}
+th,td{text-align:left;vertical-align:top;padding:8px 12px;border-bottom:1px solid var(--border)}
+th{background:var(--gray-bg);font-size:12.5px;font-weight:700;color:var(--muted);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.sum td{background:var(--brand-tint);font-weight:700}
+td.y{color:var(--ok);font-weight:700;text-align:center}
+td.x{color:var(--border);text-align:center}
+th.c{text-align:center}
+
+/* ---------- thẻ vai trò ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:16px 0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.card:hover{border-color:var(--brand)}
+.card b{display:block;font-size:15px}
+.card span{font-size:13px;color:var(--muted)}
+
+/* ---------- sơ đồ làn ---------- */
+.lane th:first-child,.lane td:first-child{position:sticky;left:0;background:var(--gray-bg);font-weight:700;font-size:12.5px;min-width:104px;z-index:1}
+.lane td{min-width:146px}
+.lane th{text-align:center}
+.nd{display:block;border:1px solid var(--border);border-left:4px solid var(--muted);border-radius:8px;padding:5px 9px;margin:4px 0;font-size:12.8px;line-height:1.35;background:var(--surface)}
+.nd.auto{border-left-color:var(--brand);background:var(--brand-tint)}
+.nd.kho{border-left-color:var(--teal)} .nd.kt{border-left-color:var(--violet)} .nd.bh{border-left-color:var(--warn)} .nd.nv{border-left-color:var(--ok)} .nd.ql{border-left-color:var(--info)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted);margin:6px 0 2px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:var(--c)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.two>div{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px}
+.two b{display:block;margin-bottom:2px}
+.hide{display:none!important}
+footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);font-size:13px;color:var(--muted)}
+
+@media(max-width:920px){
+  .wrap{grid-template-columns:minmax(0,1fr)}
+  .burger{display:block}
+  .side{position:fixed;left:0;top:var(--top);width:min(86vw,320px);z-index:25;transform:translateX(-102%);transition:transform .2s;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+  body.nav .side{transform:none}
+  .main{padding:18px 16px 70px}
+  h1{font-size:26px} h2{font-size:21px}
+  .ft{padding:14px 15px}
+  .two{grid-template-columns:1fr}
+  .top .logo small{display:none}
+  .tg.ph{margin-left:0}
+  .ts table:has(th:nth-child(4)){min-width:620px}
+}
+@media(max-width:520px){
+  .top{gap:8px;padding:0 10px}
+  .top .logo{font-size:0;gap:0}
+  .top .logo span{font-size:18px}
+}
+@media print{
+  .top,.side{display:none}.wrap{display:block}.main{padding:0}.ft{break-inside:avoid}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="burger" id="burger" aria-label="Mở mục lục">☰ Mục lục</button>
+  <a class="logo" href="#dau-trang"><span>P</span>PONAGAR <small>· tài liệu chức năng</small></a>
+  <nav class="roles" id="roles" aria-label="Lọc theo vai trò">
+    <i>Tôi là:</i>
+    <button data-v="all" class="on">Tất cả</button>
+    <button data-v="chu">Chủ</button>
+    <button data-v="ql">Quản lý</button>
+    <button data-v="bh">Bán hàng</button>
+    <button data-v="kho">Kho &amp; xưởng</button>
+    <button data-v="kt">Kế toán</button>
+    <button data-v="nv">Nhân viên</button>
+  </nav>
+</header>
+<div class="wrap">
+<aside class="side" id="side">
+  <input id="q" type="search" placeholder="Tìm chức năng…" aria-label="Tìm chức năng">
+  <div id="toc"></div>
+</aside>
+<main class="main"><div class="page" id="dau-trang">
+<p class="meta">Tài liệu chức năng · v0.3 · Cập nhật 25/11/2026 · Người lập: Bùi Tín · Khách hàng: Công ty TNHH ART 868 (Ponagar)</p>
+<h1>Tài liệu chức năng hệ thống Ponagar</h1>
+<p class="lead">Mô tả đầy đủ các chức năng cần làm: website bán hàng, quản trị đơn, <strong>kho &amp; sản xuất</strong>, <strong>nhân sự &amp; lương</strong>, và <strong>đẩy đơn sang MISA AMIS Kế toán</strong> để kế toán tính thuế, xuất hoá đơn. Chọn vai trò của bạn ở thanh trên cùng để chỉ xem phần liên quan.</p>
+
+<div class="cards" id="cards">
+  <button class="card" data-v="chu"><b>Chủ</b><span>Xem toàn bộ, phân quyền, chốt lương, xem lãi gộp</span></button>
+  <button class="card" data-v="ql"><b>Quản lý</b><span>Đơn hàng, sản phẩm, xếp ca, duyệt đơn từ</span></button>
+  <button class="card" data-v="bh"><b>Bán hàng</b><span>Chốt đơn online, bán tại showroom / sân bay</span></button>
+  <button class="card" data-v="kho"><b>Kho &amp; xưởng</b><span>Nhập xuất, kiểm kê, lệnh sản xuất, nguyên liệu</span></button>
+  <button class="card" data-v="kt">
+    <b>Kế toán</b><span>Đối soát, đẩy đơn sang MISA, thuế, hoá đơn</span></button>
+  <button class="card" data-v="nv"><b>Nhân viên · thợ</b><span>Chấm công, đăng ký ca, xem lương khoán</span></button>
+</div>
+
+<div class="note">
+  <p><strong>Khác gì so với bộ tài liệu v0.2 (29/10/2026)?</strong></p>
+  <ul>
+    <li><strong>Không đẩy đơn sang KiotViet / Sapo / Haravan nữa.</strong> Đơn và kho quản lý ngay trong hệ thống Ponagar. Phần này thay cho mục 3 của trang <a href="../specs/02-de-xuat.html">02 · Đề xuất</a>.</li>
+    <li><strong>Thêm 3 khối mới:</strong> Kho &amp; sản xuất (thành phẩm, nguyên liệu, lệnh sản xuất), Nhân sự (chấm công, lương khoán, hoa hồng), Kế toán &amp; MISA.</li>
+    <li><strong>MISA AMIS Kế toán</strong> là nơi làm sổ sách, tính thuế và xuất hoá đơn. Ponagar là nơi vận hành hằng ngày.</li>
+    <li>Toàn bộ hệ thống (GĐ1–GĐ4) có báo giá <strong>50.000.000đ</strong> ở trang <a href="../specs/03-bao-gia.html">03 · Báo giá</a>. Lộ trình và việc cần chốt: xem <a href="#lo-trinh">mục 7</a>.</li>
+  </ul>
+</div>
+<p class="meta">Mỗi chức năng có nhãn vai trò dùng nó và nhãn giai đoạn (GĐ1 đã báo giá, GĐ2–GĐ4 là phần mới). Chưa có ảnh màn hình vì phần mềm chưa làm; số liệu, tên mẫu trong ví dụ là dữ liệu mẫu.</p>
+
+<section id="tra-nhanh">
+<h3 style="margin-top:28px">Tôi muốn… → vào đâu</h3>
+<div class="ts"><table id="lookup">
+<thead><tr><th>Tôi muốn…</th><th>Vào đâu</th><th>Ai làm</th></tr></thead>
+<tbody>
+<tr data-r="ql bh"><td>Xem đơn mới, xác nhận đơn</td><td><a href="#don-hang">Quản trị › Đơn hàng</a></td><td>Bán hàng, quản lý</td></tr>
+<tr data-r="bh"><td>Bán một chiếc túi tại showroom</td><td><a href="#ban-tai-quay">Quản trị › Bán tại quầy</a></td><td>Bán hàng</td></tr>
+<tr data-r="ql bh"><td>Khách muốn đổi / trả hàng</td><td><a href="#doi-tra">Đơn hàng › Đổi trả</a></td><td>Bán hàng, quản lý duyệt</td></tr>
+<tr data-r="ql"><td>Thêm mẫu mới, sửa giá</td><td><a href="#san-pham">Quản trị › Sản phẩm</a></td><td>Quản lý</td></tr>
+<tr data-r="ql"><td>Tạo mã giảm giá</td><td><a href="#ma-giam-gia">Quản trị › Khuyến mãi</a></td><td>Quản lý</td></tr>
+<tr data-r="kho ql"><td>Xem mẫu này còn bao nhiêu, ở kho nào</td><td><a href="#ton-thanh-pham">Kho › Tồn thành phẩm</a></td><td>Kho, bán hàng, quản lý</td></tr>
+<tr data-r="kho"><td>Nhập da, phụ kiện mới mua</td><td><a href="#nhap-ncc">Kho › Nhập mua NCC</a></td><td>Kho</td></tr>
+<tr data-r="kho"><td>Chuyển hàng từ xưởng ra showroom</td><td><a href="#chuyen-kho">Kho › Chuyển kho</a></td><td>Kho</td></tr>
+<tr data-r="kho"><td>Kiểm kê cuối tháng</td><td><a href="#kiem-ke">Kho › Kiểm kê</a></td><td>Kho, quản lý duyệt</td></tr>
+<tr data-r="kho ql"><td>Đóng gói và xuất kho cho đơn</td><td><a href="#xuat-ban">Kho › Đóng gói &amp; xuất</a></td><td>Kho</td></tr>
+<tr data-r="kho ql"><td>Làm 20 chiếc túi mẫu mới</td><td><a href="#lenh-san-xuat">Xưởng › Lệnh sản xuất</a></td><td>Quản lý xưởng</td></tr>
+<tr data-r="kho nv"><td>Báo đã may / vẽ xong</td><td><a href="#cong-doan">Xưởng › Công đoạn của tôi</a></td><td>Thợ</td></tr>
+<tr data-r="kho ql"><td>Xem một mẫu túi tốn bao nhiêu da</td><td><a href="#dinh-muc">Xưởng › Định mức nguyên liệu</a></td><td>Quản lý xưởng</td></tr>
+<tr data-r="kho ql"><td>Biết nguyên liệu nào sắp hết</td><td><a href="#canh-bao-ton">Kho › Cảnh báo tồn thấp</a></td><td>Kho (Telegram tự báo)</td></tr>
+<tr data-r="nv"><td>Chấm công vào ca / ra ca</td><td><a href="#cham-cong">Điện thoại › Chấm công</a></td><td>Nhân viên</td></tr>
+<tr data-r="nv"><td>Đăng ký ca tuần sau, xin nghỉ</td><td><a href="#dang-ky-ca">Điện thoại › Ca của tôi</a> · <a href="#don-tu">Đơn từ</a></td><td>Nhân viên</td></tr>
+<tr data-r="nv"><td>Xem tháng này được bao nhiêu tiền khoán</td><td><a href="#trang-nhan-vien">Điện thoại › Lương của tôi</a></td><td>Nhân viên, thợ</td></tr>
+<tr data-r="ql"><td>Xếp ca và công bố lịch</td><td><a href="#xep-ca">Nhân sự › Xếp ca</a></td><td>Quản lý</td></tr>
+<tr data-r="ql"><td>Sửa công cho người quên chấm</td><td><a href="#bang-cham-cong">Nhân sự › Bảng chấm công</a></td><td>Quản lý</td></tr>
+<tr data-r="ql kt"><td>Cho nhân viên ứng lương</td><td><a href="#ung-luong">Nhân sự › Ứng lương</a></td><td>Quản lý duyệt, kế toán chi</td></tr>
+<tr data-r="kt"><td>Chốt bảng lương tháng</td><td><a href="#bang-luong">Nhân sự › Bảng lương</a></td><td>Kế toán lập, chủ duyệt</td></tr>
+<tr data-r="kt"><td>Xem đơn nào chưa sang MISA</td><td><a href="#misa-trang-thai">Kế toán › Đồng bộ MISA</a></td><td>Kế toán</td></tr>
+<tr data-r="kt"><td>Đơn báo lỗi khi đẩy sang MISA</td><td><a href="#misa-loi">Kế toán › Lỗi &amp; gửi lại</a></td><td>Kế toán</td></tr>
+<tr data-r="kt"><td>Khách cần hoá đơn công ty</td><td><a href="#hoa-don">Kế toán › Hoá đơn điện tử</a></td><td>Kế toán (xuất trong MISA)</td></tr>
+<tr data-r="kt"><td>Đối soát tiền COD hãng vận chuyển trả về</td><td><a href="#thu-tien">Kế toán › Thu tiền &amp; đối soát</a></td><td>Kế toán</td></tr>
+<tr data-r="kt"><td>So tồn kho Ponagar với MISA</td><td><a href="#doi-chieu-ton">Kế toán › Đối chiếu tồn kho</a></td><td>Kế toán, kho</td></tr>
+<tr data-r="chu"><td>Thêm tài khoản, đổi quyền</td><td><a href="#tai-khoan">Hệ thống › Tài khoản &amp; phân quyền</a></td><td>Chủ</td></tr>
+<tr data-r="chu"><td>Xem ai đã sửa tồn kho, sửa lương</td><td><a href="#nhat-ky">Hệ thống › Nhật ký thao tác</a></td><td>Chủ</td></tr>
+<tr data-r="chu ql"><td>Xem doanh thu, mẫu bán chạy</td><td><a href="#bao-cao">Quản trị › Báo cáo</a></td><td>Chủ, quản lý</td></tr>
+</tbody></table></div>
+</section>
+<h2 id="luong"><b>0</b>Luồng công việc</h2>
+<p class="sub">Ba luồng chính chạy xuyên các khối. Đọc phần này trước để biết việc của mình nối với ai.</p>
+
+<article class="ft" id="luong-don" data-r="ql bh kho kt">
+<h3>Một đơn hàng đi qua hệ thống</h3>
+<p class="cap">Từ lúc khách bấm đặt đến lúc kế toán có chứng từ trong MISA. Cột là thời điểm, hàng là người / nơi làm.</p>
+<div class="legend"><span style="--c:var(--brand)">hệ thống tự làm</span><span style="--c:var(--warn)">bán hàng</span><span style="--c:var(--teal)">kho · xưởng</span><span style="--c:var(--violet)">kế toán</span></div>
+<div class="ts"><table class="lane">
+<thead><tr><th></th><th>Đặt hàng</th><th>Xác nhận</th><th>Chuẩn bị hàng</th><th>Xuất kho &amp; giao</th><th>Sau khi giao</th></tr></thead>
+<tbody>
+<tr><td>Khách · Website</td>
+  <td><span class="nd">Đặt trên web · COD hoặc VietQR</span></td><td></td><td></td>
+  <td><span class="nd">Nhận tin có mã vận đơn</span></td>
+  <td><span class="nd">Nhận hàng · đổi trả trong hạn</span></td></tr>
+<tr><td>Hệ thống</td>
+  <td><span class="nd auto">Lưu đơn · <b>giữ hàng</b> ở kho</span><span class="nd auto">Báo Telegram cho shop</span></td>
+  <td><span class="nd auto">Hàng đặt làm → tạo lệnh sản xuất</span></td>
+  <td><span class="nd auto">Có vẽ tên → tạo việc cho thợ vẽ</span></td>
+  <td><span class="nd auto"><b>Trừ tồn thực</b></span><span class="nd auto"><b>Đẩy đơn sang MISA</b></span></td>
+  <td><span class="nd auto">Tính hoa hồng khi đơn hoàn tất</span></td></tr>
+<tr><td>Bán hàng</td>
+  <td><span class="nd bh">Hoặc: tạo đơn tại quầy</span></td>
+  <td><span class="nd bh">Gọi khách · bấm Xác nhận</span></td><td></td><td></td>
+  <td><span class="nd bh">Nhận yêu cầu đổi trả</span></td></tr>
+<tr><td>Kho · Xưởng</td><td></td><td></td>
+  <td><span class="nd kho">Lấy hàng · vẽ tên · gói quà</span></td>
+  <td><span class="nd kho">Quét mã · bấm Xuất kho</span></td>
+  <td><span class="nd kho">Nhận hàng trả · nhập lại kho</span></td></tr>
+<tr><td>Kế toán · MISA</td><td></td>
+  <td><span class="nd kt">Xác nhận tiền chuyển khoản</span></td><td></td>
+  <td><span class="nd kt">MISA: duyệt đề nghị → lập chứng từ → xuất hoá đơn</span></td>
+  <td><span class="nd kt">Đối soát COD · xử lý trả hàng</span></td></tr>
+</tbody></table></div>
+<ul>
+  <li><strong>Giữ hàng ≠ trừ tồn.</strong> Lúc đặt, hệ thống chỉ giữ hàng để người khác không mua trùng. Tồn thực chỉ giảm khi kho bấm <strong>Xuất kho</strong>.</li>
+  <li><strong>Đơn sang MISA lúc xuất kho</strong>, không phải lúc đặt. Đơn huỷ trước khi xuất không bao giờ sang MISA. Xem <a href="#misa-khi-nao">Khi nào đơn được đẩy</a>.</li>
+</ul>
+</article>
+
+<article class="ft" id="luong-san-xuat" data-r="ql kho nv kt">
+<h3>Từ tấm da đến chiếc túi trên kệ</h3>
+<p class="cap">Luồng nguyên liệu và sản xuất tại xưởng.</p>
+<div class="ts"><table class="lane">
+<thead><tr><th></th><th>Mua nguyên liệu</th><th>Lập lệnh</th><th>Cắt · may · vẽ</th><th>Kiểm &amp; nhập kho</th><th>Cuối tháng</th></tr></thead>
+<tbody>
+<tr><td>Kho</td>
+  <td><span class="nd kho">Nhập mua NCC theo hoá đơn</span></td>
+  <td><span class="nd kho">Xuất nguyên liệu cho lệnh</span></td><td></td>
+  <td><span class="nd kho">Nhận thành phẩm · dán tem</span></td>
+  <td><span class="nd kho">Kiểm kê nguyên liệu, thành phẩm</span></td></tr>
+<tr><td>Quản lý xưởng</td><td></td>
+  <td><span class="nd ql">Tạo lệnh sản xuất · giao thợ</span></td><td></td>
+  <td><span class="nd ql">KCS: đạt / sửa / hỏng</span></td><td></td></tr>
+<tr><td>Thợ</td><td></td><td></td>
+  <td><span class="nd nv">Bấm Xong từng công đoạn</span></td><td></td>
+  <td><span class="nd nv">Xem tiền khoán</span></td></tr>
+<tr><td>Hệ thống</td>
+  <td><span class="nd auto">Tồn nguyên liệu tăng</span></td>
+  <td><span class="nd auto">Tính nguyên liệu cần theo định mức</span></td>
+  <td><span class="nd auto">Ghi sản lượng cho từng thợ</span></td>
+  <td><span class="nd auto">Tồn thành phẩm tăng · web hiện Còn hàng</span></td>
+  <td><span class="nd auto">Lương khoán vào bảng lương</span></td></tr>
+<tr><td>Kế toán · MISA</td>
+  <td><span class="nd kt">Chứng từ mua hàng (đẩy MISA)</span></td><td></td><td></td><td></td>
+  <td><span class="nd kt">Lấy báo cáo Nhập–Xuất–Tồn tính giá thành</span></td></tr>
+</tbody></table></div>
+</article>
+
+<article class="ft" id="luong-luong" data-r="ql nv kt chu">
+<h3>Một tháng lương</h3>
+<div class="ts"><table class="lane">
+<thead><tr><th></th><th>Đầu tuần</th><th>Hằng ngày</th><th>Ngày 1–3 tháng sau</th><th>Ngày trả lương</th></tr></thead>
+<tbody>
+<tr><td>Nhân viên · thợ</td>
+  <td><span class="nd nv">Đăng ký ca</span></td>
+  <td><span class="nd nv">Chấm công vào / ra</span><span class="nd nv">Thợ: bấm Xong công đoạn</span></td>
+  <td><span class="nd nv">Xem và xác nhận bảng công</span></td>
+  <td><span class="nd nv">Nhận phiếu lương</span></td></tr>
+<tr><td>Quản lý</td>
+  <td><span class="nd ql">Xếp ca · công bố</span></td>
+  <td><span class="nd ql">Duyệt đơn từ, ứng lương</span></td>
+  <td><span class="nd ql">Chốt công · thưởng phạt</span></td><td></td></tr>
+<tr><td>Kế toán</td><td></td><td></td>
+  <td><span class="nd kt">Lập bảng lương</span></td>
+  <td><span class="nd kt">Chi lương · đánh dấu đã trả</span></td></tr>
+<tr><td>Chủ</td><td></td><td></td>
+  <td><span class="nd">Duyệt bảng lương</span></td><td></td></tr>
+<tr><td>Hệ thống</td><td></td>
+  <td><span class="nd auto">Cộng giờ, sản lượng khoán, doanh số</span></td>
+  <td><span class="nd auto">Tính lương = công + khoán + hoa hồng ± thưởng phạt − ứng</span></td>
+  <td><span class="nd auto">Gửi phiếu lương qua điện thoại</span></td></tr>
+</tbody></table></div>
+</article>
+
+<article class="ft" id="ai-lam-gi" data-r="chu ql bh kho kt nv">
+<h3>Ai làm được gì</h3>
+<p class="cap">Quyền mặc định của từng vai trò. Chủ có thể bật tắt từng quyền cho từng tài khoản ở <a href="#tai-khoan">Tài khoản &amp; phân quyền</a>.</p>
+<div class="ts"><table>
+<thead><tr><th>Việc</th><th class="c">Chủ</th><th class="c">Quản lý</th><th class="c">Bán hàng</th><th class="c">Kho · xưởng</th><th class="c">Kế toán</th><th class="c">Nhân viên</th></tr></thead>
+<tbody>
+<tr><td>Xem và xác nhận đơn</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">xem</td><td class="y">xem</td><td class="x">–</td></tr>
+<tr><td>Huỷ đơn, duyệt đổi trả, hoàn tiền</td><td class="y">✓</td><td class="y">✓</td><td class="x">–</td><td class="x">–</td><td class="y">hoàn tiền</td><td class="x">–</td></tr>
+<tr><td>Sửa sản phẩm, giá, khuyến mãi</td><td class="y">✓</td><td class="y">✓</td><td class="x">–</td><td class="x">–</td><td class="x">–</td><td class="x">–</td></tr>
+<tr><td>Nhập, xuất, chuyển kho</td><td class="y">✓</td><td class="y">✓</td><td class="x">–</td><td class="y">✓</td><td class="x">–</td><td class="x">–</td></tr>
+<tr><td>Duyệt kiểm kê, xuất huỷ</td><td class="y">✓</td><td class="y">✓</td><td class="x">–</td><td class="x">–</td><td class="y">xem</td><td class="x">–</td></tr>
+<tr><td>Xem giá vốn, giá nhập</td><td class="y">✓</td><td class="y">✓</td><td class="x">–</td><td class="x">–</td><td class="y">✓</td><td class="x">–</td></tr>
+<tr><td>Tạo lệnh sản xuất, KCS</td><td class="y">✓</td><td class="y">✓</td><td class="x">–</td><td class="y">quản lý xưởng</td><td class="x">–</td><td class="x">–</td></tr>
+<tr><td>Xếp ca, sửa công, duyệt đơn từ</td><td class="y">✓</td><td class="y">✓</td><td class="x">–</td><td class="x">–</td><td class="x">–</td><td class="x">–</td></tr>
+<tr><td>Lập bảng lương</td><td class="y">duyệt</td><td class="x">–</td><td class="x">–</td><td class="x">–</td><td class="y">✓</td><td class="x">–</td></tr>
+<tr><td>Kết nối MISA, gửi lại đơn lỗi</td><td class="y">✓</td><td class="x">–</td><td class="x">–</td><td class="x">–</td><td class="y">✓</td><td class="x">–</td></tr>
+<tr><td>Chấm công, xem lương của mình</td><td class="x">–</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+<tr><td>Tài khoản, phân quyền, nhật ký</td><td class="y">✓</td><td class="x">–</td><td class="x">–</td><td class="x">–</td><td class="x">–</td><td class="x">–</td></tr>
+</tbody></table></div>
+</article>
+
+<h2 id="website"><b>1</b>Website bán hàng</h2>
+<p class="sub">Phần khách hàng nhìn thấy. Đã mô tả ở <a href="../specs/01-yeu-cau.html">01 · Yêu cầu</a>; ở đây chỉ ghi cách dùng và các điểm nối với kho, MISA.</p>
+
+<article class="ft" id="web-trang-chu" data-r="ql" data-p="1">
+<h3>Trang chủ &amp; menu lớn</h3>
+<p class="cap">Banner, chọn theo cảm hứng (chủ đề tranh), khối ưu đãi có đồng hồ đếm ngược, đặt làm riêng, video xưởng, showroom, FAQ.</p>
+<ul>
+  <li>Menu ba tầng: loại sản phẩm → chủ đề tranh → mức giá.</li>
+  <li>Thanh <strong>Gọi · Zalo · Messenger</strong> dính màn hình, nút <strong>Gọi lại cho tôi</strong>.</li>
+  <li>Banner, khối ưu đãi sửa trong <a href="#noi-dung">Quản trị › Nội dung</a>, không cần sửa code.</li>
+</ul>
+</article>
+
+<article class="ft" id="web-danh-muc" data-r="ql" data-p="1">
+<h3>Danh mục, bộ lọc &amp; tìm kiếm</h3>
+<p class="cap">Lọc theo chủ đề tranh, màu da, giá, kích thước, tình trạng; mỗi lựa chọn có số đếm. Ô tìm gợi ý ngay khi gõ, gõ không dấu vẫn ra.</p>
+<ul>
+  <li>Bộ lọc <strong>Tình trạng</strong> lấy từ kho: <em>Có sẵn</em> (tồn có thể bán &gt; 0) hoặc <em>Đặt làm</em>.</li>
+  <li>Tồn đổi → web đổi trong vài giây. Xem <a href="#ton-len-web">Tồn hiện lên web</a>.</li>
+</ul>
+</article>
+
+<article class="ft" id="web-chi-tiet" data-r="ql bh" data-p="1">
+<h3>Chi tiết sản phẩm</h3>
+<p class="cap">Ảnh, chọn màu da, size, ô <strong>Vẽ tên miễn phí</strong>, câu chuyện bức tranh, nút Mua ngay / Thêm giỏ / Đặt làm theo mẫu.</p>
+<ul>
+  <li>Mỗi tổ hợp <strong>màu da × size</strong> là một biến thể, có mã (SKU), giá và tồn riêng.</li>
+  <li>Biến thể hết hàng: nút đổi thành <strong>Đặt làm · 7–10 ngày</strong> nếu mẫu cho phép đặt làm; nếu không thì hiện <em>Tạm hết</em> và ô nhận tin khi có hàng.</li>
+  <li>Khách nhập tên cần vẽ (tối đa 12 ký tự). Tên này đi theo đơn tới thợ vẽ.</li>
+  <li>Giá trên web là <strong>giá đã gồm thuế GTGT</strong>. Cách tách thuế: xem <a href="#tinh-thue">Tính thuế</a>.</li>
+</ul>
+</article>
+
+<article class="ft" id="web-dat-hang" data-r="ql bh kt" data-p="1">
+<h3>Giỏ hàng &amp; đặt hàng</h3>
+<p class="cap">Một trang: thông tin nhận hàng, gói quà, mã giảm giá, cách thanh toán (COD hoặc chuyển khoản VietQR). Không bắt tạo tài khoản.</p>
+<ol>
+  <li>Khách nhập tên, số điện thoại, địa chỉ. Phí giao tính theo tỉnh.</li>
+  <li>Chọn <strong>COD</strong> hoặc <strong>Chuyển khoản</strong>. Chuyển khoản hiện mã VietQR có sẵn số tiền và mã đơn.</li>
+  <li>Bấm <strong>Đặt hàng</strong> → hệ thống kiểm tồn lần cuối, giữ hàng, gửi tin xác nhận.</li>
+</ol>
+<ul>
+  <li><strong>Mới:</strong> ô <strong>Xuất hoá đơn công ty</strong> (tên công ty, mã số thuế, địa chỉ, email nhận hoá đơn). Thông tin này sang MISA cùng đơn. Xem <a href="#hoa-don">Hoá đơn điện tử</a>.</li>
+  <li>Nếu vừa có người mua mất chiếc cuối: báo ngay ở giỏ, không cho đặt trùng.</li>
+  <li>Đơn chuyển khoản chưa nhận tiền sau <strong>24 giờ</strong>: tự nhả hàng đang giữ và báo bán hàng gọi lại.</li>
+</ul>
+</article>
+
+<article class="ft" id="web-dat-lam" data-r="ql bh kho" data-p="1">
+<h3>Đặt làm riêng</h3>
+<p class="cap">Ba bước: chọn dáng túi và màu da → chọn tranh có sẵn hoặc tải ảnh lên → để lại số điện thoại.</p>
+<ul>
+  <li>Yêu cầu vào <a href="#don-hang">Đơn hàng</a> với nhãn <strong>Đặt làm</strong>, trạng thái <em>Chờ báo giá</em>.</li>
+  <li>Bán hàng báo giá, khách đồng ý và đặt cọc → hệ thống tạo <a href="#lenh-san-xuat">lệnh sản xuất</a> gắn với đơn.</li>
+</ul>
+</article>
+
+<article class="ft" id="web-theo-doi" data-r="bh" data-p="1">
+<h3>Theo dõi đơn</h3>
+<p class="cap">Khách nhập mã đơn + số điện thoại để xem đơn đang ở bước nào, mã vận đơn, và tải hoá đơn nếu đã có.</p>
+<ul>
+  <li>Khách huỷ được khi đơn còn <em>Chờ xác nhận</em>. Sau đó phải gọi shop.</li>
+  <li>Đơn đặt làm hiện thêm tiến độ xưởng: Cắt → May → Vẽ → Hoàn thiện.</li>
+</ul>
+</article>
+<h2 id="quan-tri"><b>2</b>Quản trị bán hàng</h2>
+<p class="sub">Trang <code>/admin</code>. Menu chia bốn cổng: <strong>Bán hàng</strong> · <strong>Kho &amp; xưởng</strong> · <strong>Nhân sự</strong> · <strong>Kế toán</strong>. Mục nào không có quyền sẽ hiện ổ khoá.</p>
+
+<article class="ft" id="dang-nhap" data-r="chu ql bh kho kt" data-p="1">
+<h3>Đăng nhập</h3>
+<p class="cap">Email + mật khẩu, sau đó nhập mã xác thực 2 lớp (2FA) với tài khoản chủ, quản lý, kế toán.</p>
+<ol>
+  <li>Nhập <strong>email</strong> và <strong>mật khẩu</strong> → Tiếp tục.</li>
+  <li>Mở ứng dụng xác thực trên điện thoại, nhập mã 6 số.</li>
+</ol>
+<ul>
+  <li>Sai mật khẩu 5 lần: khoá 15 phút.</li>
+  <li>Nhân viên, thợ không dùng trang này. Họ vào <a href="#trang-nhan-vien">trang nhân viên</a> bằng số điện thoại + PIN.</li>
+</ul>
+</article>
+
+<article class="ft" id="tong-quan" data-r="chu ql" data-p="1">
+<h3>Tổng quan</h3>
+<p class="cap">Bốn ô số: đơn hôm nay, chờ xác nhận, chờ xuất kho, doanh thu. Bên dưới: việc cần làm ngay.</p>
+<ul>
+  <li><strong>Việc cần làm</strong> gom từ mọi khối: đơn chờ quá 2 giờ, đơn lỗi MISA, nguyên liệu dưới mức tối thiểu, lệnh sản xuất trễ hạn, đơn từ chờ duyệt.</li>
+  <li>Bấm vào từng dòng để nhảy tới đúng màn hình xử lý.</li>
+</ul>
+</article>
+
+<article class="ft" id="don-hang" data-r="ql bh kho kt" data-p="1">
+<h3>Đơn hàng</h3>
+<p class="cap">Danh sách đơn: mã, khách, sản phẩm, tổng tiền, thanh toán, trạng thái, kho xuất, trạng thái MISA. Lọc theo trạng thái, kênh bán, ngày.</p>
+<div class="ts"><table>
+<thead><tr><th>Trạng thái</th><th>Nghĩa là</th><th>Ai bấm chuyển</th><th>Kho</th></tr></thead>
+<tbody>
+<tr><td><strong>Chờ xác nhận</strong></td><td>Khách vừa đặt</td><td>—</td><td>Đang giữ hàng</td></tr>
+<tr><td><strong>Đã xác nhận</strong></td><td>Đã gọi khách, đơn chắc chắn</td><td>Bán hàng</td><td>Đang giữ hàng</td></tr>
+<tr><td><strong>Đang sản xuất</strong></td><td>Chỉ với hàng đặt làm</td><td>Tự động khi có lệnh sản xuất</td><td>Chưa có hàng</td></tr>
+<tr><td><strong>Đang đóng gói</strong></td><td>Kho đã nhận, đang lấy hàng, vẽ tên</td><td>Kho</td><td>Đang giữ hàng</td></tr>
+<tr><td><strong>Đã xuất kho</strong></td><td>Đã giao cho hãng vận chuyển hoặc khách cầm về</td><td>Kho</td><td><strong>Trừ tồn thực</strong> · đẩy MISA</td></tr>
+<tr><td><strong>Hoàn tất</strong></td><td>Khách đã nhận, hết hạn đổi trả</td><td>Tự động</td><td>—</td></tr>
+<tr><td><strong>Đã huỷ</strong></td><td>Huỷ trước khi xuất kho</td><td>Bán hàng, quản lý</td><td>Nhả hàng đang giữ</td></tr>
+<tr><td><strong>Trả hàng</strong></td><td>Khách trả sau khi nhận</td><td>Quản lý duyệt</td><td>Nhập lại kho</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Đơn mới báo ngay qua Telegram cho nhóm bán hàng.</li>
+  <li><strong>Đã xuất kho thì không huỷ được</strong>, chỉ làm <a href="#doi-tra">đổi trả</a>. Lý do: hàng đã rời kho và đơn đã sang MISA.</li>
+  <li>Cột <strong>MISA</strong>: xem nghĩa từng trạng thái ở <a href="#misa-trang-thai">Trạng thái đồng bộ</a>.</li>
+</ul>
+</article>
+
+<article class="ft" id="chi-tiet-don" data-r="ql bh kho" data-p="1">
+<h3>Chi tiết đơn &amp; xử lý</h3>
+<p class="cap">Bên trái: dòng hàng, tên cần vẽ, ghi chú. Bên phải: khách, thanh toán, giao hàng, lịch sử thao tác.</p>
+<ol>
+  <li>Gọi khách xác nhận. Bấm <strong>Xác nhận đơn</strong>.</li>
+  <li>Kiểm cột <strong>Kho xuất</strong>. Hệ thống tự chọn kho còn hàng theo thứ tự ưu tiên; đổi kho nếu cần.</li>
+  <li>Bấm <strong>Chuyển kho đóng gói</strong>. Đơn hiện ở màn hình <a href="#xuat-ban">Đóng gói &amp; xuất</a> của kho.</li>
+</ol>
+<ul>
+  <li>Sửa dòng hàng, địa chỉ được đến trước khi xuất kho. Mỗi lần sửa ghi lại ai sửa, sửa gì.</li>
+  <li>Một đơn có thể xuất từ <strong>nhiều kho</strong> (túi ở xưởng, ví ở showroom): hệ thống tách thành hai phiếu xuất, vẫn là một đơn.</li>
+  <li>Ô <strong>Người chốt đơn</strong>: dùng để tính <a href="#hoa-hong">hoa hồng</a>. Đơn web tự gán cho người bấm Xác nhận.</li>
+</ul>
+</article>
+
+<article class="ft" id="ban-tai-quay" data-r="bh ql" data-p="2">
+<h3>Bán tại quầy (showroom, sân bay)</h3>
+<p class="cap">Màn hình bán nhanh trên máy tính bảng: quét mã hoặc gõ tên mẫu, chọn cách thu tiền, in phiếu.</p>
+<ol>
+  <li>Chọn <strong>điểm bán</strong> (gắn với kho của điểm đó).</li>
+  <li>Quét tem trên túi hoặc gõ tên mẫu. Hệ thống chỉ cho chọn hàng đang có ở kho điểm bán.</li>
+  <li>Chọn <strong>Tiền mặt</strong>, <strong>Chuyển khoản</strong> hoặc <strong>Quẹt thẻ</strong> → Thu tiền.</li>
+</ol>
+<ul>
+  <li>Bán tại quầy là đơn <strong>xuất kho ngay</strong>: trừ tồn và sang MISA luôn, không qua bước đóng gói.</li>
+  <li>Cần có chức năng này thì tồn showroom, sân bay mới đúng. Không cần phần mềm bán hàng bên ngoài.</li>
+  <li>Khách lấy hoá đơn công ty: bấm <strong>Thêm thông tin hoá đơn</strong> trước khi thu tiền.</li>
+  <li>Giảm giá tại quầy quá <strong>10%</strong> cần quản lý nhập PIN duyệt.</li>
+</ul>
+</article>
+
+<article class="ft" id="doi-tra" data-r="ql bh kho kt" data-p="2">
+<h3>Đổi trả &amp; hoàn tiền</h3>
+<p class="cap">Mở đơn đã xuất → <strong>Tạo yêu cầu đổi trả</strong> → chọn dòng hàng, lý do, cách xử lý.</p>
+<ol>
+  <li>Bán hàng tạo yêu cầu: <strong>Trả hàng hoàn tiền</strong> hoặc <strong>Đổi mẫu khác</strong>.</li>
+  <li>Quản lý duyệt.</li>
+  <li>Kho nhận hàng, chọn tình trạng: <strong>Bán lại được</strong> (nhập lại kho) hoặc <strong>Lỗi</strong> (vào kho hàng lỗi).</li>
+  <li>Kế toán hoàn tiền, đánh dấu <strong>Đã hoàn</strong>.</li>
+</ol>
+<ul>
+  <li><strong>Hàng có vẽ tên, hàng đặt làm không đổi trả</strong>, trừ lỗi do xưởng.</li>
+  <li>Đổi mẫu khác = một phiếu trả + một đơn mới, chênh lệch thu thêm hoặc hoàn lại.</li>
+  <li>Sang MISA: hệ thống gửi chứng từ <strong>trả lại hàng bán</strong> tham chiếu đơn gốc. Xem <a href="#misa-huy-tra">Huỷ, trả hàng sau khi đã đẩy</a>.</li>
+  <li>Hoa hồng của đơn bị trả sẽ trừ lại ở kỳ lương đang mở.</li>
+</ul>
+</article>
+
+<article class="ft" id="san-pham" data-r="ql" data-p="1">
+<h3>Sản phẩm &amp; biến thể</h3>
+<p class="cap">Danh sách ~10.000 mẫu: ảnh, tên, danh mục, chủ đề tranh, màu da, giá, tồn, trạng thái. Sửa hàng loạt giá, bộ sưu tập, ẩn hiện.</p>
+<ul>
+  <li>Mỗi biến thể có: <strong>SKU</strong>, giá bán, mã vạch, <strong>mã hàng MISA</strong> (mặc định bằng SKU), <strong>thuế suất</strong> (theo nhóm hàng).</li>
+  <li>Bật <strong>Cho đặt làm</strong> và nhập số ngày làm để web nhận đơn khi hết hàng.</li>
+  <li><strong>Ẩn ≠ xoá.</strong> Mẫu đã từng bán không xoá được, chỉ ẩn.</li>
+  <li>Tab <strong>Định mức</strong> trong mẫu: dẫn sang <a href="#dinh-muc">Định mức nguyên liệu</a>.</li>
+  <li>Đổi SKU sau khi đã bán: không cho. Lý do: SKU là khoá khớp với MISA.</li>
+</ul>
+</article>
+
+<article class="ft" id="nhap-excel" data-r="ql" data-p="1">
+<h3>Nhập / xuất Excel</h3>
+<p class="cap">Tải file xuất từ Haravan hoặc file mẫu Ponagar. Hệ thống kiểm từng dòng, báo lỗi trước khi ghi.</p>
+<ul>
+  <li>Màu da, chủ đề viết không đúng danh sách chuẩn: gợi ý sửa ngay trên màn hình.</li>
+  <li>Bấm <strong>Tải file lỗi</strong> để sửa các dòng sai rồi nhập lại.</li>
+  <li>Mọi danh sách (đơn, tồn, chấm công, lương) đều có nút <strong>Xuất Excel</strong>.</li>
+</ul>
+</article>
+
+<article class="ft" id="khach-hang" data-r="ql bh" data-p="1">
+<h3>Khách hàng</h3>
+<p class="cap">Mỗi số điện thoại là một khách: lịch sử mua, tổng chi, ghi chú, thông tin xuất hoá đơn đã dùng.</p>
+<ul>
+  <li>Khách mua lần hai trở lên tự gắn nhãn <strong>Khách quen</strong>.</li>
+  <li>Khách doanh nghiệp (có mã số thuế) được lưu để lần sau chọn lại, và khớp sang danh mục khách hàng của MISA theo mã số thuế.</li>
+</ul>
+</article>
+
+<article class="ft" id="ma-giam-gia" data-r="ql kt" data-p="1">
+<h3>Khuyến mãi &amp; mã giảm giá</h3>
+<p class="cap">Danh sách mã: mức giảm, điều kiện, hiệu lực, lượt dùng; công tắc Bật để tạm dừng.</p>
+<ul>
+  <li>Giảm theo % hoặc số tiền; áp cho toàn đơn, một danh mục hoặc một bộ sưu tập.</li>
+  <li>Ưu đãi có hạn: đặt giờ bắt đầu, kết thúc; web tự hiện đồng hồ đếm ngược.</li>
+  <li>Tiền giảm <strong>chia đều theo tỉ lệ giá</strong> cho từng dòng hàng trước khi tính thuế. Ví dụ ở <a href="#tinh-thue">Tính thuế</a>.</li>
+</ul>
+</article>
+
+<article class="ft" id="noi-dung" data-r="ql" data-p="1">
+<h3>Nội dung: banner, bài viết, trang tĩnh</h3>
+<p class="cap">Banner trang chủ, cẩm nang, câu chuyện, showroom, FAQ, chính sách.</p>
+<ul>
+  <li>Mỗi bài có tiêu đề SEO, mô tả, ảnh đại diện.</li>
+  <li>Hẹn giờ đăng và gỡ banner.</li>
+</ul>
+</article>
+
+<article class="ft" id="bao-cao" data-r="chu ql kt" data-p="2">
+<h3>Báo cáo bán hàng</h3>
+<p class="cap">Doanh thu theo ngày, kênh (web, showroom, sân bay), mẫu bán chạy, mẫu tồn lâu, tỉ lệ huỷ và trả.</p>
+<ul>
+  <li><strong>Doanh thu</strong> tính theo đơn <em>Đã xuất kho</em>, trừ hàng trả. Cùng cách tính với số đẩy sang MISA để hai bên khớp nhau.</li>
+  <li><strong>Lãi gộp tham khảo</strong> = doanh thu chưa thuế − giá vốn tham khảo. Chỉ chủ và kế toán thấy. Số chính thức là số trong MISA.</li>
+  <li>Xuất Excel mọi báo cáo.</li>
+</ul>
+</article>
+<h2 id="kho"><b>3</b>Kho &amp; sản xuất</h2>
+<p class="sub">Phần mới. Quản lý hai loại hàng: <strong>thành phẩm</strong> (túi, ví, phụ kiện để bán) và <strong>nguyên liệu</strong> (da, lót, khoá, màu vẽ). Nối hai loại là <strong>lệnh sản xuất</strong>.</p>
+
+<article class="ft" id="kho-vao" data-r="kho ql" data-p="2">
+<h3>Vào cổng Kho · chọn kho</h3>
+<p class="cap">Góc trên có ô chọn kho đang làm việc. Mọi phiếu tạo ra mặc định thuộc kho này.</p>
+<ul>
+  <li>Thủ kho chỉ thấy kho mình được gán. Quản lý và chủ thấy tất cả, có thêm lựa chọn <strong>Tất cả kho</strong>.</li>
+  <li>Dùng được trên điện thoại để quét mã khi đi lấy hàng.</li>
+</ul>
+</article>
+
+<article class="ft" id="danh-sach-kho" data-r="kho ql chu" data-p="2">
+<h3>Danh sách kho</h3>
+<p class="cap">Mỗi kho có: tên, địa chỉ, loại, người phụ trách, mã kho MISA, có bán online hay không.</p>
+<div class="ts"><table>
+<thead><tr><th>Kho (đề xuất ban đầu)</th><th>Chứa</th><th>Bán online</th><th>Bán tại quầy</th></tr></thead>
+<tbody>
+<tr><td><strong>Xưởng · nguyên liệu</strong></td><td>Da, lót, khoá, chỉ, màu vẽ</td><td>—</td><td>—</td></tr>
+<tr><td><strong>Xưởng · thành phẩm</strong></td><td>Hàng vừa làm xong</td><td>Có (ưu tiên 1)</td><td>—</td></tr>
+<tr><td><strong>Showroom 166 Hoa Lan</strong></td><td>Hàng trưng bày, bán lẻ</td><td>Có (ưu tiên 2)</td><td>Có</td></tr>
+<tr><td><strong>Điểm bán sân bay</strong></td><td>Hàng bán lẻ</td><td>Không</td><td>Có</td></tr>
+<tr><td><strong>Hàng lỗi · chờ xử lý</strong></td><td>Hàng trả về bị lỗi, hàng KCS không đạt</td><td>Không</td><td>—</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Kho <strong>không bán online</strong> thì tồn ở đó không cộng vào số hiện trên web.</li>
+  <li>Thêm kho mới chỉ chủ làm được. Kho đã có phiếu thì không xoá, chỉ ngừng dùng.</li>
+</ul>
+</article>
+
+<article class="ft" id="kho-bat-dau" data-r="kho ql" data-p="2">
+<h3>Bắt đầu dùng: nhập tồn đầu kỳ</h3>
+<p class="cap">Làm một lần trước ngày chạy thật.</p>
+<ol>
+  <li>Tạo các kho, gán thủ kho.</li>
+  <li>Kiểm đếm thực tế từng kho. Điền vào file Excel mẫu: SKU · số lượng · kho.</li>
+  <li>Vào <strong>Kho › Tồn đầu kỳ</strong>, tải file lên. Hệ thống báo SKU không tồn tại.</li>
+  <li>Quản lý bấm <strong>Chốt tồn đầu kỳ</strong>. Sau bước này mọi thay đổi tồn phải qua phiếu.</li>
+</ol>
+<ul>
+  <li>Kế toán nhập cùng số tồn đầu kỳ vào MISA để hai bên bắt đầu từ một con số.</li>
+</ul>
+</article>
+
+<article class="ft" id="ton-thanh-pham" data-r="kho ql bh" data-p="2">
+<h3>Tồn thành phẩm</h3>
+<p class="cap">Bảng tồn theo biến thể × kho. Ba cột số: Tồn thực · Đang giữ · Có thể bán.</p>
+<div class="ts"><table>
+<thead><tr><th>Cột</th><th>Nghĩa là</th><th>Ví dụ</th></tr></thead>
+<tbody>
+<tr><td><strong>Tồn thực</strong></td><td>Số đang nằm trên kệ</td><td class="n">5</td></tr>
+<tr><td><strong>Đang giữ</strong></td><td>Đã có đơn đặt, chưa xuất kho</td><td class="n">2</td></tr>
+<tr><td><strong>Có thể bán</strong></td><td>Tồn thực − Đang giữ. Web và quầy bán theo số này</td><td class="n">3</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Bấm vào một dòng để xem <strong>thẻ kho</strong>: mọi phiếu nhập, xuất, chuyển, kiểm kê của biến thể đó, ai làm, lúc nào.</li>
+  <li><strong>Không sửa tay con số tồn.</strong> Muốn đổi phải lập phiếu (nhập, xuất, kiểm kê) để còn dấu vết.</li>
+  <li>Hệ thống không cho tồn âm. Xuất quá số đang có sẽ bị chặn và báo kiểm kê lại.</li>
+</ul>
+</article>
+
+<article class="ft" id="ton-len-web" data-r="ql bh" data-p="2">
+<h3>Tồn hiện lên web</h3>
+<p class="cap">Website lấy số <strong>Có thể bán</strong> cộng từ các kho có bật bán online.</p>
+<div class="ts"><table>
+<thead><tr><th>Có thể bán</th><th>Web hiện</th></tr></thead>
+<tbody>
+<tr><td>Từ 3 trở lên</td><td>Còn hàng</td></tr>
+<tr><td>1–2</td><td>Chỉ còn 2 chiếc</td></tr>
+<tr><td>0, mẫu cho đặt làm</td><td>Đặt làm · 7–10 ngày</td></tr>
+<tr><td>0, mẫu không cho đặt làm</td><td>Tạm hết · nhận tin khi có hàng</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Bán tại quầy chiếc cuối cùng → web chuyển <em>Tạm hết</em> trong vài giây.</li>
+</ul>
+</article>
+
+<article class="ft" id="xuat-ban" data-r="kho" data-p="2">
+<h3>Đóng gói &amp; xuất kho cho đơn</h3>
+<p class="cap">Danh sách đơn chờ đóng gói của kho đang chọn, xếp theo giờ đặt. Mỗi đơn hiện vị trí kệ, tên cần vẽ, yêu cầu gói quà.</p>
+<ol>
+  <li>Bấm <strong>Nhận đơn</strong>. In phiếu lấy hàng.</li>
+  <li>Lấy hàng, <strong>quét tem</strong> từng chiếc. Quét sai mẫu, sai màu hệ thống báo đỏ.</li>
+  <li>Đơn có vẽ tên: chuyển thợ vẽ, chờ thợ bấm <strong>Xong</strong>.</li>
+  <li>Đóng gói, dán nhãn vận chuyển.</li>
+  <li>Bấm <strong>Xuất kho</strong>, nhập mã vận đơn.</li>
+</ol>
+<ul>
+  <li>Bấm <strong>Xuất kho</strong> là lúc: tồn thực giảm, hết giữ hàng, đơn sang MISA, khách nhận tin có mã vận đơn.</li>
+  <li>Thiếu hàng thực tế so với hệ thống: bấm <strong>Báo thiếu</strong>. Đơn quay về bán hàng để đổi kho hoặc báo khách.</li>
+</ul>
+</article>
+
+<article class="ft" id="chuyen-kho" data-r="kho ql" data-p="2">
+<h3>Chuyển kho</h3>
+<p class="cap">Phiếu chuyển có hai đầu: kho đi bấm Xuất, kho đến bấm Nhận.</p>
+<ol>
+  <li>Kho đi tạo phiếu, chọn kho đến, quét hàng → <strong>Xuất chuyển</strong>.</li>
+  <li>Hàng ở trạng thái <strong>Đang đi đường</strong>: đã rời kho đi, chưa vào kho đến, chưa bán được.</li>
+  <li>Kho đến đếm, bấm <strong>Nhận đủ</strong> hoặc nhập số thực nhận.</li>
+</ol>
+<ul>
+  <li>Nhận thiếu so với phiếu: phần chênh treo lại, quản lý phải xử lý (tìm lại hoặc lập phiếu huỷ).</li>
+  <li>Chuyển kho không sang MISA từng phiếu. Kế toán lấy báo cáo chuyển kho theo tháng nếu cần.</li>
+</ul>
+</article>
+
+<article class="ft" id="kiem-ke" data-r="kho ql kt" data-p="2">
+<h3>Kiểm kê</h3>
+<p class="cap">Chọn kho, chọn phạm vi (toàn kho hoặc một nhóm hàng), đếm, so với hệ thống.</p>
+<ol>
+  <li>Bấm <strong>Tạo phiếu kiểm kê</strong>. Trong lúc kiểm, kho đó tạm khoá nhập xuất.</li>
+  <li>Quét từng chiếc hoặc nhập số đếm. Dùng điện thoại được.</li>
+  <li>Hệ thống hiện cột <strong>Chênh lệch</strong>. Nhập lý do cho từng dòng lệch.</li>
+  <li>Quản lý <strong>Duyệt</strong>. Tồn được điều chỉnh theo số đếm.</li>
+</ol>
+<ul>
+  <li>Thủ kho <strong>không thấy số hệ thống</strong> trong lúc đếm, tránh điền cho khớp.</li>
+  <li>Phiếu kiểm kê đã duyệt gửi kế toán để điều chỉnh bên MISA.</li>
+  <li>Đề xuất: thành phẩm kiểm mỗi tháng, nguyên liệu kiểm mỗi quý.</li>
+</ul>
+</article>
+
+<article class="ft" id="xuat-huy" data-r="kho ql" data-p="2">
+<h3>Xuất khác: huỷ, tặng, hàng mẫu</h3>
+<p class="cap">Phiếu xuất không gắn với đơn bán. Bắt buộc chọn lý do và có quản lý duyệt.</p>
+<ul>
+  <li>Lý do có sẵn: <strong>Hỏng</strong> · <strong>Tặng khách</strong> · <strong>Hàng mẫu chụp ảnh</strong> · <strong>Mượn trưng bày</strong> (có ngày trả).</li>
+  <li>Mượn trưng bày quá hạn chưa trả: nhắc qua Telegram.</li>
+</ul>
+</article>
+
+<article class="ft" id="tem" data-r="kho" data-p="2">
+<h3>Tem mã vạch</h3>
+<p class="cap">Chọn biến thể, số lượng → in tem: mã vạch, tên mẫu, màu da, giá.</p>
+<ul>
+  <li>Tem in tự động khi nhập kho thành phẩm từ lệnh sản xuất.</li>
+  <li>Hàng đặt làm riêng in tem có mã đơn để không nhầm với hàng bán sẵn.</li>
+</ul>
+</article>
+
+<article class="ft" id="nguyen-lieu" data-r="kho ql" data-p="3">
+<h3>Nguyên liệu</h3>
+<p class="cap">Danh sách nguyên liệu: mã, tên, nhóm, đơn vị, tồn, mức tối thiểu, giá nhập gần nhất, mã hàng MISA.</p>
+<div class="ts"><table>
+<thead><tr><th>Nhóm</th><th>Ví dụ</th><th>Đơn vị tồn</th><th>Đơn vị mua</th></tr></thead>
+<tbody>
+<tr><td>Da</td><td>Da bò sáp nâu, da bò đỏ đô</td><td>pia</td><td>tấm (mỗi tấm một diện tích)</td></tr>
+<tr><td>Vải lót</td><td>Lót canvas kem</td><td>mét</td><td>cây (50 m)</td></tr>
+<tr><td>Phụ kiện kim loại</td><td>Khoá kéo, khoen, móc, nút</td><td>cái</td><td>bịch (100 cái)</td></tr>
+<tr><td>Chỉ, keo</td><td>Chỉ sáp 0,55 mm</td><td>mét · ml</td><td>cuộn · can</td></tr>
+<tr><td>Màu vẽ</td><td>Màu acrylic da, sơn phủ bóng</td><td>ml</td><td>chai</td></tr>
+<tr><td>Bao bì</td><td>Hộp quà, túi vải, thiệp</td><td>cái</td><td>thùng</td></tr>
+</tbody></table></div>
+<ul>
+  <li><strong>Da nhập theo tấm, tính tồn theo pia.</strong> Mỗi tấm là một dòng riêng: mã tấm, diện tích, màu, lô nhập. Khi xuất cho lệnh sản xuất, chọn tấm và ghi số pia đã cắt; phần còn lại vẫn nằm trong kho với diện tích mới.</li>
+  <li>Mỗi nguyên liệu có <strong>hệ số quy đổi</strong> giữa đơn vị mua và đơn vị tồn (1 cây = 50 m).</li>
+  <li>Đặt <strong>mức tối thiểu</strong> để hệ thống cảnh báo. Xem <a href="#canh-bao-ton">Cảnh báo tồn thấp</a>.</li>
+</ul>
+</article>
+
+<article class="ft" id="ncc" data-r="kho ql kt" data-p="3">
+<h3>Nhà cung cấp</h3>
+<p class="cap">Tên, mã số thuế, liên hệ, nguyên liệu thường mua, giá gần nhất, công nợ tham khảo.</p>
+<ul>
+  <li>Mã nhà cung cấp khớp với danh mục nhà cung cấp trong MISA theo mã số thuế.</li>
+</ul>
+</article>
+
+<article class="ft" id="nhap-ncc" data-r="kho kt" data-p="3">
+<h3>Nhập mua nhà cung cấp</h3>
+<p class="cap">Phiếu nhập: nhà cung cấp, số hoá đơn, từng dòng nguyên liệu với số lượng, đơn giá, thuế.</p>
+<ol>
+  <li>Chọn nhà cung cấp, nhập <strong>số và ngày hoá đơn</strong>, chụp ảnh hoá đơn đính kèm.</li>
+  <li>Thêm từng dòng. Với da: nhập từng tấm và diện tích.</li>
+  <li>Bấm <strong>Nhập kho</strong>. Tồn nguyên liệu tăng.</li>
+</ol>
+<ul>
+  <li>Phiếu nhập đã chốt sang MISA thành <strong>chứng từ mua hàng</strong> để kế toán hạch toán thuế đầu vào.</li>
+  <li>Sai sau khi chốt: không sửa, lập <strong>phiếu điều chỉnh</strong> (giữ dấu vết).</li>
+  <li>Thủ kho không thấy đơn giá nếu chủ tắt quyền <em>Xem giá nhập</em>; khi đó kế toán bổ sung giá sau.</li>
+</ul>
+</article>
+
+<article class="ft" id="dinh-muc" data-r="ql kho" data-p="3">
+<h3>Định mức nguyên liệu (BOM)</h3>
+<p class="cap">Mỗi mẫu × size có một bảng: làm một chiếc cần những nguyên liệu gì, bao nhiêu.</p>
+<div class="ts"><table>
+<thead><tr><th>Ví dụ: Túi Tote size M</th><th class="n">Định mức / chiếc</th><th>Ghi chú</th></tr></thead>
+<tbody>
+<tr><td>Da bò sáp (theo màu khách chọn)</td><td class="n">6,5 pia</td><td>Đã gồm hao hụt 12%</td></tr>
+<tr><td>Vải lót canvas</td><td class="n">0,4 m</td><td></td></tr>
+<tr><td>Khoá kéo 30 cm</td><td class="n">1 cái</td><td></td></tr>
+<tr><td>Khoen quai đồng</td><td class="n">4 cái</td><td></td></tr>
+<tr><td>Chỉ sáp</td><td class="n">25 m</td><td></td></tr>
+<tr><td>Màu acrylic da</td><td class="n">15 ml</td><td>Trung bình, tuỳ tranh</td></tr>
+<tr><td>Hộp quà + túi vải</td><td class="n">1 bộ</td><td>Xuất lúc đóng gói</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Định mức theo <strong>dáng túi × size</strong>, dùng chung cho mọi tranh vẽ cùng dáng. 10.000 mẫu không cần 10.000 bảng.</li>
+  <li>Màu da là tham số: lệnh làm túi đỏ đô sẽ tự lấy da đỏ đô.</li>
+  <li>Sửa định mức chỉ áp cho lệnh tạo sau đó. Lệnh đang chạy giữ định mức cũ.</li>
+  <li>Sau mỗi lệnh, hệ thống so <strong>định mức</strong> với <strong>thực xuất</strong> để quản lý chỉnh lại cho sát.</li>
+</ul>
+</article>
+
+<article class="ft" id="lenh-san-xuat" data-r="ql kho" data-p="3">
+<h3>Lệnh sản xuất</h3>
+<p class="cap">Một lệnh = làm N chiếc của một biến thể. Hiện: nguyên liệu cần, thợ từng công đoạn, hạn xong, tiến độ.</p>
+<ol>
+  <li>Bấm <strong>Tạo lệnh</strong>. Chọn mẫu, màu da, size, số lượng, hạn xong.</li>
+  <li>Hệ thống tính nguyên liệu cần theo định mức và báo ngay món nào không đủ.</li>
+  <li>Gán thợ cho từng công đoạn: <strong>Cắt → May → Vẽ → Hoàn thiện</strong>.</li>
+  <li>Kho bấm <strong>Xuất nguyên liệu</strong> (chọn tấm da cụ thể). Lệnh chuyển <em>Đang làm</em>.</li>
+  <li>Thợ bấm <strong>Xong</strong> từng công đoạn trên điện thoại.</li>
+  <li>Quản lý xưởng <strong>KCS</strong> → hàng đạt nhập kho thành phẩm.</li>
+</ol>
+<div class="ts"><table>
+<thead><tr><th>Loại lệnh</th><th>Tạo từ đâu</th><th>Hàng xong đi đâu</th></tr></thead>
+<tbody>
+<tr><td><strong>Làm hàng bán sẵn</strong></td><td>Quản lý xưởng tạo tay, hoặc từ gợi ý tồn thấp</td><td>Kho thành phẩm, web hiện Còn hàng</td></tr>
+<tr><td><strong>Làm theo đơn</strong></td><td>Tự tạo khi khách đặt mẫu đang hết (cho đặt làm)</td><td>Giữ sẵn cho đơn đó, chuyển thẳng đóng gói</td></tr>
+<tr><td><strong>Đặt làm riêng</strong></td><td>Từ yêu cầu đặt làm riêng đã cọc</td><td>Giữ sẵn cho đơn đó; kèm ảnh tranh khách gửi</td></tr>
+<tr><td><strong>Vẽ tên</strong></td><td>Tự tạo khi đơn có vẽ tên</td><td>Chỉ một công đoạn Vẽ, trả về đóng gói</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Thiếu nguyên liệu vẫn tạo được lệnh ở trạng thái <em>Chờ nguyên liệu</em>; hệ thống báo kho cần mua gì.</li>
+  <li>Lệnh trễ hạn hiện đỏ ở <a href="#tong-quan">Tổng quan</a> và báo Telegram.</li>
+</ul>
+</article>
+
+<article class="ft" id="cong-doan" data-r="kho nv" data-p="3">
+<h3>Công đoạn của tôi (thợ)</h3>
+<p class="cap">Trên điện thoại: danh sách việc được giao hôm nay, mỗi việc có ảnh mẫu, số lượng, hạn.</p>
+<ol>
+  <li>Mở việc, xem ảnh mẫu và ghi chú (tên cần vẽ, tranh khách gửi).</li>
+  <li>Làm xong bấm <strong>Xong</strong>, nhập số chiếc hoàn thành.</li>
+</ol>
+<ul>
+  <li>Số chiếc bấm Xong là cơ sở tính <a href="#luong-khoan">lương khoán</a>, nhưng <strong>chỉ tính tiền khi KCS đạt</strong>.</li>
+  <li>Công đoạn sau chỉ mở khi công đoạn trước đã xong.</li>
+</ul>
+</article>
+
+<article class="ft" id="kcs" data-r="ql kho" data-p="3">
+<h3>KCS &amp; nhập kho thành phẩm</h3>
+<p class="cap">Quản lý xưởng kiểm từng chiếc, chọn một trong ba kết quả.</p>
+<div class="ts"><table>
+<thead><tr><th>Kết quả</th><th>Hàng</th><th>Tiền khoán</th></tr></thead>
+<tbody>
+<tr><td><strong>Đạt</strong></td><td>Nhập kho thành phẩm, in tem</td><td>Tính đủ cho các công đoạn</td></tr>
+<tr><td><strong>Sửa lại</strong></td><td>Trả về công đoạn bị lỗi</td><td>Chưa tính; sửa xong đạt mới tính, không tính hai lần</td></tr>
+<tr><td><strong>Hỏng</strong></td><td>Vào kho hàng lỗi; nguyên liệu ghi nhận hao hụt</td><td>Công đoạn gây lỗi không tính; công đoạn trước vẫn tính</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Lệnh 20 chiếc, đạt 19, hỏng 1 → nhập kho 19. Lệnh đóng khi mọi chiếc đều có kết quả.</li>
+</ul>
+</article>
+
+<article class="ft" id="gia-von" data-r="chu kt" data-p="3">
+<h3>Giá vốn tham khảo</h3>
+<p class="cap">Mỗi biến thể hiện giá vốn ước tính = nguyên liệu thực xuất + tiền khoán các công đoạn.</p>
+<ul>
+  <li>Nguyên liệu tính theo <strong>giá bình quân</strong> của kho tại lúc xuất.</li>
+  <li>Đây là số <strong>để quản trị</strong> (định giá bán, xem mẫu nào lời). Giá thành chính thức để báo cáo thuế do kế toán tính trong MISA.</li>
+  <li>Chỉ chủ và kế toán thấy.</li>
+</ul>
+</article>
+
+<article class="ft" id="canh-bao-ton" data-r="kho ql" data-p="2">
+<h3>Cảnh báo tồn thấp</h3>
+<p class="cap">Mỗi sáng 8:00 hệ thống gửi Telegram danh sách hàng dưới mức tối thiểu.</p>
+<ul>
+  <li><strong>Nguyên liệu</strong> dưới mức: gợi ý số cần mua dựa trên các lệnh đang chờ.</li>
+  <li><strong>Thành phẩm</strong> bán chạy sắp hết: gợi ý tạo lệnh sản xuất, bấm một lần là ra lệnh nháp.</li>
+  <li>Showroom thiếu mà xưởng còn: gợi ý phiếu chuyển kho.</li>
+</ul>
+</article>
+
+<article class="ft" id="nxt" data-r="kho ql kt" data-p="2">
+<h3>Báo cáo Nhập – Xuất – Tồn</h3>
+<p class="cap">Chọn kho, khoảng ngày: tồn đầu · nhập · xuất · tồn cuối cho từng mã, có số lượng và giá trị.</p>
+<ul>
+  <li>Tách cột theo loại phiếu: nhập mua, nhập sản xuất, nhập trả, xuất bán, xuất sản xuất, chuyển kho, huỷ, kiểm kê.</li>
+  <li>Kế toán xuất Excel báo cáo này cuối tháng để đối chiếu và tính giá thành trong MISA.</li>
+  <li>Báo cáo <strong>hao hụt da</strong>: định mức so với thực cắt theo từng lệnh, từng thợ cắt.</li>
+</ul>
+</article>
+<h2 id="nhan-su"><b>4</b>Nhân sự &amp; lương</h2>
+<p class="sub">Phần mới. Gồm hồ sơ, xếp ca, chấm công, đơn từ, và bốn cách tính tiền: lương công, <strong>lương khoán theo sản phẩm</strong>, <strong>hoa hồng bán hàng</strong>, thưởng phạt.</p>
+
+<article class="ft" id="ns-vao" data-r="ql kt chu" data-p="4">
+<h3>Vào cổng Nhân sự · tổng quan</h3>
+<p class="cap">Hôm nay ai đang làm, ai trễ, ai nghỉ; đơn từ chờ duyệt; ứng lương chờ duyệt; số ngày còn lại đến hạn chốt công.</p>
+<ul>
+  <li>Quản lý chỉ thấy người thuộc bộ phận mình. Chủ và kế toán thấy tất cả.</li>
+</ul>
+</article>
+
+<article class="ft" id="ho-so" data-r="ql kt chu" data-p="4">
+<h3>Hồ sơ nhân viên</h3>
+<p class="cap">Họ tên, ảnh, số điện thoại, bộ phận, chức danh, ngày vào làm, cách tính lương, tài khoản ngân hàng nhận lương.</p>
+<div class="ts"><table>
+<thead><tr><th>Bộ phận</th><th>Chức danh</th><th>Cách tính lương thường dùng</th></tr></thead>
+<tbody>
+<tr><td>Xưởng</td><td>Thợ cắt · thợ may · thợ vẽ · hoàn thiện</td><td>Khoán sản phẩm, hoặc lương công + khoán</td></tr>
+<tr><td>Showroom · sân bay</td><td>Nhân viên bán hàng</td><td>Lương giờ hoặc tháng + hoa hồng</td></tr>
+<tr><td>Online</td><td>Tư vấn, chốt đơn</td><td>Lương tháng + hoa hồng</td></tr>
+<tr><td>Kho</td><td>Thủ kho, đóng gói</td><td>Lương tháng</td></tr>
+<tr><td>Văn phòng</td><td>Quản lý, kế toán</td><td>Lương tháng</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Mỗi hồ sơ gắn với một tài khoản đăng nhập (nếu có) và một <strong>PIN chấm công</strong>.</li>
+  <li>Đổi mức lương: nhập <strong>ngày hiệu lực</strong>. Hệ thống giữ lịch sử, bảng lương tháng cũ không đổi.</li>
+  <li>Nghỉ việc: chuyển <em>Đã nghỉ</em>, khoá đăng nhập. Không xoá hồ sơ vì còn bảng lương, phiếu kho liên quan.</li>
+  <li>Mức lương chỉ chủ và kế toán thấy.</li>
+</ul>
+</article>
+
+<article class="ft" id="pin" data-r="ql nv" data-p="4">
+<h3>PIN chấm công &amp; duyệt điện thoại</h3>
+<p class="cap">Mỗi nhân viên đăng nhập trang nhân viên bằng số điện thoại + PIN 4 số, trên một điện thoại đã được duyệt.</p>
+<ol>
+  <li>Quản lý tạo hồ sơ → hệ thống sinh PIN tạm.</li>
+  <li>Nhân viên mở trang nhân viên, nhập số điện thoại + PIN tạm, đặt PIN mới.</li>
+  <li>Quản lý bấm <strong>Duyệt thiết bị</strong> cho điện thoại đó.</li>
+</ol>
+<ul>
+  <li>Mỗi người <strong>một điện thoại</strong>. Đổi máy phải duyệt lại. Mục đích: không chấm công hộ.</li>
+  <li>Quên PIN: quản lý bấm <strong>Cấp lại PIN</strong>.</li>
+</ul>
+</article>
+
+<article class="ft" id="dang-ky-ca" data-r="nv ql" data-p="4">
+<h3>Đăng ký ca</h3>
+<p class="cap">Nhân viên bán hàng, làm theo giờ chọn các ca muốn làm trong tuần tới.</p>
+<ol>
+  <li>Mở <strong>Ca của tôi</strong> → tuần sau.</li>
+  <li>Chạm vào ô ca muốn làm. Bấm <strong>Gửi đăng ký</strong> trước 18:00 thứ Sáu.</li>
+</ol>
+<ul>
+  <li>Xưởng và văn phòng làm giờ cố định thì không cần đăng ký; quản lý gán <strong>lịch cố định</strong> một lần.</li>
+</ul>
+</article>
+
+<article class="ft" id="xep-ca" data-r="ql" data-p="4">
+<h3>Xếp ca &amp; công bố</h3>
+<p class="cap">Bảng tuần: hàng là nhân viên, cột là ngày, ô là ca. Ô xanh là ca nhân viên đã đăng ký.</p>
+<ol>
+  <li>Chọn điểm làm việc (showroom, sân bay, xưởng).</li>
+  <li>Kéo thả hoặc chạm để gán ca. Hệ thống báo ca thiếu người, người trùng ca.</li>
+  <li>Bấm <strong>Công bố</strong>. Nhân viên nhận thông báo lịch tuần.</li>
+</ol>
+<ul>
+  <li>Ca mẫu khai một lần: tên, giờ vào, giờ ra, giờ nghỉ giữa ca.</li>
+  <li>Sau khi công bố, đổi ca phải qua <a href="#don-tu">đơn đổi ca</a> hoặc quản lý sửa và ghi lý do.</li>
+</ul>
+</article>
+
+<article class="ft" id="cham-cong" data-r="nv" data-p="4">
+<h3>Chấm công</h3>
+<p class="cap">Trang nhân viên có một nút lớn: <strong>Vào ca</strong> hoặc <strong>Ra ca</strong>.</p>
+<ol>
+  <li>Đến nơi làm, kết nối Wi-Fi của điểm làm việc.</li>
+  <li>Mở trang nhân viên, bấm <strong>Vào ca</strong>. Hết ca bấm <strong>Ra ca</strong>.</li>
+</ol>
+<ul>
+  <li>Chỉ chấm được khi điện thoại đang ở <strong>mạng Wi-Fi của điểm làm việc</strong> hoặc trong bán kính 100 m (định vị).</li>
+  <li>Ngoài mạng (đi giao hàng, hội chợ): bấm <strong>Chấm công ngoài điểm</strong>, chụp ảnh, ghi lý do → chờ quản lý duyệt.</li>
+  <li>Vào trễ quá 5 phút so với ca: ghi <em>Trễ</em>. Quên ra ca: hệ thống tự đóng lúc hết ca và đánh dấu <em>Cần xác nhận</em>.</li>
+</ul>
+</article>
+
+<article class="ft" id="bang-cham-cong" data-r="ql kt" data-p="4">
+<h3>Bảng chấm công</h3>
+<p class="cap">Bảng tháng: mỗi ô là một ngày của một người, hiện giờ vào, giờ ra, số giờ, ký hiệu trễ / nghỉ / tăng ca.</p>
+<ul>
+  <li>Quản lý sửa công phải nhập <strong>lý do</strong>; ô đã sửa có dấu chấm cam và xem được giá trị cũ.</li>
+  <li>Ngày 1 tháng sau: nhân viên vào xem và bấm <strong>Xác nhận công</strong> hoặc <strong>Báo sai</strong>.</li>
+  <li>Quản lý bấm <strong>Chốt công</strong> tháng. Sau khi chốt, muốn sửa phải mở lại (chỉ chủ).</li>
+</ul>
+</article>
+
+<article class="ft" id="don-tu" data-r="nv ql" data-p="4">
+<h3>Đơn từ</h3>
+<p class="cap">Nhân viên gửi từ điện thoại, quản lý duyệt trong cổng Nhân sự hoặc bấm ngay trên tin Telegram.</p>
+<div class="ts"><table>
+<thead><tr><th>Loại đơn</th><th>Khi duyệt</th></tr></thead>
+<tbody>
+<tr><td>Nghỉ phép · nghỉ không lương</td><td>Bảng công ghi P hoặc KL; trừ số ngày phép còn lại</td></tr>
+<tr><td>Đi trễ · về sớm có lý do</td><td>Không tính phạt đi trễ</td></tr>
+<tr><td>Tăng ca</td><td>Giờ ngoài ca được tính hệ số tăng ca</td></tr>
+<tr><td>Đổi ca</td><td>Hai người đổi ca cho nhau; cả hai cùng đồng ý rồi mới tới quản lý</td></tr>
+<tr><td>Chấm công ngoài điểm · quên chấm</td><td>Bổ sung giờ vào bảng công</td></tr>
+</tbody></table></div>
+</article>
+
+<article class="ft" id="luong-khoan" data-r="ql kt nv" data-p="4">
+<h3>Lương khoán theo sản phẩm</h3>
+<p class="cap">Bảng đơn giá: dáng túi × công đoạn → số tiền mỗi chiếc. Sản lượng lấy tự động từ lệnh sản xuất.</p>
+<div class="ts"><table>
+<thead><tr><th>Ví dụ đơn giá khoán</th><th class="n">Cắt</th><th class="n">May</th><th class="n">Vẽ</th><th class="n">Hoàn thiện</th></tr></thead>
+<tbody>
+<tr><td>Túi Tote size M</td><td class="n">15.000</td><td class="n">90.000</td><td class="n">120.000</td><td class="n">20.000</td></tr>
+<tr><td>Ví dài</td><td class="n">6.000</td><td class="n">35.000</td><td class="n">45.000</td><td class="n">8.000</td></tr>
+<tr><td>Vẽ tên (theo đơn)</td><td class="n">—</td><td class="n">—</td><td class="n">10.000</td><td class="n">—</td></tr>
+</tbody></table></div>
+<p><strong>Ví dụ:</strong> tháng này thợ vẽ Mai có 42 túi Tote và 30 ví dài được KCS đạt.</p>
+<div class="ts"><table>
+<tbody>
+<tr><td>Túi Tote: 42 × 120.000</td><td class="n">5.040.000</td></tr>
+<tr><td>Ví dài: 30 × 45.000</td><td class="n">1.350.000</td></tr>
+<tr class="sum"><td>Tiền khoán tháng</td><td class="n">6.390.000</td></tr>
+</tbody></table></div>
+<ul>
+  <li><strong>KCS đạt mới tính tiền.</strong> Hàng sửa lại tính một lần khi đạt. Hàng hỏng: công đoạn gây lỗi không tính.</li>
+  <li>Tranh khó có thể đặt <strong>hệ số</strong> (ví dụ ×1,5) ngay trên lệnh sản xuất.</li>
+  <li>Đổi đơn giá: nhập ngày hiệu lực; sản lượng trước ngày đó tính giá cũ.</li>
+  <li>Thợ xem được từng dòng sản lượng của mình ở <a href="#trang-nhan-vien">trang nhân viên</a>, thấy sai thì báo trước ngày chốt.</li>
+</ul>
+</article>
+
+<article class="ft" id="hoa-hong" data-r="ql kt bh" data-p="4">
+<h3>Hoa hồng bán hàng</h3>
+<p class="cap">Bảng mức hoa hồng theo bậc doanh số. Doanh số lấy tự động từ đơn có tên người chốt.</p>
+<p><strong>Ví dụ:</strong> mức 1% cho 100 triệu đầu, 2% cho phần vượt. Tháng này Lan chốt 185.000.000đ.</p>
+<div class="ts"><table>
+<tbody>
+<tr><td>100.000.000 × 1%</td><td class="n">1.000.000</td></tr>
+<tr><td>85.000.000 × 2%</td><td class="n">1.700.000</td></tr>
+<tr class="sum"><td>Hoa hồng tháng</td><td class="n">2.700.000</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Doanh số tính hoa hồng = tiền hàng <strong>chưa thuế, sau giảm giá</strong>, không gồm phí giao hàng.</li>
+  <li>Chỉ tính đơn <strong>Hoàn tất</strong> trong tháng. Đơn trả hàng tháng sau: trừ lại vào kỳ lương đang mở.</li>
+  <li>Đơn tại quầy tính cho người đứng ca bấm thu tiền. Đơn web tính cho người bấm Xác nhận. Quản lý sửa được người chốt trước khi chốt lương.</li>
+  <li>Có thể đặt mức riêng cho từng kênh (online, showroom, sân bay) hoặc từng người.</li>
+</ul>
+</article>
+
+<article class="ft" id="thuong-phat" data-r="ql kt" data-p="4">
+<h3>Thưởng, phạt &amp; phụ cấp</h3>
+<p class="cap">Quy định khai một lần; hệ thống tự áp theo bảng công. Quản lý thêm khoản lẻ bằng tay kèm lý do.</p>
+<ul>
+  <li><strong>Tự động:</strong> phụ cấp ăn trưa theo ngày công, chuyên cần (không trễ, không nghỉ không phép), phạt đi trễ theo số lần.</li>
+  <li><strong>Thêm tay:</strong> thưởng nóng, thưởng lễ, phạt làm hỏng hàng. Bắt buộc ghi lý do; nhân viên thấy trong phiếu lương.</li>
+</ul>
+</article>
+
+<article class="ft" id="ung-luong" data-r="nv ql kt" data-p="4">
+<h3>Ứng lương</h3>
+<p class="cap">Nhân viên gửi yêu cầu từ điện thoại: số tiền, lý do.</p>
+<ol>
+  <li>Nhân viên gửi yêu cầu. Hệ thống hiện mức tối đa được ứng (mặc định 50% tiền đã làm ra tính đến hôm đó).</li>
+  <li>Quản lý duyệt.</li>
+  <li>Kế toán chi tiền, bấm <strong>Đã chi</strong>.</li>
+</ol>
+<ul>
+  <li>Khoản đã chi tự trừ vào bảng lương tháng đó.</li>
+</ul>
+</article>
+
+<article class="ft" id="bang-luong" data-r="kt chu" data-p="4">
+<h3>Bảng lương tháng</h3>
+<p class="cap">Mỗi người một dòng: lương công, khoán, hoa hồng, phụ cấp, thưởng, phạt, ứng, khấu trừ, thực lãnh. Bấm vào số nào cũng xem được chi tiết.</p>
+<ol>
+  <li>Sau khi quản lý chốt công, kế toán bấm <strong>Lập bảng lương</strong> tháng.</li>
+  <li>Kiểm, nhập các khoản khấu trừ (bảo hiểm, thuế thu nhập cá nhân).</li>
+  <li>Gửi chủ <strong>Duyệt</strong>.</li>
+  <li>Chi lương, bấm <strong>Đã trả</strong>. Phiếu lương tự gửi tới từng người.</li>
+</ol>
+<p><strong>Ví dụ:</strong> thợ vẽ Mai, lương cơ bản 6.000.000đ / 26 công, tháng này làm 24 công.</p>
+<div class="ts"><table>
+<tbody>
+<tr><td>Lương công: 6.000.000 ÷ 26 × 24</td><td class="n">5.538.462</td></tr>
+<tr><td>Lương khoán (xem ví dụ trên)</td><td class="n">6.390.000</td></tr>
+<tr><td>Phụ cấp ăn trưa: 24 × 30.000</td><td class="n">720.000</td></tr>
+<tr><td>Thưởng chuyên cần</td><td class="n">300.000</td></tr>
+<tr><td>Phạt đi trễ 2 lần</td><td class="n">−100.000</td></tr>
+<tr><td>Đã ứng ngày 15</td><td class="n">−2.000.000</td></tr>
+<tr class="sum"><td>Thực lãnh</td><td class="n">10.848.462</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Bốn cách tính lương công: <strong>theo tháng</strong> (chia công chuẩn), <strong>theo giờ</strong>, <strong>chỉ khoán</strong>, <strong>kết hợp</strong>.</li>
+  <li>Bản đầu <strong>không tự tính bảo hiểm xã hội và thuế thu nhập cá nhân</strong>. Kế toán nhập số khấu trừ từng người (hoặc tải Excel lên).</li>
+  <li>Bảng lương đã duyệt bị khoá. Sai sót sửa bằng khoản điều chỉnh ở tháng sau.</li>
+  <li>Xuất Excel bảng lương và file chuyển khoản hàng loạt theo mẫu ngân hàng.</li>
+</ul>
+</article>
+
+<article class="ft" id="trang-nhan-vien" data-r="nv" data-p="4">
+<h3>Trang nhân viên trên điện thoại</h3>
+<p class="cap">Mở bằng trình duyệt điện thoại, thêm ra màn hình chính như một ứng dụng. Năm mục: Chấm công · Ca của tôi · Việc của tôi · Đơn từ · Lương của tôi.</p>
+<ul>
+  <li><strong>Việc của tôi</strong> chỉ hiện với thợ: các <a href="#cong-doan">công đoạn</a> được giao.</li>
+  <li><strong>Lương của tôi</strong>: số công, sản lượng khoán từng ngày, doanh số và hoa hồng tạm tính, các khoản ứng, phiếu lương các tháng trước.</li>
+  <li>Nhân viên chỉ thấy dữ liệu của chính mình.</li>
+</ul>
+</article>
+<h2 id="ke-toan"><b>5</b>Kế toán &amp; MISA</h2>
+<p class="sub">Phần mới. Ponagar gửi dữ liệu bán hàng sang <strong>MISA AMIS Kế toán</strong> (bản online). Kế toán duyệt, lập chứng từ, tính thuế và xuất hoá đơn trong MISA.</p>
+
+<article class="ft" id="misa-mo-hinh" data-r="kt chu ql" data-p="2">
+<h3>Ai giữ số liệu gì</h3>
+<p class="cap">Hai hệ thống, mỗi bên một việc. Không nhập cùng một thứ ở hai nơi.</p>
+<div class="ts"><table>
+<thead><tr><th>Việc</th><th>Làm ở Ponagar</th><th>Làm ở MISA</th></tr></thead>
+<tbody>
+<tr><td>Đơn hàng, giao hàng, đổi trả</td><td><strong>Gốc</strong></td><td>Nhận bản sao để hạch toán</td></tr>
+<tr><td>Tồn kho hằng ngày, giữ hàng, sản xuất</td><td><strong>Gốc</strong></td><td>Tồn kho sổ sách, đối chiếu cuối tháng</td></tr>
+<tr><td>Chứng từ bán hàng, sổ sách, công nợ</td><td>—</td><td><strong>Gốc</strong></td></tr>
+<tr><td>Thuế GTGT, tờ khai</td><td>Tính sẵn trên từng đơn</td><td><strong>Gốc</strong> (số kê khai)</td></tr>
+<tr><td>Hoá đơn điện tử</td><td>Lưu số hoá đơn, cho khách tải</td><td><strong>Gốc</strong> (phát hành)</td></tr>
+<tr><td>Chấm công, tính lương</td><td><strong>Gốc</strong></td><td>Hạch toán chi phí lương (nhập từ Excel)</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Dữ liệu chỉ đi <strong>một chiều</strong>: Ponagar → MISA. Sửa chứng từ trong MISA không làm đổi đơn bên Ponagar.</li>
+  <li>MISA lỗi hoặc bảo trì: website vẫn bán bình thường, đơn xếp hàng chờ gửi sau.</li>
+</ul>
+</article>
+
+<article class="ft" id="misa-ket-noi" data-r="kt chu" data-p="2">
+<h3>Kết nối MISA AMIS Kế toán</h3>
+<p class="cap">Làm một lần. Cần bốn thông tin, nhập ở <strong>Kế toán › Kết nối MISA</strong>.</p>
+<div class="ts"><table>
+<thead><tr><th>Thông tin</th><th>Lấy ở đâu</th><th>Ai làm</th></tr></thead>
+<tbody>
+<tr><td><strong>ClientID</strong></td><td>MISA cấp sau khi đăng ký ứng dụng trên cổng nhà phát triển MISA và được duyệt</td><td>Bên làm phần mềm</td></tr>
+<tr><td><strong>Mã truy cập</strong> (access code)</td><td>Trong AMIS Kế toán, bằng tài khoản quản trị của công ty</td><td>Kế toán / chủ</td></tr>
+<tr><td><strong>Mã công ty</strong></td><td>Tự đặt, ví dụ <code>ponagar</code></td><td>Bên làm phần mềm</td></tr>
+<tr><td><strong>Địa chỉ nhận kết quả</strong> (callback)</td><td>Hệ thống Ponagar tạo sẵn, đăng ký với MISA</td><td>Bên làm phần mềm</td></tr>
+</tbody></table></div>
+<p><strong>Trong AMIS Kế toán, kế toán bật một lần:</strong></p>
+<ol>
+  <li>Vào <strong>Các tiện ích và thiết lập</strong> → <strong>Kết nối ứng dụng</strong> → tab <strong>API kết nối</strong>.</li>
+  <li>Tích cho phép phần mềm khác đẩy dữ liệu vào AMIS Kế toán.</li>
+  <li>Bấm <strong>Thiết lập dữ liệu kết nối</strong>: tab <strong>Danh mục</strong> và tab <strong>Chứng từ</strong>, tích quy tắc đồng bộ chứng từ bán hàng.</li>
+</ol>
+<p><strong>Trong Ponagar:</strong> nhập bốn thông tin trên → bấm <strong>Thử kết nối</strong> → bấm <strong>Gửi 1 đơn mẫu</strong> và kiểm bên MISA.</p>
+<ul>
+  <li>Nên tạo một <strong>dữ liệu kế toán thử</strong> trong AMIS để chạy thử trước, rồi mới đổi sang dữ liệu thật.</li>
+  <li>Mã truy cập là bí mật: lưu mã hoá, chỉ chủ và kế toán thấy màn hình này.</li>
+</ul>
+<div class="note q"><p><strong>Cần xác nhận với MISA trước khi làm:</strong> gói AMIS Kế toán của công ty có mở tính năng API kết nối không; thời gian MISA duyệt ClientID; API có phí riêng không.</p></div>
+</article>
+
+<article class="ft" id="misa-danh-muc" data-r="kt ql" data-p="2">
+<h3>Khớp danh mục</h3>
+<p class="cap">Đơn chỉ sang được khi mọi mã trong đơn đều có bên MISA. Màn hình <strong>Kế toán › Khớp danh mục</strong> liệt kê mã nào đã khớp, mã nào chưa.</p>
+<div class="ts"><table>
+<thead><tr><th>Bên Ponagar</th><th>Bên MISA</th><th>Cách khớp</th></tr></thead>
+<tbody>
+<tr><td>Biến thể sản phẩm (SKU)</td><td>Vật tư hàng hoá</td><td>Mã hàng MISA = SKU. Mẫu mới tự gửi sang khi tạo</td></tr>
+<tr><td>Nguyên liệu</td><td>Vật tư hàng hoá</td><td>Mã hàng MISA = mã nguyên liệu</td></tr>
+<tr><td>Kho</td><td>Kho</td><td>Mỗi kho nhập một mã kho MISA</td></tr>
+<tr><td>Khách lẻ</td><td>Khách hàng</td><td>Dùng chung một mã, ví dụ <code>KHACHLE</code></td></tr>
+<tr><td>Khách lấy hoá đơn công ty</td><td>Khách hàng</td><td>Theo mã số thuế; chưa có thì tạo mới</td></tr>
+<tr><td>Nhà cung cấp</td><td>Nhà cung cấp</td><td>Theo mã số thuế</td></tr>
+<tr><td>Phí giao hàng, phí gói quà</td><td>Mã dịch vụ</td><td>Mỗi loại phí một mã cố định</td></tr>
+</tbody></table></div>
+<ul>
+  <li>10.000 mẫu: gửi danh mục sang MISA theo lô lần đầu, sau đó từng mẫu mới.</li>
+  <li>Mã chưa khớp hiện đỏ ở cột <strong>Mã hàng MISA</strong> trong danh sách sản phẩm.</li>
+</ul>
+<div class="note q"><p><strong>Cần xác nhận:</strong> API danh mục của MISA cho <em>đẩy</em> hàng hoá mới sang hay chỉ cho <em>lấy</em> danh mục về. Nếu chỉ lấy về, kế toán nhập danh mục vào MISA bằng Excel do Ponagar xuất đúng mẫu.</p></div>
+</article>
+
+<article class="ft" id="misa-khi-nao" data-r="kt ql" data-p="2">
+<h3>Khi nào đơn được đẩy</h3>
+<p class="cap">Mặc định: ngay khi đơn chuyển <strong>Đã xuất kho</strong>.</p>
+<div class="ts"><table>
+<thead><tr><th>Sự kiện</th><th>Gửi sang MISA</th></tr></thead>
+<tbody>
+<tr><td>Khách đặt, đơn chờ xác nhận</td><td>Chưa gửi</td></tr>
+<tr><td>Đơn huỷ trước khi xuất kho</td><td>Không bao giờ gửi</td></tr>
+<tr><td><strong>Kho bấm Xuất kho</strong> / bán tại quầy thu tiền</td><td><strong>Gửi chứng từ bán hàng</strong></td></tr>
+<tr><td>Khách trả hàng (đã duyệt, kho đã nhận)</td><td>Gửi chứng từ trả lại hàng bán</td></tr>
+<tr><td>Nhập mua nhà cung cấp (GĐ3)</td><td>Gửi chứng từ mua hàng</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Chọn mốc xuất kho vì đó là lúc hàng được giao cho khách, cũng là mốc lập hoá đơn với hàng hoá. Kế toán có thể đổi mốc ở phần cài đặt.</li>
+  <li>Gửi trong vòng khoảng 1 phút. Không cần ai bấm.</li>
+  <li>Mỗi đơn là <strong>một chứng từ</strong>, mang mã đơn Ponagar để tra ngược.</li>
+</ul>
+</article>
+
+<article class="ft" id="misa-noi-dung" data-r="kt" data-p="2">
+<h3>Nội dung gửi sang &amp; việc của kế toán bên MISA</h3>
+<p class="cap">Mỗi chứng từ bán hàng gồm phần chung và các dòng chi tiết.</p>
+<div class="ts"><table>
+<thead><tr><th>Phần</th><th>Trường</th></tr></thead>
+<tbody>
+<tr><td>Chung</td><td>Mã đơn Ponagar · ngày xuất kho · khách hàng (mã, tên, mã số thuế, địa chỉ, email) · cách thanh toán · kênh bán · người bán</td></tr>
+<tr><td>Mỗi dòng hàng</td><td>Mã hàng · tên · đơn vị · số lượng · đơn giá chưa thuế · chiết khấu · thành tiền chưa thuế · thuế suất · tiền thuế · mã kho xuất</td></tr>
+<tr><td>Dòng phí</td><td>Phí giao hàng, phí gói quà (nếu thu của khách)</td></tr>
+</tbody></table></div>
+<p><strong>Bên MISA, dữ liệu không tự ghi sổ.</strong> Nó nằm ở danh sách <strong>Đề nghị lập chứng từ kế toán</strong> chờ kế toán duyệt:</p>
+<ol>
+  <li>Trong AMIS Kế toán vào <strong>Tiện ích</strong> → <strong>Sinh chứng từ từ đề nghị lập CT kế toán</strong>.</li>
+  <li>Chọn khoảng ngày → <strong>Lấy dữ liệu</strong>.</li>
+  <li>Tích các dòng cần lập → <strong>Lập CT kế toán</strong>. MISA tạo chứng từ và báo khi xong.</li>
+</ol>
+<ul>
+  <li>Kế toán nên làm việc này <strong>mỗi ngày một lần</strong>, sau khi xem <a href="#doi-soat-ngay">đối soát cuối ngày</a>.</li>
+  <li>MISA giới hạn 500 dòng chi tiết mỗi chứng từ. Đơn bán lẻ không chạm mức này; phiếu nhập mua lớn sẽ tự tách.</li>
+</ul>
+</article>
+
+<article class="ft" id="tinh-thue" data-r="kt ql" data-p="2">
+<h3>Tính thuế trên đơn</h3>
+<p class="cap">Giá niêm yết trên web và tại quầy là giá khách trả, <strong>đã gồm thuế GTGT</strong>. Hệ thống tách ngược ra giá chưa thuế và tiền thuế cho từng dòng.</p>
+<p><strong>Ví dụ:</strong> đơn có một túi 2.160.000đ và một ví 1.390.000đ, dùng mã giảm 10%, miễn phí giao hàng, thuế suất 8%.</p>
+<div class="ts"><table>
+<thead><tr><th>Dòng hàng</th><th class="n">Giá niêm yết</th><th class="n">Giảm 10%</th><th class="n">Khách trả</th><th class="n">Chưa thuế</th><th class="n">Thuế 8%</th></tr></thead>
+<tbody>
+<tr><td>Túi da vẽ tay Sen Hồng</td><td class="n">2.160.000</td><td class="n">−216.000</td><td class="n">1.944.000</td><td class="n">1.800.000</td><td class="n">144.000</td></tr>
+<tr><td>Ví dài Leaf</td><td class="n">1.390.000</td><td class="n">−139.000</td><td class="n">1.251.000</td><td class="n">1.158.333</td><td class="n">92.667</td></tr>
+<tr class="sum"><td>Tổng</td><td class="n">3.550.000</td><td class="n">−355.000</td><td class="n">3.195.000</td><td class="n">2.958.333</td><td class="n">236.667</td></tr>
+</tbody></table></div>
+<ul>
+  <li><strong>Giảm giá chia theo tỉ lệ giá</strong> từng dòng, rồi mới tách thuế.</li>
+  <li><strong>Chưa thuế</strong> = khách trả ÷ (1 + thuế suất), làm tròn đến đồng. <strong>Thuế</strong> = khách trả − chưa thuế. Cách này bảo đảm tổng luôn đúng số tiền khách đã trả, không lệch 1 đồng.</li>
+  <li>Thuế suất khai theo <strong>nhóm hàng</strong> và có <strong>ngày hiệu lực</strong>. Đổi thuế suất không cần sửa code, đơn cũ giữ thuế suất cũ.</li>
+  <li>Phí giao hàng, phí gói quà thu của khách là dòng riêng, có thuế suất riêng.</li>
+  <li>Quà tặng kèm (thiệp, vẽ tên miễn phí) hiện là dòng giá 0đ nếu kế toán yêu cầu.</li>
+</ul>
+<div class="note q">
+  <p><strong>Kế toán chốt trước khi chạy:</strong></p>
+  <ul>
+    <li>Thuế suất từng nhóm hàng. Mức giảm còn 8% theo Nghị định 174/2025/NĐ-CP áp dụng đến hết <strong>31/12/2026</strong>; cần đặt sẵn mức áp dụng từ 01/01/2027 theo quy định tại thời điểm đó.</li>
+    <li>Phí giao hàng ghi nhận là doanh thu của công ty hay khoản thu hộ hãng vận chuyển.</li>
+    <li>Tiền thuế lấy theo số Ponagar gửi sang hay để MISA tự tính lại từ giá chưa thuế.</li>
+  </ul>
+</div>
+</article>
+
+<article class="ft" id="misa-trang-thai" data-r="kt ql" data-p="2">
+<h3>Trạng thái đồng bộ</h3>
+<p class="cap">Màn hình <strong>Kế toán › Đồng bộ MISA</strong>: mọi chứng từ đã và sẽ gửi, lọc theo trạng thái, ngày, loại.</p>
+<div class="ts"><table>
+<thead><tr><th>Trạng thái</th><th>Nghĩa là</th><th>Cần làm gì</th></tr></thead>
+<tbody>
+<tr><td><strong>Chưa đến lúc</strong></td><td>Đơn chưa xuất kho</td><td>Không</td></tr>
+<tr><td><strong>Chờ gửi</strong></td><td>Đang xếp hàng</td><td>Không. Bình thường dưới 1 phút</td></tr>
+<tr><td><strong>Đã gửi · chờ MISA</strong></td><td>MISA đã nhận yêu cầu, đang xử lý</td><td>Không. Quá 15 phút chưa có kết quả thì báo kế toán</td></tr>
+<tr><td><strong>MISA đã nhận</strong></td><td>Đã nằm ở Đề nghị lập chứng từ bên MISA</td><td>Kế toán vào MISA lập chứng từ</td></tr>
+<tr><td><strong>Lỗi</strong></td><td>MISA từ chối, có ghi lý do</td><td>Sửa theo lý do → <strong>Gửi lại</strong></td></tr>
+<tr><td><strong>Đã rút lại</strong></td><td>Đề nghị đã bị xoá bên MISA theo yêu cầu</td><td>Không</td></tr>
+</tbody></table></div>
+<ul>
+  <li>MISA xử lý <strong>không đồng thời</strong>: gửi thành công chưa chắc dữ liệu đúng. Kết quả thật trả về sau qua địa chỉ nhận kết quả. Vì vậy có hai trạng thái <em>Đã gửi</em> và <em>MISA đã nhận</em>.</li>
+  <li>Một đơn không bao giờ sang MISA hai lần: mỗi chứng từ mang mã đơn làm khoá chống trùng.</li>
+</ul>
+</article>
+
+<article class="ft" id="misa-loi" data-r="kt" data-p="2">
+<h3>Lỗi &amp; gửi lại</h3>
+<p class="cap">Đơn lỗi hiện đỏ, kèm lý do bằng tiếng Việt và nút <strong>Gửi lại</strong>.</p>
+<div class="ts"><table>
+<thead><tr><th>Lý do thường gặp</th><th>Cách sửa</th></tr></thead>
+<tbody>
+<tr><td>Mã hàng chưa có bên MISA</td><td>Vào <a href="#misa-danh-muc">Khớp danh mục</a>, gửi mã sang hoặc nhập bên MISA → Gửi lại</td></tr>
+<tr><td>Mã kho chưa khớp</td><td>Nhập mã kho MISA cho kho đó → Gửi lại</td></tr>
+<tr><td>Mã số thuế khách sai</td><td>Sửa trong đơn → Gửi lại</td></tr>
+<tr><td>Kỳ kế toán đã khoá sổ</td><td>Kế toán mở sổ bên MISA, hoặc đổi ngày chứng từ → Gửi lại</td></tr>
+<tr><td>Mã truy cập hết hạn / bị đổi</td><td>Lấy mã mới trong AMIS, nhập ở Kết nối MISA; các đơn chờ tự gửi tiếp</td></tr>
+<tr><td>MISA không phản hồi</td><td>Không cần làm gì. Hệ thống tự thử lại 5 lần, giãn dần trong 1 giờ</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Thử đủ 5 lần vẫn lỗi: báo Telegram cho kế toán, đơn nằm ở tab <strong>Lỗi</strong> chờ xử lý tay.</li>
+  <li><strong>Gửi lại tất cả</strong>: gửi lại mọi đơn lỗi cùng một lý do sau khi đã sửa.</li>
+</ul>
+</article>
+
+<article class="ft" id="misa-huy-tra" data-r="kt ql" data-p="2">
+<h3>Sửa, huỷ, trả hàng sau khi đã đẩy</h3>
+<div class="ts"><table>
+<thead><tr><th>Tình huống</th><th>Hệ thống làm</th></tr></thead>
+<tbody>
+<tr><td>Đơn sai, bên MISA <strong>chưa lập chứng từ</strong> (còn ở Đề nghị)</td><td>Kế toán bấm <strong>Rút lại</strong> → xoá đề nghị bên MISA → sửa đơn → gửi lại</td></tr>
+<tr><td>Bên MISA <strong>đã lập chứng từ</strong></td><td>Không rút được. Kế toán sửa hoặc xoá chứng từ trong MISA trước, rồi gửi lại</td></tr>
+<tr><td>Khách trả một phần hoặc toàn bộ</td><td>Gửi chứng từ <strong>trả lại hàng bán</strong>, tham chiếu mã đơn gốc</td></tr>
+<tr><td>Đã xuất hoá đơn rồi mới trả hàng</td><td>Kế toán lập hoá đơn điều chỉnh / thay thế trong MISA; Ponagar chỉ ghi chú số hoá đơn mới</td></tr>
+</tbody></table></div>
+</article>
+
+<article class="ft" id="hoa-don" data-r="kt bh" data-p="2">
+<h3>Hoá đơn điện tử</h3>
+<p class="cap">Hoá đơn do kế toán <strong>phát hành trong MISA</strong> từ chứng từ bán hàng. Ponagar chỉ cung cấp đủ dữ liệu và lưu lại số hoá đơn.</p>
+<ul>
+  <li>Khách điền <strong>thông tin xuất hoá đơn công ty</strong> lúc đặt hàng hoặc tại quầy. Thông tin này sang MISA cùng chứng từ, kế toán không phải gõ lại.</li>
+  <li>Nhập mã số thuế, hệ thống kiểm đúng định dạng (10 hoặc 13 số).</li>
+  <li>Sau khi xuất, kế toán dán <strong>số hoá đơn và mã tra cứu</strong> vào đơn (hoặc tải Excel lên hàng loạt). Khách thấy nút <strong>Tải hoá đơn</strong> ở trang theo dõi đơn.</li>
+  <li>Đơn khách lẻ không lấy hoá đơn: xuất theo từng đơn hay cách khác do kế toán quyết định theo quy định hiện hành; dữ liệu từng đơn đã có sẵn bên MISA.</li>
+</ul>
+<div class="note q"><p><strong>Cần xác nhận:</strong> MISA có trả số hoá đơn về qua API không. Nếu có, bỏ được bước dán tay. Phương án khác (làm sau): Ponagar gọi thẳng MISA meInvoice để phát hành hoá đơn ngay khi xuất kho.</p></div>
+</article>
+
+<article class="ft" id="thu-tien" data-r="kt" data-p="2">
+<h3>Thu tiền &amp; đối soát</h3>
+<p class="cap">Mỗi đơn có trạng thái tiền riêng, tách khỏi trạng thái giao hàng.</p>
+<div class="ts"><table>
+<thead><tr><th>Cách thanh toán</th><th>Đánh dấu đã thu khi</th></tr></thead>
+<tbody>
+<tr><td>Chuyển khoản VietQR</td><td>Kế toán thấy tiền về, bấm <strong>Đã nhận tiền</strong> (tìm theo mã đơn trong nội dung chuyển khoản)</td></tr>
+<tr><td>COD</td><td>Hãng vận chuyển chuyển tiền về; kế toán tải file đối soát của hãng lên, hệ thống tự khớp theo mã vận đơn</td></tr>
+<tr><td>Tiền mặt, quẹt thẻ tại quầy</td><td>Ngay lúc bán; cuối ca nhân viên nộp tiền, quản lý xác nhận số</td></tr>
+</tbody></table></div>
+<ul>
+  <li>File đối soát COD: dòng nào lệch tiền, thiếu đơn hoặc hàng hoàn sẽ hiện riêng để xử lý.</li>
+  <li>Giai đoạn sau có thể gửi <strong>phiếu thu</strong> (tiền mặt, tiền gửi) sang MISA tự động. Bản đầu kế toán hạch toán thu tiền trong MISA.</li>
+</ul>
+</article>
+
+<article class="ft" id="doi-soat-ngay" data-r="kt chu" data-p="2">
+<h3>Đối soát cuối ngày</h3>
+<p class="cap">Một màn hình so ba con số của ngày: đã xuất kho · đã sang MISA · đã thu tiền.</p>
+<div class="ts"><table>
+<thead><tr><th>Ví dụ ngày 25/11</th><th class="n">Số đơn</th><th class="n">Tiền chưa thuế</th><th class="n">Thuế</th></tr></thead>
+<tbody>
+<tr><td>Đơn đã xuất kho</td><td class="n">18</td><td class="n">31.250.000</td><td class="n">2.500.000</td></tr>
+<tr><td>MISA đã nhận</td><td class="n">17</td><td class="n">29.450.000</td><td class="n">2.356.000</td></tr>
+<tr class="sum"><td>Chênh lệch</td><td class="n">1</td><td class="n">1.800.000</td><td class="n">144.000</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Chênh lệch khác 0: bấm vào để xem đúng đơn nào đang lỗi hoặc đang chờ.</li>
+  <li>Mỗi sáng 8:00 gửi Telegram cho kế toán tóm tắt ngày hôm trước.</li>
+</ul>
+</article>
+
+<article class="ft" id="doi-chieu-ton" data-r="kt kho" data-p="3">
+<h3>Đối chiếu tồn kho với MISA</h3>
+<p class="cap">Cuối tháng, bấm <strong>Lấy tồn từ MISA</strong>. Hệ thống đặt cạnh nhau tồn Ponagar và tồn MISA theo từng mã, từng kho.</p>
+<ul>
+  <li>Chỉ hiện các mã lệch. Lý do thường gặp: chứng từ còn nằm ở Đề nghị chưa lập, phiếu kiểm kê chưa điều chỉnh bên MISA.</li>
+  <li>Ponagar không tự sửa tồn theo MISA và ngược lại. Màn hình này chỉ để tìm chỗ lệch.</li>
+</ul>
+</article>
+
+<article class="ft" id="luong-ke-toan" data-r="kt" data-p="4">
+<h3>Chi phí lương sang kế toán</h3>
+<p class="cap">Bảng lương đã duyệt xuất Excel theo bộ phận để kế toán hạch toán trong MISA.</p>
+<ul>
+  <li>Tách sẵn: lương xưởng (vào giá thành), lương bán hàng, lương văn phòng.</li>
+  <li>Bản đầu không đẩy bảng lương sang MISA qua API.</li>
+</ul>
+</article>
+<h2 id="he-thong"><b>6</b>Hệ thống</h2>
+<p class="sub">Các chức năng dùng chung cho mọi khối.</p>
+
+<article class="ft" id="tai-khoan" data-r="chu" data-p="1">
+<h3>Tài khoản &amp; phân quyền</h3>
+<p class="cap">Danh sách tài khoản quản trị: tên, email, vai trò, kho được gán, lần đăng nhập cuối, công tắc khoá.</p>
+<ol>
+  <li>Bấm <strong>Thêm tài khoản</strong>, nhập email, chọn <strong>vai trò</strong> (Quản lý, Bán hàng, Kho, Quản lý xưởng, Kế toán).</li>
+  <li>Gán kho, điểm bán, bộ phận người đó được thấy.</li>
+  <li>Bật tắt từng quyền lẻ nếu cần khác mặc định. Xem bảng <a href="#ai-lam-gi">Ai làm được gì</a>.</li>
+</ol>
+<ul>
+  <li>Quyền nhạy cảm tách riêng: <strong>Xem giá nhập</strong>, <strong>Xem lương</strong>, <strong>Duyệt kiểm kê</strong>, <strong>Kết nối MISA</strong>, <strong>Mở lại kỳ đã chốt</strong>.</li>
+  <li>Bắt buộc 2FA với chủ, quản lý, kế toán.</li>
+  <li>Người nghỉ việc: khoá tài khoản, không xoá.</li>
+</ul>
+</article>
+
+<article class="ft" id="thong-bao" data-r="chu ql kt kho" data-p="2">
+<h3>Thông báo Telegram</h3>
+<p class="cap">Mỗi nhóm việc một nhóm chat. Bật tắt từng loại tin ở <strong>Hệ thống › Thông báo</strong>.</p>
+<div class="ts"><table>
+<thead><tr><th>Nhóm</th><th>Nhận tin</th></tr></thead>
+<tbody>
+<tr><td>Bán hàng</td><td>Đơn mới · đơn chuyển khoản quá 24 giờ · yêu cầu gọi lại · yêu cầu đặt làm riêng</td></tr>
+<tr><td>Kho &amp; xưởng</td><td>Đơn chờ đóng gói · tồn thấp mỗi sáng · lệnh sản xuất trễ · hàng mượn quá hạn</td></tr>
+<tr><td>Kế toán</td><td>Đơn lỗi MISA · tóm tắt đối soát mỗi sáng · yêu cầu hoàn tiền · ứng lương đã duyệt</td></tr>
+<tr><td>Quản lý</td><td>Đơn từ chờ duyệt · giảm giá vượt mức · kiểm kê lệch lớn</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Email dùng cho khách (xác nhận đơn, mã vận đơn). Zalo ZNS là tuỳ chọn thêm, tính phí theo tin.</li>
+</ul>
+</article>
+
+<article class="ft" id="nhat-ky" data-r="chu" data-p="2">
+<h3>Nhật ký thao tác</h3>
+<p class="cap">Ai · làm gì · lúc nào · giá trị trước và sau. Lọc theo người, loại việc, ngày.</p>
+<ul>
+  <li>Ghi mọi thao tác chạm tới <strong>tiền, tồn kho, lương, quyền</strong>: sửa giá, huỷ đơn, duyệt kiểm kê, sửa công, sửa đơn giá khoán, đổi mã truy cập MISA.</li>
+  <li>Không ai sửa hay xoá được nhật ký, kể cả chủ.</li>
+</ul>
+</article>
+
+<article class="ft" id="sao-luu" data-r="chu" data-p="1">
+<h3>Sao lưu &amp; an toàn dữ liệu</h3>
+<p class="cap">Chạy tự động, chủ chỉ cần xem đèn xanh ở <strong>Hệ thống › Sao lưu</strong>.</p>
+<ul>
+  <li>Sao lưu cơ sở dữ liệu <strong>mỗi đêm</strong>, giữ 14 bản gần nhất, có một bản lưu ngoài máy chủ.</li>
+  <li>Dữ liệu lương, mã truy cập MISA, tài khoản ngân hàng nhân viên lưu <strong>mã hoá</strong>.</li>
+  <li>Chi tiết máy chủ: xem <a href="../specs/05-cau-hinh-vps.html">05 · Cấu hình VPS</a>. Khối mới chạy chung máy chủ 4GB hiện tại; theo dõi dung lượng khi dữ liệu kho và chấm công lớn dần.</li>
+</ul>
+</article>
+
+<h2 id="lo-trinh"><b>7</b>Lộ trình &amp; việc cần chốt</h2>
+<p class="sub">Phần dành cho người quyết định. Không lọc theo vai trò.</p>
+
+<article class="ft" id="giai-doan">
+<h3>Bốn giai đoạn</h3>
+<p class="cap">Mỗi giai đoạn chạy thật được ngay, không phải chờ giai đoạn sau. Thời gian là ước lượng, tính từ khi chốt phạm vi.</p>
+<div class="ts"><table>
+<thead><tr><th>Giai đoạn</th><th>Gồm</th><th>Ước lượng</th><th>Phụ thuộc</th></tr></thead>
+<tbody>
+<tr><td><strong>GĐ1</strong> · Website &amp; đơn hàng</td><td>Mục 1, phần lớn mục 2, tài khoản, sao lưu</td><td>~5 tuần</td><td>Báo giá 16.000.000đ</td></tr>
+<tr><td><strong>GĐ2</strong> · Kho thành phẩm &amp; MISA</td><td>Kho, tồn, giữ hàng, đóng gói, chuyển kho, kiểm kê, bán tại quầy, đổi trả, đẩy đơn MISA, đối soát</td><td>~4–5 tuần</td><td>GĐ1 · MISA duyệt ClientID</td></tr>
+<tr><td><strong>GĐ3</strong> · Nguyên liệu &amp; sản xuất</td><td>Nguyên liệu, nhà cung cấp, nhập mua, định mức, lệnh sản xuất, KCS, giá vốn, đối chiếu tồn MISA</td><td>~4 tuần</td><td>GĐ2</td></tr>
+<tr><td><strong>GĐ4</strong> · Nhân sự &amp; lương</td><td>Toàn bộ mục 4</td><td>~4–5 tuần</td><td>GĐ3 (lương khoán lấy sản lượng từ lệnh sản xuất)</td></tr>
+</tbody></table></div>
+<ul>
+  <li><strong>Báo giá trọn 4 giai đoạn: 50.000.000đ</strong> (GĐ1 16tr · GĐ2 14tr · GĐ3 10tr · GĐ4 10tr), chi tiết ở <a href="../specs/03-bao-gia.html">03 · Báo giá</a>.</li>
+  <li>Nếu cần chấm công sớm, có thể tách phần hồ sơ, xếp ca, chấm công, lương công của GĐ4 làm trước; lương khoán nối vào sau khi có GĐ3.</li>
+  <li>Thứ tự GĐ2 trước GĐ3 vì đẩy đơn sang MISA chỉ cần tồn thành phẩm, chưa cần nguyên liệu.</li>
+</ul>
+</article>
+
+<article class="ft" id="thay-doi-ky-thuat">
+<h3>Thay đổi kỹ thuật so với đề xuất cũ</h3>
+<div class="ts"><table>
+<thead><tr><th>Hạng mục</th><th>Bản v0.2</th><th>Bản này</th></tr></thead>
+<tbody>
+<tr><td>Nơi quản lý đơn, kho</td><td>Phần mềm ngoài (KiotViet / Sapo…)</td><td>Trong hệ thống Ponagar</td></tr>
+<tr><td>Kết nối ngoài</td><td>Đẩy đơn sang 1 phần mềm bán hàng</td><td>Đẩy chứng từ sang MISA AMIS Kế toán</td></tr>
+<tr><td>Tồn trên web</td><td>Một con số nhập tay theo biến thể</td><td>Tính từ sổ kho, theo từng kho</td></tr>
+<tr><td>Codebase</td><td>Một ứng dụng Nuxt 3 + PostgreSQL</td><td>Giữ nguyên; thêm bốn cổng trong <code>/admin</code> và trang nhân viên cho điện thoại</td></tr>
+<tr><td>Hàng đợi</td><td>Thử lại 5 lần khi đẩy đơn</td><td>Giữ nguyên cơ chế, thêm địa chỉ nhận kết quả từ MISA</td></tr>
+<tr><td>Cài đặt <code>OMS_PROVIDER</code></td><td>kiotviet / sapo / haravan…</td><td>Bỏ; thay bằng nhóm cài đặt MISA</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Sổ kho thiết kế theo kiểu <strong>chỉ ghi thêm</strong>: mỗi lần nhập, xuất là một dòng mới, không sửa dòng cũ. Tồn là tổng các dòng. Nhờ vậy luôn truy được vì sao tồn ra con số này.</li>
+  <li>Cần cập nhật lại trang <a href="../specs/02-de-xuat.html">02 · Đề xuất</a>, <a href="../specs/03-bao-gia.html">03 · Báo giá</a> và prototype <em>Đơn hàng + đồng bộ</em> cho khớp với tài liệu này.</li>
+</ul>
+</article>
+
+<article class="ft" id="can-chot">
+<h3>Việc cần khách trả lời</h3>
+<div class="ts"><table>
+<thead><tr><th>#</th><th>Câu hỏi</th><th>Hỏi ai</th><th>Ảnh hưởng</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Gói AMIS Kế toán đang dùng có bật được <strong>API kết nối</strong> không? Ai giữ tài khoản quản trị?</td><td>Kế toán · MISA</td><td>Toàn bộ mục 5</td></tr>
+<tr><td>2</td><td>Đơn sang MISA lúc <strong>xuất kho</strong> có đúng ý kế toán không? Mỗi đơn một chứng từ hay gộp khách lẻ theo ngày?</td><td>Kế toán</td><td>Khi nào đẩy</td></tr>
+<tr><td>3</td><td>Thuế suất từng nhóm hàng; phí giao hàng ghi nhận thế nào; hoá đơn cho khách lẻ xuất ra sao?</td><td>Kế toán</td><td>Tính thuế, hoá đơn</td></tr>
+<tr><td>4</td><td>Công ty đã có danh mục hàng hoá trong MISA chưa? Mã hàng đang đặt theo quy tắc nào?</td><td>Kế toán</td><td>Khớp danh mục</td></tr>
+<tr><td>5</td><td>Thực tế có mấy kho, mấy điểm bán? Điểm bán sân bay có máy tính bảng và mạng không?</td><td>Chủ</td><td>Danh sách kho, bán tại quầy</td></tr>
+<tr><td>6</td><td>Da đang tính theo <strong>pia</strong> hay đơn vị khác? Có cần theo dõi từng tấm không?</td><td>Xưởng</td><td>Nguyên liệu</td></tr>
+<tr><td>7</td><td>Xưởng có đúng bốn công đoạn Cắt · May · Vẽ · Hoàn thiện? Một thợ làm nhiều công đoạn không?</td><td>Xưởng</td><td>Lệnh sản xuất, khoán</td></tr>
+<tr><td>8</td><td>Bảng đơn giá khoán và mức hoa hồng hiện tại (đang tính bằng sổ hay Excel?)</td><td>Chủ · kế toán</td><td>Lương</td></tr>
+<tr><td>9</td><td>Chấm công bằng điện thoại được không, hay đã có máy vân tay cần lấy dữ liệu?</td><td>Chủ</td><td>Chấm công</td></tr>
+<tr><td>10</td><td>Đặt làm riêng: cọc bao nhiêu %, thời gian làm cam kết?</td><td>Chủ</td><td>Đặt làm riêng</td></tr>
+<tr><td>11</td><td>Bảo hiểm và thuế thu nhập cá nhân: kế toán nhập tay hằng tháng có chấp nhận được không?</td><td>Kế toán</td><td>Bảng lương</td></tr>
+</tbody></table></div>
+</article>
+
+<article class="ft" id="xac-nhan-misa">
+<h3>Điểm cần kiểm lại với tài liệu API của MISA</h3>
+<p class="cap">Những điều đã đọc được từ tài liệu MISA và những điều còn phải thử trên dữ liệu kiểm thử.</p>
+<div class="two">
+  <div><b>Đã rõ</b>
+    <ul>
+      <li>Có API: xác thực, danh mục, chứng từ, xoá đề nghị sinh chứng từ, lấy tồn kho vật tư.</li>
+      <li>Áp dụng cho Tiền mặt, Tiền gửi, Mua hàng, Bán hàng.</li>
+      <li>Xử lý không đồng thời, kết quả trả qua callback.</li>
+      <li>Dữ liệu vào danh sách Đề nghị, kế toán bấm lập chứng từ.</li>
+      <li>Tối đa 500 dòng chi tiết mỗi chứng từ.</li>
+    </ul></div>
+  <div><b>Phải thử</b>
+    <ul>
+      <li>Cấu trúc chi tiết của chứng từ bán hàng và trả lại hàng bán.</li>
+      <li>Có truyền được tiền thuế từng dòng, hay MISA tự tính.</li>
+      <li>API danh mục cho đẩy sang hay chỉ lấy về.</li>
+      <li>Có lấy được số hoá đơn sau khi phát hành không.</li>
+      <li>Thời hạn của mã truy cập, giới hạn số lần gọi.</li>
+    </ul></div>
+</div>
+<p class="meta">Nguồn: <a href="https://helpact.misa.vn/?p=12579">Kết nối với các ứng dụng khác qua API (helpact.misa.vn)</a> · <a href="https://developer.misa.vn/products-openapi/AMISKT">Open API AMIS Kế toán DN (developer.misa.vn)</a> · <a href="https://doc.meinvoice.vn/about">Tài liệu tích hợp meInvoice</a> · <a href="https://sme.misa.vn/345453/nghi-dinh-174-ve-giam-thue-gtgt/">Nghị định 174/2025 về giảm thuế GTGT (sme.misa.vn)</a>. Đọc ngày 25/11/2026.</p>
+</article>
+
+<h2 id="tro-giup"><b>?</b>Trợ giúp</h2>
+
+<article class="ft" id="su-co">
+<h3>Sự cố thường gặp</h3>
+<div class="ts"><table>
+<thead><tr><th>Hiện tượng</th><th>Nguyên nhân thường gặp</th><th>Làm gì</th></tr></thead>
+<tbody>
+<tr data-r="bh ql"><td>Web báo hết hàng nhưng trên kệ còn</td><td>Hàng đang bị giữ cho đơn chưa xuất, hoặc nằm ở kho không bán online</td><td>Xem cột Đang giữ ở <a href="#ton-thanh-pham">Tồn thành phẩm</a></td></tr>
+<tr data-r="kho"><td>Không bấm Xuất kho được</td><td>Chưa quét đủ hàng, hoặc việc vẽ tên chưa xong</td><td>Xem dòng còn đỏ trong đơn</td></tr>
+<tr data-r="kho"><td>Tồn hệ thống khác số đếm</td><td>Bán tại quầy không qua hệ thống, chuyển kho chưa bấm Nhận</td><td>Kiểm phiếu chuyển đang đi đường, rồi <a href="#kiem-ke">kiểm kê</a></td></tr>
+<tr data-r="kt"><td>Đơn đứng mãi ở Đã gửi · chờ MISA</td><td>MISA chưa trả kết quả</td><td>Chờ 15 phút; vẫn vậy thì xem <a href="#misa-loi">Lỗi &amp; gửi lại</a></td></tr>
+<tr data-r="kt"><td>Bên MISA không thấy đơn</td><td>Chưa bấm Lấy dữ liệu ở Đề nghị lập chứng từ, hoặc chọn sai khoảng ngày</td><td>Xem lại <a href="#misa-noi-dung">việc của kế toán bên MISA</a></td></tr>
+<tr data-r="nv"><td>Không bấm Vào ca được</td><td>Điện thoại chưa kết nối Wi-Fi điểm làm việc, hoặc đổi máy chưa duyệt</td><td>Kết nối Wi-Fi; nhờ quản lý duyệt thiết bị</td></tr>
+<tr data-r="nv"><td>Tiền khoán thiếu so với số đã làm</td><td>Hàng chưa qua KCS hoặc bị trả sửa</td><td>Xem trạng thái từng chiếc ở Lương của tôi</td></tr>
+<tr data-r="bh"><td>Hoa hồng chưa tính đơn vừa bán</td><td>Đơn chưa Hoàn tất (còn trong hạn đổi trả)</td><td>Chờ đơn hoàn tất; hoa hồng tạm tính hiện riêng</td></tr>
+</tbody></table></div>
+</article>
+
+<footer>Ponagar · Tài liệu chức năng v0.3 · 25/11/2026 · Bộ tài liệu liên quan: <a href="../specs/index.html">Specs</a> · <a href="../prototype/index.html">Prototype</a></footer>
+</div></main>
+</div>
+<script>
+(function(){
+  var ROLE={chu:'chủ',ql:'quản lý',bh:'bán hàng',kho:'kho · xưởng',kt:'kế toán',nv:'nhân viên'};
+  var page=document.querySelector('.page'), toc=document.getElementById('toc');
+  var $=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+
+  // 1) Mục lục: dựng từ các h2 và khối chức năng
+  var html='<a class="it" href="#tra-nhanh" style="padding-left:8px">Tôi muốn… → vào đâu</a>', groups=[], cur=null;
+  $(':scope > *',page).forEach(function(el){
+    if(el.tagName==='H2'){cur={h:el,items:[],sub:null};groups.push(cur);return;}
+    if(!cur)return;
+    if(el.classList.contains('sub'))cur.sub=el;
+    if(el.classList.contains('ft'))cur.items.push(el);
+  });
+  groups.forEach(function(g){
+    var num=g.h.querySelector('b').textContent, name=g.h.textContent.slice(num.length);
+    html+='<div class="grp" data-g="'+g.h.id+'"><a class="gh" href="#'+g.h.id+'"><b>'+num+'</b>'+name+'</a>';
+    g.items.forEach(function(a){html+='<a class="it" href="#'+a.id+'" data-for="'+a.id+'">'+a.querySelector('h3').textContent.trim()+'</a>';});
+    html+='</div>';
+  });
+  toc.innerHTML=html;
+
+  // 2) Nhãn vai trò + giai đoạn trên từng chức năng
+  $('.ft').forEach(function(a){
+    var h=a.querySelector('h3'); if(!h)return;
+    (a.dataset.r||'').split(' ').filter(Boolean).forEach(function(r){
+      var s=document.createElement('span'); s.className='tg '+r; s.textContent=ROLE[r]; h.appendChild(s);
+    });
+    var p=a.dataset.p;
+    if(p){var s=document.createElement('span'); s.className='tg ph'+(p>1?' new':''); s.textContent='GĐ'+p+(p>1?' · mới':' · đã báo giá'); h.appendChild(s);}
+  });
+
+  // 3) Lọc theo vai trò (?vai-tro=ql)
+  var btns=$('#roles button');
+  function setRole(v,push){
+    if(!ROLE[v])v='all';
+    btns.forEach(function(b){b.classList.toggle('on',b.dataset.v===v);});
+    $('[data-r]').forEach(function(el){
+      var ok=v==='all'||v==='chu'||el.dataset.r.split(' ').indexOf(v)>-1;
+      el.classList.toggle('hide',!ok);
+    });
+    groups.forEach(function(g){
+      var has=g.items.length===0||g.items.some(function(a){return !a.classList.contains('hide');});
+      g.h.classList.toggle('hide',!has); if(g.sub)g.sub.classList.toggle('hide',!has);
+      var box=toc.querySelector('[data-g="'+g.h.id+'"]'); if(box)box.classList.toggle('hide',!has);
+    });
+    $('#toc a[data-for]').forEach(function(l){
+      l.classList.toggle('hide',document.getElementById(l.dataset.for).classList.contains('hide'));
+    });
+    if(push){try{var u=new URL(location.href); if(v==='all')u.searchParams.delete('vai-tro'); else u.searchParams.set('vai-tro',v); history.replaceState(null,'',u);}catch(e){}}
+  }
+  btns.forEach(function(b){b.onclick=function(){setRole(b.dataset.v,true);};});
+  $('#cards .card').forEach(function(c){c.onclick=function(){setRole(c.dataset.v,true);document.getElementById('tra-nhanh').scrollIntoView();};});
+  var init='all'; try{init=new URL(location.href).searchParams.get('vai-tro')||'all';}catch(e){}
+  setRole(init,false);
+
+  // 4) Tìm trong mục lục
+  document.getElementById('q').addEventListener('input',function(){
+    var k=this.value.trim().toLowerCase();
+    $('#toc .grp').forEach(function(g){
+      var any=false;
+      $('a.it',g).forEach(function(l){var m=!k||l.textContent.toLowerCase().indexOf(k)>-1; l.style.display=m?'':'none'; if(m)any=true;});
+      g.style.display=any?'':'none';
+    });
+  });
+
+  // 5) Tô đậm mục đang đọc
+  if('IntersectionObserver' in window){
+    var links={}; $('#toc a[data-for]').forEach(function(l){links[l.dataset.for]=l;});
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting)return;
+        $('#toc a.on').forEach(function(l){l.classList.remove('on');});
+        var l=links[e.target.id]; if(l){l.classList.add('on'); if(l.scrollIntoViewIfNeeded)l.scrollIntoViewIfNeeded(false);}
+      });
+    },{rootMargin:'-70px 0px -65% 0px'});
+    $('.ft[id]').forEach(function(a){io.observe(a);});
+  }
+
+  // 6) Mục lục trên điện thoại
+  document.getElementById('burger').onclick=function(){document.body.classList.toggle('nav');};
+  toc.addEventListener('click',function(e){if(e.target.closest('a'))document.body.classList.remove('nav');});
+})();
+</script>
+</body>
+</html>

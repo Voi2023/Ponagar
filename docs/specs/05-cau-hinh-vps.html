@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ponagar — 05 · Cấu hình VPS</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="../prototype/assets/tokens.css">
+<link rel="stylesheet" href="../prototype/assets/ponagar-theme.css">
+<style>
+body{background:var(--bg)}
+.doc-top{background:var(--brand);color:var(--surface);position:sticky;top:0;z-index:10}
+.doc-top .in{max-width:1100px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:6px;height:56px;overflow-x:auto}
+.doc-top b{font-size:17px;margin-right:12px;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.doc-top b i{background:var(--accent);color:var(--accent-ink);border-radius:7px;padding:4px}
+.doc-top a{white-space:nowrap;font-size:13px;font-weight:600;padding:7px 11px;border-radius:8px;display:flex;gap:6px;align-items:center}
+.doc-top a:hover{background:color-mix(in srgb,var(--surface) 14%,transparent)}
+.doc-top a.on{background:var(--accent);color:var(--accent-ink)}
+.doc{max-width:1100px;margin:22px auto 60px;padding:0 16px}
+.doc .panel{padding:28px 32px}
+.guide{max-width:none}
+.guide h1{font-size:28px;margin:0 0 14px;color:var(--brand-dark);font-family:var(--font-display)}
+.guide h2{font-family:var(--font-display)}
+.guide h2:first-of-type{margin-top:18px}
+.guide ul,.guide ol{padding-left:22px;line-height:1.65}
+.guide li{margin:3px 0}
+.guide blockquote{margin:12px 0;background:var(--brand-tint);border-left:4px solid var(--brand);border-radius:0 9px 9px 0;padding:10px 14px;font-size:13.6px}
+.guide blockquote p{margin:4px 0}
+.guide table{margin:10px 0 16px}
+.guide table td,.guide table th{vertical-align:top}
+.guide table tr td:not(:first-child){font-variant-numeric:tabular-nums}
+.guide pre{background:var(--ink);color:var(--gray-bg);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:12.4px;line-height:1.5}
+.guide code{font-family:var(--font-mono);font-size:12.4px}
+.guide :not(pre)>code{background:var(--gray-bg);border-radius:5px;padding:1px 6px}
+.guide a{color:var(--brand);font-weight:600}
+.guide hr{border:none;border-top:1px solid var(--border);margin:20px 0}
+.guide tr.sum td{background:var(--brand-tint);font-weight:800}
+.guide tr.grp td{background:var(--bg)}
+@media(max-width:700px){.doc .panel{padding:18px 16px}}
+@media print{.doc-top{display:none}.doc .panel{box-shadow:none;border:none}}
+</style>
+</head>
+<body>
+<header class="doc-top"><div class="in"><b><img src="https://cdn.hstatic.net/themes/1000360703/1001524369/14/ponagar-mark.png?v=535" alt="" style="width:30px;height:30px;border-radius:6px;box-shadow:0 0 0 2px var(--surface)">Ponagar · Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class=""><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class=""><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class=""><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class="on"><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
+<main class="doc"><article class="panel guide">
+<h1>05 — Cấu hình VPS &amp; search engine</h1>
+<h2>1. Chọn search engine cho 10.000 sản phẩm</h2>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>Tiêu chí</th>
+<th>PostgreSQL (unaccent + pg_trgm)</th>
+<th><strong>Meilisearch</strong> ✅</th>
+<th>Typesense</th>
+<th>Elasticsearch / OpenSearch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RAM cần cho 10k SP</td>
+<td>0 (dùng DB sẵn có)</td>
+<td><strong>~150–300MB</strong></td>
+<td>~200–400MB</td>
+<td><strong>≥ 2GB</strong> (Java)</td>
+</tr>
+<tr>
+<td>Gõ không dấu ("tui da ve tay")</td>
+<td>Có (unaccent)</td>
+<td><strong>Có sẵn</strong></td>
+<td>Có sẵn</td>
+<td>Cần cấu hình</td>
+</tr>
+<tr>
+<td>Gõ sai chính tả</td>
+<td>Yếu (trigram)</td>
+<td><strong>Tốt</strong></td>
+<td>Tốt</td>
+<td>Tốt</td>
+</tr>
+<tr>
+<td>Đếm số lượng bộ lọc (facet)</td>
+<td>Tự viết SQL</td>
+<td><strong>Có sẵn</strong></td>
+<td>Có sẵn</td>
+<td>Có sẵn</td>
+</tr>
+<tr>
+<td>Tốc độ gợi ý khi gõ</td>
+<td>30–150ms</td>
+<td><strong>&lt; 50ms</strong></td>
+<td>&lt; 50ms</td>
+<td>&lt; 50ms</td>
+</tr>
+<tr>
+<td>Độ khó vận hành</td>
+<td>Thấp</td>
+<td><strong>Thấp (1 file chạy)</strong></td>
+<td>Thấp</td>
+<td>Cao</td>
+</tr>
+<tr>
+<td>Hợp VPS 4GB / 4 triệu/năm</td>
+<td>Có</td>
+<td><strong>Có</strong></td>
+<td>Có</td>
+<td><strong>Không</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Chọn Meilisearch</strong> (mã nguồn mở, tự cài miễn phí trên VPS):</p>
+<ul>
+<li>10.000 sản phẩm là quy mô nhỏ với Meilisearch: index vài chục MB, tìm &lt; 50ms.</li>
+<li>Có sẵn <strong>tìm không dấu, sửa lỗi chính tả, đếm bộ lọc, sắp xếp</strong> → làm được bộ lọc kiểu thienkimhome mà không phải tự viết.</li>
+<li><strong>PostgreSQL vẫn là dữ liệu gốc.</strong> Meilisearch chỉ là bản sao để tìm; hỏng thì dựng lại index trong ~1 phút.</li>
+<li><strong>Dự phòng:</strong> nếu Meilisearch tạm ngừng, API tự chuyển sang tìm bằng PostgreSQL (pg_trgm) → web không chết.</li>
+<li>Elasticsearch quá nặng cho VPS 4GB; Typesense ngang Meilisearch nhưng cộng đồng nhỏ hơn.</li>
+</ul>
+<h2>2. Thông số VPS</h2>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>Mục</th>
+<th>Cấu hình</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPU / RAM / Ổ</td>
+<td><strong>2 vCPU · 4GB RAM · 80GB SSD NVMe</strong> (VPS trong nước, ~4 triệu/năm)</td>
+</tr>
+<tr>
+<td>Hệ điều hành</td>
+<td>Ubuntu Server 24.04 LTS</td>
+</tr>
+<tr>
+<td>Swap</td>
+<td>2GB</td>
+</tr>
+<tr>
+<td>Phần mềm</td>
+<td>Docker + Docker Compose</td>
+</tr>
+<tr>
+<td>Tên miền / SSL</td>
+<td>Cloudflare (proxy bật) + Caddy tự cấp SSL</td>
+</tr>
+<tr>
+<td>Cổng mở</td>
+<td>22 (SSH, chỉ key), 80, 443 — <strong>Postgres/Meilisearch không mở ra ngoài</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Chia RAM 4GB:</strong></p>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>Dịch vụ</th>
+<th style="text-align: right;">Giới hạn RAM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL 16</td>
+<td style="text-align: right;">1,5GB</td>
+</tr>
+<tr>
+<td>Meilisearch</td>
+<td style="text-align: right;">1GB</td>
+</tr>
+<tr>
+<td>Nuxt (website + admin + API)</td>
+<td style="text-align: right;">768MB</td>
+</tr>
+<tr>
+<td>Caddy</td>
+<td style="text-align: right;">128MB</td>
+</tr>
+<tr>
+<td>Hệ điều hành + dự phòng</td>
+<td style="text-align: right;">~600MB</td>
+</tr>
+</tbody>
+</table></div>
+<h2>3. docker-compose.yml</h2>
+<pre><code class="language-yaml">services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: [&quot;80:80&quot;, &quot;443:443&quot;]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/uploads:/srv/uploads:ro
+      - caddy_data:/data
+    mem_limit: 128m
+
+  app:
+    image: ponagar/web:latest            # build từ repo (Nuxt 3, Node 22)
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_OPTIONS: --max-old-space-size=512
+    volumes: [&quot;./data/uploads:/app/uploads&quot;]
+    depends_on: [db, search]
+    mem_limit: 768m
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ponagar
+      POSTGRES_USER: ponagar
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    command: &gt;
+      postgres -c shared_buffers=768MB -c effective_cache_size=2GB
+               -c work_mem=8MB -c maintenance_work_mem=128MB
+               -c max_connections=40 -c random_page_cost=1.1
+    volumes: [&quot;./data/pg:/var/lib/postgresql/data&quot;]
+    mem_limit: 1536m
+
+  search:
+    image: getmeili/meilisearch:v1.11   # ghim bản cụ thể; nâng cấp có kiểm thử
+    restart: unless-stopped
+    environment:
+      MEILI_ENV: production
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}   # &gt;= 32 ký tự ngẫu nhiên
+      MEILI_NO_ANALYTICS: &quot;true&quot;
+      MEILI_MAX_INDEXING_MEMORY: 512Mb
+      MEILI_MAX_INDEXING_THREADS: 1         # index không tranh CPU với web
+    volumes: [&quot;./data/meili:/meili_data&quot;]
+    mem_limit: 1g
+
+volumes:
+  caddy_data:
+</code></pre>
+<h2>4. Caddyfile</h2>
+<pre><code>ponagar.co, www.ponagar.co {
+  encode zstd gzip
+  @img path /uploads/*
+  handle @img {
+    root * /srv
+    header Cache-Control &quot;public, max-age=31536000, immutable&quot;
+    file_server
+  }
+  reverse_proxy app:3000
+}
+</code></pre>
+<h2>5. .env (không commit lên git)</h2>
+<pre><code>DATABASE_URL=postgres://ponagar:&lt;DB_PASSWORD&gt;@db:5432/ponagar
+DB_PASSWORD=&lt;ngẫu nhiên&gt;
+MEILI_HOST=http://search:7700
+MEILI_MASTER_KEY=&lt;ngẫu nhiên 32+ ký tự&gt;
+MEILI_SEARCH_KEY=&lt;key chỉ-tìm, tạo từ master key&gt;
+OMS_PROVIDER=kiotviet            # kiotviet | sapo | haravan | nhanh | pancake | none
+OMS_CLIENT_ID= / OMS_SECRET=     # do phần mềm quản lý đơn cấp
+NOTIFY_TELEGRAM_BOT= / NOTIFY_TELEGRAM_CHAT=
+NOTIFY_EMAIL=ponagar.co@gmail.com
+</code></pre>
+<h2>6. Cấu hình index Meilisearch (<code>products</code>)</h2>
+<p>Áp tự động mỗi lần deploy (script <code>npm run search:setup</code>):</p>
+<pre><code class="language-json">{
+  &quot;searchableAttributes&quot;: [&quot;name&quot;, &quot;sku&quot;, &quot;theme&quot;, &quot;collection&quot;, &quot;category&quot;, &quot;leather_colors&quot;, &quot;tags&quot;, &quot;short_desc&quot;],
+  &quot;filterableAttributes&quot;: [&quot;category&quot;, &quot;type&quot;, &quot;collection&quot;, &quot;theme&quot;, &quot;leather_colors&quot;, &quot;size&quot;, &quot;price&quot;, &quot;in_stock&quot;, &quot;made_to_order&quot;, &quot;visible&quot;],
+  &quot;sortableAttributes&quot;: [&quot;price&quot;, &quot;created_at&quot;, &quot;sold_count&quot;],
+  &quot;rankingRules&quot;: [&quot;words&quot;, &quot;typo&quot;, &quot;proximity&quot;, &quot;attribute&quot;, &quot;sort&quot;, &quot;exactness&quot;, &quot;sold_count:desc&quot;],
+  &quot;typoTolerance&quot;: { &quot;minWordSizeForTypos&quot;: { &quot;oneTypo&quot;: 4, &quot;twoTypos&quot;: 8 } },
+  &quot;synonyms&quot;: {
+    &quot;ví&quot;: [&quot;bóp&quot;], &quot;bóp&quot;: [&quot;ví&quot;],
+    &quot;túi chéo&quot;: [&quot;túi đeo chéo&quot;], &quot;balo&quot;: [&quot;ba lô&quot;],
+    &quot;quà tặng&quot;: [&quot;quà&quot;]
+  },
+  &quot;faceting&quot;: { &quot;maxValuesPerFacet&quot;: 100 },
+  &quot;pagination&quot;: { &quot;maxTotalHits&quot;: 5000 }
+}
+</code></pre>
+<ul>
+<li><strong>Đồng bộ:</strong> lưu/sửa/ẩn sản phẩm trong admin → đẩy ngay sang Meilisearch; mỗi đêm 02:00 <strong>dựng lại toàn bộ index</strong> từ PostgreSQL để chắc chắn khớp.</li>
+<li><strong>Bảo mật:</strong> website gọi Meilisearch <strong>qua API của Nuxt</strong> (không lộ key ra trình duyệt); Meilisearch không mở cổng ra Internet.</li>
+<li>Mỗi tài liệu chỉ chứa trường cần tìm/lọc (không chứa mô tả dài, giá vốn).</li>
+</ul>
+<h2>7. PostgreSQL</h2>
+<pre><code class="language-sql">CREATE EXTENSION IF NOT EXISTS unaccent;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE OR REPLACE FUNCTION unaccent_immutable(text) RETURNS text
+  LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $$ SELECT public.unaccent('public.unaccent', $1) $$;
+-- tìm dự phòng khi Meilisearch ngừng + ô tìm trong admin
+CREATE INDEX products_name_trgm ON products USING gin (unaccent_immutable(name) gin_trgm_ops);
+</code></pre>
+<h2>8. Bảo mật server</h2>
+<ul>
+<li>SSH chỉ đăng nhập bằng key, tắt đăng nhập <code>root</code> và mật khẩu; đổi cổng SSH nếu muốn.</li>
+<li><code>ufw</code>: chỉ mở 22, 80, 443. <code>fail2ban</code> cho SSH.</li>
+<li><code>unattended-upgrades</code> tự cập nhật bản vá bảo mật.</li>
+<li>Cloudflare: bật proxy, "Always use HTTPS", chặn bot cơ bản; chỉ cho IP Cloudflare vào cổng 80/443.</li>
+<li>Admin <code>/admin</code>: mật khẩu mạnh + <strong>2FA</strong>; khoá tài khoản sau 5 lần sai.</li>
+</ul>
+<h2>9. Sao lưu</h2>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>Gì</th>
+<th>Khi nào</th>
+<th>Giữ</th>
+<th>Lưu ở</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL (<code>pg_dump</code>)</td>
+<td>Hằng đêm 01:30</td>
+<td>7 ngày + 4 tuần</td>
+<td>VPS + kho ngoài (Cloudflare R2 / Google Drive qua <code>rclone</code>)</td>
+</tr>
+<tr>
+<td>Ảnh sản phẩm</td>
+<td>Hằng tuần (đồng bộ thay đổi)</td>
+<td>Bản mới nhất</td>
+<td>Kho ngoài</td>
+</tr>
+<tr>
+<td>Meilisearch</td>
+<td><strong>Không cần</strong></td>
+<td>—</td>
+<td>Dựng lại từ PostgreSQL</td>
+</tr>
+</tbody>
+</table></div>
+<p>Kiểm tra khôi phục thử <strong>mỗi quý</strong>.</p>
+<h2>10. Giám sát</h2>
+<ul>
+<li>UptimeRobot (miễn phí): kiểm tra trang chủ + <code>/api/health</code> mỗi 5 phút, báo Telegram/email.</li>
+<li><code>/api/health</code> kiểm tra DB, Meilisearch, hàng đợi đẩy đơn.</li>
+<li>Docker log giới hạn 10MB × 3 file mỗi dịch vụ để không đầy ổ.</li>
+</ul>
+</article></main>
+</body>
+</html>

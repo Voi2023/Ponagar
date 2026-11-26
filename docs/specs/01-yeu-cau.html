@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ponagar — 01 · Yêu cầu</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="../prototype/assets/tokens.css">
+<link rel="stylesheet" href="../prototype/assets/ponagar-theme.css">
+<style>
+body{background:var(--bg)}
+.doc-top{background:var(--brand);color:var(--surface);position:sticky;top:0;z-index:10}
+.doc-top .in{max-width:1100px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:6px;height:56px;overflow-x:auto}
+.doc-top b{font-size:17px;margin-right:12px;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.doc-top b i{background:var(--accent);color:var(--accent-ink);border-radius:7px;padding:4px}
+.doc-top a{white-space:nowrap;font-size:13px;font-weight:600;padding:7px 11px;border-radius:8px;display:flex;gap:6px;align-items:center}
+.doc-top a:hover{background:color-mix(in srgb,var(--surface) 14%,transparent)}
+.doc-top a.on{background:var(--accent);color:var(--accent-ink)}
+.doc{max-width:1100px;margin:22px auto 60px;padding:0 16px}
+.doc .panel{padding:28px 32px}
+.guide{max-width:none}
+.guide h1{font-size:28px;margin:0 0 14px;color:var(--brand-dark);font-family:var(--font-display)}
+.guide h2{font-family:var(--font-display)}
+.guide h2:first-of-type{margin-top:18px}
+.guide ul,.guide ol{padding-left:22px;line-height:1.65}
+.guide li{margin:3px 0}
+.guide blockquote{margin:12px 0;background:var(--brand-tint);border-left:4px solid var(--brand);border-radius:0 9px 9px 0;padding:10px 14px;font-size:13.6px}
+.guide blockquote p{margin:4px 0}
+.guide table{margin:10px 0 16px}
+.guide table td,.guide table th{vertical-align:top}
+.guide table tr td:not(:first-child){font-variant-numeric:tabular-nums}
+.guide pre{background:var(--ink);color:var(--gray-bg);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:12.4px;line-height:1.5}
+.guide code{font-family:var(--font-mono);font-size:12.4px}
+.guide :not(pre)>code{background:var(--gray-bg);border-radius:5px;padding:1px 6px}
+.guide a{color:var(--brand);font-weight:600}
+.guide hr{border:none;border-top:1px solid var(--border);margin:20px 0}
+.guide tr.sum td{background:var(--brand-tint);font-weight:800}
+.guide tr.grp td{background:var(--bg)}
+@media(max-width:700px){.doc .panel{padding:18px 16px}}
+@media print{.doc-top{display:none}.doc .panel{box-shadow:none;border:none}}
+</style>
+</head>
+<body>
+<header class="doc-top"><div class="in"><b><img src="https://cdn.hstatic.net/themes/1000360703/1001524369/14/ponagar-mark.png?v=535" alt="" style="width:30px;height:30px;border-radius:6px;box-shadow:0 0 0 2px var(--surface)">Ponagar · Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class="on"><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class=""><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class=""><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class=""><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
+<main class="doc"><article class="panel guide">
+<h1>01 — Tóm tắt yêu cầu khách hàng</h1>
+<h2>1. Bối cảnh</h2>
+<ul>
+<li><strong>Ponagar</strong> (Công ty TNHH ART 868) đang bán túi da vẽ tay trên <strong>ponagar.co</strong> (Haravan, dựng bằng Muse AI).</li>
+<li>Muốn <strong>làm lại</strong> website với quy mô <strong>~10.000 sản phẩm</strong>, bố cục và tính năng mạnh như <strong>thienkimhome.com</strong>.</li>
+<li>Ngân sách ban đầu (29/10): dưới 15 triệu cho riêng website. <strong>Cập nhật 26/11:</strong> phạm vi mở rộng thêm kho, sản xuất, nhân sự, MISA → phí làm <strong>50 triệu</strong> + <strong>4 triệu/năm</strong> server (xem <a href="03-bao-gia.html">03</a>).</li>
+</ul>
+<h2>2. Khách muốn gì</h2>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>#</th>
+<th>Yêu cầu</th>
+<th>Ghi chú</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Menu lớn</strong>: loại sản phẩm → chủ đề tranh → mức giá</td>
+<td>Túi nữ, túi nam, ví, phụ kiện, tranh da, quà doanh nghiệp</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Trang danh mục + bộ lọc</strong>: chủ đề tranh, màu da, giá, kích thước, có sẵn/đặt làm</td>
+<td>Lọc nhanh trên 10.000 SP</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Tìm kiếm</strong> gợi ý tức thì: tên mẫu, mã, chủ đề, gõ không dấu</td>
+<td>Xem <a href="05-cau-hinh-vps.html">05 · Cấu hình VPS</a></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Chi tiết SP</strong>: ảnh, chọn màu da, size, <strong>vẽ tên miễn phí</strong>, câu chuyện tranh</td>
+<td>Nút mua ngay / thêm giỏ / đặt làm theo mẫu / gọi lại</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Giỏ hàng &amp; đặt hàng nhanh</strong>: COD, chuyển khoản VietQR, gói quà</td>
+<td>Không bắt tạo tài khoản</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Đơn tự đẩy sang phần mềm quản lý đơn</strong> của công ty</td>
+<td>Chưa biết đang dùng phần mềm nào → đề xuất ở <a href="02-de-xuat.html">02</a></td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Đặt làm riêng</strong>: chọn màu da, chọn tranh hoặc gửi ảnh</td>
+<td>Form + tải ảnh lên</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Khuyến mãi: giá giảm, ưu đãi có hạn, mã giảm giá</td>
+<td></td>
+</tr>
+<tr>
+<td>9</td>
+<td>Trang câu chuyện, xưởng (video), showroom, FAQ, cẩm nang, chính sách</td>
+<td></td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Trang quản trị</strong>: SP, danh mục, màu da, đơn, banner, bài viết</td>
+<td><strong>Nhập/xuất Excel</strong> (nhận file xuất từ Haravan)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Màu sắc đúng nhận diện logo, <strong>mobile trước</strong>, tải nhanh, SEO tốt</td>
+<td>Giữ thứ hạng Google của ponagar.co</td>
+</tr>
+</tbody>
+</table></div>
+<h2>3. Câu hỏi cần khách trả lời</h2>
+<ol>
+<li>Công ty đang dùng <strong>phần mềm quản lý đơn/bán hàng</strong> nào? (KiotViet, Sapo, Haravan, Nhanh.vn, Pancake… hay chưa có?)</li>
+<li>10.000 sản phẩm đã có đủ <strong>ảnh + mô tả trên Haravan</strong> chưa? Có xuất file được không?</li>
+<li>Giữ <strong>3 ngôn ngữ (VI/EN/JA)</strong> như site cũ hay chỉ tiếng Việt ở bản đầu?</li>
+<li>Địa chỉ <strong>điểm bán sân bay</strong> và giờ mở cửa?</li>
+<li>Ai mua/gia hạn <strong>VPS và tên miền</strong> (công ty đứng tên hay bên làm web)?</li>
+</ol>
+</article></main>
+</body>
+</html>

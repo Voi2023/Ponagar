@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ponagar — Tổng quan</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="../prototype/assets/tokens.css">
+<link rel="stylesheet" href="../prototype/assets/ponagar-theme.css">
+<style>
+body{background:var(--bg)}
+.doc-top{background:var(--brand);color:var(--surface);position:sticky;top:0;z-index:10}
+.doc-top .in{max-width:1100px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:6px;height:56px;overflow-x:auto}
+.doc-top b{font-size:17px;margin-right:12px;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.doc-top b i{background:var(--accent);color:var(--accent-ink);border-radius:7px;padding:4px}
+.doc-top a{white-space:nowrap;font-size:13px;font-weight:600;padding:7px 11px;border-radius:8px;display:flex;gap:6px;align-items:center}
+.doc-top a:hover{background:color-mix(in srgb,var(--surface) 14%,transparent)}
+.doc-top a.on{background:var(--accent);color:var(--accent-ink)}
+.doc{max-width:1100px;margin:22px auto 60px;padding:0 16px}
+.doc .panel{padding:28px 32px}
+.guide{max-width:none}
+.guide h1{font-size:28px;margin:0 0 14px;color:var(--brand-dark);font-family:var(--font-display)}
+.guide h2{font-family:var(--font-display)}
+.guide h2:first-of-type{margin-top:18px}
+.guide ul,.guide ol{padding-left:22px;line-height:1.65}
+.guide li{margin:3px 0}
+.guide blockquote{margin:12px 0;background:var(--brand-tint);border-left:4px solid var(--brand);border-radius:0 9px 9px 0;padding:10px 14px;font-size:13.6px}
+.guide blockquote p{margin:4px 0}
+.guide table{margin:10px 0 16px}
+.guide table td,.guide table th{vertical-align:top}
+.guide table tr td:not(:first-child){font-variant-numeric:tabular-nums}
+.guide pre{background:var(--ink);color:var(--gray-bg);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:12.4px;line-height:1.5}
+.guide code{font-family:var(--font-mono);font-size:12.4px}
+.guide :not(pre)>code{background:var(--gray-bg);border-radius:5px;padding:1px 6px}
+.guide a{color:var(--brand);font-weight:600}
+.guide hr{border:none;border-top:1px solid var(--border);margin:20px 0}
+.guide tr.sum td{background:var(--brand-tint);font-weight:800}
+.guide tr.grp td{background:var(--bg)}
+@media(max-width:700px){.doc .panel{padding:18px 16px}}
+@media print{.doc-top{display:none}.doc .panel{box-shadow:none;border:none}}
+</style>
+</head>
+<body>
+<header class="doc-top"><div class="in"><b><img src="https://cdn.hstatic.net/themes/1000360703/1001524369/14/ponagar-mark.png?v=535" alt="" style="width:30px;height:30px;border-radius:6px;box-shadow:0 0 0 2px var(--surface)">Ponagar · Specs</b><a href="index.html" class="on"><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class=""><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class=""><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class=""><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class=""><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
+<main class="doc"><article class="panel guide">
+<h1>Ponagar — Làm lại website bán hàng</h1>
+<blockquote>
+<p>Ngày lập: 29/10/2026 · Người lập: Bùi Tín · Trạng thái: <strong>Bản gửi khách duyệt (v0.3 · 26/11/2026)</strong></p>
+</blockquote>
+<h2>Khách hàng</h2>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Công ty</td>
+<td><strong>Công ty TNHH ART 868</strong></td>
+</tr>
+<tr>
+<td>Số ĐKKD</td>
+<td>0319090382</td>
+</tr>
+<tr>
+<td>Địa chỉ</td>
+<td>166 Hoa Lan, P. Cầu Kiệu, TP.HCM</td>
+</tr>
+<tr>
+<td>Liên hệ</td>
+<td><a href="tel:0909720027">0909 720 027</a> · <a href="mailto:ponagar.co@gmail.com">ponagar.co@gmail.com</a></td>
+</tr>
+<tr>
+<td>Thương hiệu</td>
+<td><strong>Ponagar</strong> — túi da vẽ tay, ví, phụ kiện da (từ 2010)</td>
+</tr>
+<tr>
+<td>Website hiện tại</td>
+<td>ponagar.co (chạy trên Haravan)</td>
+</tr>
+</tbody>
+</table></div>
+<h2>Bộ tài liệu</h2>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>Trang</th>
+<th>Nội dung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="01-yeu-cau.html">01 · Yêu cầu</a></td>
+<td>Tóm tắt ngắn yêu cầu của khách</td>
+</tr>
+<tr>
+<td><a href="02-de-xuat.html">02 · Đề xuất</a></td>
+<td>Việc cần làm, kiến trúc, đẩy đơn sang phần mềm quản lý, lộ trình</td>
+</tr>
+<tr>
+<td><a href="03-bao-gia.html">03 · Báo giá</a></td>
+<td><strong>50.000.000đ</strong> phí làm toàn hệ thống (4 giai đoạn) + <strong>4.000.000đ/năm</strong> VPS</td>
+</tr>
+<tr>
+<td><a href="04-design-system.html">04 · Design system</a></td>
+<td>Màu từ logo, cách dùng kit <code>dmcl-shared</code></td>
+</tr>
+<tr>
+<td><a href="05-cau-hinh-vps.html">05 · Cấu hình VPS</a></td>
+<td>Search engine cho 10.000 SP, cấu hình server, bảo mật, sao lưu</td>
+</tr>
+<tr>
+<td><a href="../gioi-thieu.html">Giới thiệu hệ thống</a></td>
+<td>Bản tóm tắt cho khách: hệ thống làm được gì, lộ trình, chi phí</td>
+</tr>
+<tr>
+<td><a href="../prototype/index.html">Prototype</a></td>
+<td>Giao diện click được (mở bằng trình duyệt)</td>
+</tr>
+</tbody>
+</table></div>
+<h2>Đã thống nhất</h2>
+<ol>
+<li>Site mới bán <strong>sản phẩm của Ponagar</strong> (túi da, ví, phụ kiện, tranh da, đặt làm riêng), khoảng <strong>10.000 sản phẩm</strong>.</li>
+<li><strong>thienkimhome.com</strong> chỉ là mẫu tham chiếu <strong>bố cục và tính năng</strong> (menu lớn, bộ lọc, khối ưu đãi, trang SEO theo danh mục). Không sao chép nội dung, hình ảnh của họ.</li>
+<li><strong>Tự viết code</strong> (không dùng nền tảng thuê bao), phí làm <strong>50 triệu</strong> cho toàn hệ thống (website, kho &amp; sản xuất, nhân sự, kết nối MISA), chạy trên <strong>VPS ~4 triệu/năm</strong>.</li>
+<li>Màu sắc theo logo: <strong>đỏ #BB2E30</strong> trên nền trắng/kem.</li>
+<li>Đơn đặt trên web <strong>tự đẩy sang phần mềm quản lý đơn</strong> của công ty (chờ khách cho biết đang dùng phần mềm nào).</li>
+</ol>
+</article></main>
+</body>
+</html>

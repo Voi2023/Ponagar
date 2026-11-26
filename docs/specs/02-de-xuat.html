@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ponagar — 02 · Đề xuất</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="../prototype/assets/tokens.css">
+<link rel="stylesheet" href="../prototype/assets/ponagar-theme.css">
+<style>
+body{background:var(--bg)}
+.doc-top{background:var(--brand);color:var(--surface);position:sticky;top:0;z-index:10}
+.doc-top .in{max-width:1100px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:6px;height:56px;overflow-x:auto}
+.doc-top b{font-size:17px;margin-right:12px;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.doc-top b i{background:var(--accent);color:var(--accent-ink);border-radius:7px;padding:4px}
+.doc-top a{white-space:nowrap;font-size:13px;font-weight:600;padding:7px 11px;border-radius:8px;display:flex;gap:6px;align-items:center}
+.doc-top a:hover{background:color-mix(in srgb,var(--surface) 14%,transparent)}
+.doc-top a.on{background:var(--accent);color:var(--accent-ink)}
+.doc{max-width:1100px;margin:22px auto 60px;padding:0 16px}
+.doc .panel{padding:28px 32px}
+.guide{max-width:none}
+.guide h1{font-size:28px;margin:0 0 14px;color:var(--brand-dark);font-family:var(--font-display)}
+.guide h2{font-family:var(--font-display)}
+.guide h2:first-of-type{margin-top:18px}
+.guide ul,.guide ol{padding-left:22px;line-height:1.65}
+.guide li{margin:3px 0}
+.guide blockquote{margin:12px 0;background:var(--brand-tint);border-left:4px solid var(--brand);border-radius:0 9px 9px 0;padding:10px 14px;font-size:13.6px}
+.guide blockquote p{margin:4px 0}
+.guide table{margin:10px 0 16px}
+.guide table td,.guide table th{vertical-align:top}
+.guide table tr td:not(:first-child){font-variant-numeric:tabular-nums}
+.guide pre{background:var(--ink);color:var(--gray-bg);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:12.4px;line-height:1.5}
+.guide code{font-family:var(--font-mono);font-size:12.4px}
+.guide :not(pre)>code{background:var(--gray-bg);border-radius:5px;padding:1px 6px}
+.guide a{color:var(--brand);font-weight:600}
+.guide hr{border:none;border-top:1px solid var(--border);margin:20px 0}
+.guide tr.sum td{background:var(--brand-tint);font-weight:800}
+.guide tr.grp td{background:var(--bg)}
+@media(max-width:700px){.doc .panel{padding:18px 16px}}
+@media print{.doc-top{display:none}.doc .panel{box-shadow:none;border:none}}
+</style>
+</head>
+<body>
+<header class="doc-top"><div class="in"><b><img src="https://cdn.hstatic.net/themes/1000360703/1001524369/14/ponagar-mark.png?v=535" alt="" style="width:30px;height:30px;border-radius:6px;box-shadow:0 0 0 2px var(--surface)">Ponagar · Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class=""><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class="on"><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class=""><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class=""><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
+<main class="doc"><article class="panel guide">
+<h1>02 — Đề xuất các việc cần làm</h1>
+<blockquote>
+<p>Ngân sách nhỏ nên nguyên tắc là: <strong>một ứng dụng, một server, tận dụng tối đa thứ đã có</strong> (kit UI <code>dmcl-shared</code>, dữ liệu trên Haravan, Cloudflare miễn phí).</p>
+</blockquote>
+<h2>1. Kiến trúc gọn</h2>
+<pre><code>Khách ─► Cloudflare (DNS + CDN + SSL, miễn phí) ─► VPS 2 vCPU / 4GB
+                                                    ├─ Caddy (reverse proxy)
+                                                    ├─ Nuxt 3: website (SSR) + /admin (Vue + @dmcl/ui-kit) + API
+                                                    ├─ PostgreSQL 16 (dữ liệu gốc)
+                                                    ├─ Meilisearch (tìm kiếm + bộ lọc)
+                                                    └─ Thư mục ảnh WebP (Cloudflare cache)
+Đơn mới ─► hàng đợi ─► API phần mềm quản lý đơn (KiotViet / Sapo / Haravan / Nhanh.vn / Pancake)
+       └─► báo Zalo / Telegram / email cho shop
+</code></pre>
+<ul>
+<li><strong>Một codebase Nuxt 3</strong> chứa cả website, trang quản trị và API → ít công nhất, dễ bảo trì.</li>
+<li>Website <strong>render phía server (SSR)</strong> để Google đọc được (quan trọng khi rời Haravan).</li>
+<li>Admin dùng nguyên <code>AppShell</code>, <code>BaseModal</code>, <code>FormSection</code>… của <code>@dmcl/ui-kit</code> → không thiết kế lại admin.</li>
+<li>Chi tiết cấu hình server + search engine: <a href="05-cau-hinh-vps.html">05 · Cấu hình VPS</a>.</li>
+</ul>
+<h2>2. Dữ liệu 10.000 sản phẩm</h2>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>Vấn đề</th>
+<th>Đề xuất</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lấy dữ liệu từ ponagar.co</td>
+<td>Xuất Excel sản phẩm từ Haravan → <strong>công cụ nhập</strong> tự đọc, tải ảnh về, nén <strong>WebP</strong>.</td>
+</tr>
+<tr>
+<td>Màu da, chủ đề tranh nhập không đồng nhất</td>
+<td><strong>Danh sách chuẩn</strong> (8 màu da, các chủ đề) + gợi ý sửa khi import.</td>
+</tr>
+<tr>
+<td>Biến thể</td>
+<td><strong>SP cha → biến thể</strong> (màu da × size); giá/tồn theo biến thể.</td>
+</tr>
+<tr>
+<td>Ảnh nặng</td>
+<td>Mỗi ảnh tạo 3 cỡ (400/800/1600px), Cloudflare cache → VPS nhẹ.</td>
+</tr>
+<tr>
+<td>Giữ SEO cũ</td>
+<td>Map URL Haravan cũ (<code>/products/...</code>, <code>/collections/...</code>) → <strong>301</strong> sang URL mới.</td>
+</tr>
+</tbody>
+</table></div>
+<h2>3. Đơn hàng → phần mềm quản lý đơn</h2>
+<p>Công ty chưa xác định phần mềm. Website làm sẵn <strong>bộ chuyển đổi (adapter)</strong>, bản đầu kết nối <strong>1 phần mềm</strong> công ty đang dùng:</p>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>Phần mềm</th>
+<th>Phù hợp với</th>
+<th>Kết nối</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>KiotViet</strong></td>
+<td>Cửa hàng bán lẻ, quản lý kho + bán tại quầy, rất phổ biến</td>
+<td>Public API (tạo đơn đặt hàng)</td>
+</tr>
+<tr>
+<td><strong>Sapo</strong> (Sapo OMNI)</td>
+<td>Bán đa kênh: web, Shopee/TikTok, Facebook, cửa hàng</td>
+<td>API</td>
+</tr>
+<tr>
+<td><strong>Haravan</strong> (OmniPower)</td>
+<td>ponagar.co <strong>đang dùng Haravan</strong> → nếu giữ Haravan làm nơi quản lý đơn/kho thì ít thay đổi thói quen nhất</td>
+<td>API</td>
+</tr>
+<tr>
+<td><strong>Nhanh.vn</strong></td>
+<td>Mạnh về kho + kết nối nhiều hãng vận chuyển</td>
+<td>API <code>order/add</code></td>
+</tr>
+<tr>
+<td><strong>Pancake POS</strong></td>
+<td>Bán chủ yếu qua Facebook/Instagram/livestream, chốt đơn inbox</td>
+<td>API</td>
+</tr>
+<tr>
+<td>Chưa có / không có API</td>
+<td>—</td>
+<td>Báo đơn qua Zalo/Telegram + <strong>xuất Excel</strong> theo ngày</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Gợi ý:</strong> nếu chưa dùng phần mềm nào → <strong>KiotViet</strong> (bán tại showroom + kho) hoặc <strong>Sapo</strong> (bán nhiều kênh online). Nếu đang quen Haravan → giữ <strong>Haravan</strong> làm nơi quản lý đơn.
+Lưu ý: cần kiểm tra <strong>gói đang thuê có mở API</strong> không (một số gói thấp không có).</p>
+<p><strong>Cách đẩy đơn:</strong> đơn lưu trên web trước → đẩy sang phần mềm qua hàng đợi → lỗi thì <strong>tự thử lại 5 lần</strong>, rồi báo đỏ trong admin để bấm <strong>"Gửi lại"</strong>. Không bao giờ mất đơn khi phần mềm bên kia lỗi.
+Mỗi sản phẩm trên web lưu <strong>mã SP bên phần mềm quản lý</strong> để đơn đẩy sang khớp đúng hàng.</p>
+<h2>4. Tính năng học từ thienkimhome (làm theo kiểu Ponagar)</h2>
+<ul>
+<li>Menu lớn nhiều tầng, trang <strong>danh mục × chủ đề</strong> làm trang SEO (vd: <em>túi da vẽ tay đồng quê</em>).</li>
+<li>Bộ lọc có <strong>số đếm</strong>, sắp xếp, phân trang; khối <strong>ưu đãi có đồng hồ đếm ngược</strong>.</li>
+<li>Thanh <strong>Gọi / Zalo / Messenger</strong> dính màn hình, nút <strong>"Gọi lại cho tôi"</strong>.</li>
+<li>Khác biệt của Ponagar: <strong>câu chuyện bức tranh</strong>, <strong>vẽ tên miễn phí</strong>, <strong>đặt làm riêng</strong>, video xưởng.</li>
+</ul>
+<h2>5. SEO</h2>
+<ul>
+<li>Schema <code>Product</code>, <code>Offer</code>, <code>BreadcrumbList</code>, <code>FAQPage</code>, <code>LocalBusiness</code> (showroom).</li>
+<li>Sitemap tự sinh (chia file ≤ 5.000 URL), canonical cho trang lọc, <strong>301 từ URL Haravan cũ</strong>.</li>
+<li>GA4 + Meta Pixel + Google Search Console.</li>
+</ul>
+<h2>6. Lộ trình (~5 tuần)</h2>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>Tuần</th>
+<th>Việc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Chốt prototype, dựng VPS, nhập thử 500 SP từ Haravan</td>
+</tr>
+<tr>
+<td>2–3</td>
+<td>Website + admin + tìm kiếm/bộ lọc</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Nhập đủ 10.000 SP, kết nối phần mềm quản lý đơn, SEO, 301</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Khách kiểm thử, sửa lỗi, chuyển tên miền, bàn giao</td>
+</tr>
+</tbody>
+</table></div>
+<h2>7. Rủi ro &amp; cách giảm</h2>
+<div class="table-scroll"><table class="data">
+<thead>
+<tr>
+<th>Rủi ro</th>
+<th>Cách giảm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ngân sách thấp, phạm vi dễ phình</td>
+<td>Chốt danh sách tính năng ở trang 03; phát sinh tính riêng</td>
+</tr>
+<tr>
+<td>Phần mềm quản lý không có API</td>
+<td>Dùng báo đơn Zalo/Telegram + xuất Excel</td>
+</tr>
+<tr>
+<td>Rớt thứ hạng khi rời Haravan</td>
+<td>Map 301 đầy đủ, giữ tiêu đề/mô tả SEO cũ</td>
+</tr>
+<tr>
+<td>VPS nhỏ quá tải mùa sale</td>
+<td>Cloudflare cache trang + ảnh; nâng gói VPS khi cần</td>
+</tr>
+</tbody>
+</table></div>
+</article></main>
+</body>
+</html>
