@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ponagar — Túi da vẽ tay (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/ponagar-theme.css">
+<link rel="stylesheet" href="assets/shop.css">
+<script src="assets/proto.js"></script>
+</head>
+<body class="shop">
+<div id="chrome-top"></div>
+
+<main class="shop-wrap">
+  <!-- Hero: menu danh mục trái · slider giữa · 3 banner phải (bố cục thienkimhome.com) -->
+  <section class="tk-hero">
+    <nav class="tk-side" id="side"></nav>
+
+    <div class="tk-slider">
+      <div class="tk-slides">
+        <a class="tk-slide s1 on" href="category.html">
+          <span class="kick">Bộ sưu tập Đông 2026</span>
+          <h2>Quà ấm <em>mùa đông</em><br>ưu đãi đến 20%</h2>
+          <span class="date">05/11/2026 – 26/12/2026</span>
+          <span class="btn btn-accent">Mua ngay <i class="ti ti-arrow-right"></i></span>
+          <i class="ti ti-snowflake big"></i>
+        </a>
+        <a class="tk-slide s2" href="#">
+          <span class="kick">Đặt làm riêng</span>
+          <h2>Vẽ theo <em>ảnh của bạn</em></h2>
+          <p>Chọn màu da, chọn tranh hoặc gửi ảnh. Hoạ sĩ vẽ tay từng chiếc tại xưởng Sài Gòn.</p>
+          <span class="btn btn-accent">Bắt đầu thiết kế <i class="ti ti-arrow-right"></i></span>
+          <i class="ti ti-brush big"></i>
+        </a>
+        <a class="tk-slide s3" href="category.html">
+          <span class="kick">Quà Tết doanh nghiệp 2027</span>
+          <h2>Khắc logo <em>miễn phí</em><br>đơn từ 20 sản phẩm</h2>
+          <span class="date">Nhận đặt đến 15/01/2027</span>
+          <span class="btn btn-accent">Nhận báo giá <i class="ti ti-arrow-right"></i></span>
+          <i class="ti ti-gift big"></i>
+        </a>
+      </div>
+      <div class="tk-tabs" id="tabs">
+        <button class="on">Ưu đãi mùa đông<br><small>05/11 – 26/12/2026</small></button>
+        <button>Đặt làm riêng<br><small>Vẽ theo ảnh</small></button>
+        <button>Quà Tết doanh nghiệp<br><small>Đến 15/01/2027</small></button>
+      </div>
+    </div>
+
+    <div class="tk-banners">
+      <a class="tk-bn" href="#"><small>Mua trên website</small><b>Vẽ tên miễn phí</b><span class="cta">Xem ngay</span><i class="ti ti-signature"></i></a>
+      <a class="tk-bn alt" href="#"><small>Freeship từ 500K</small><b>COD toàn quốc</b><span class="cta">Chính sách giao hàng</span><i class="ti ti-truck-delivery"></i></a>
+      <a class="tk-bn dk" href="#"><small>Đường may · khoá · nút</small><b>Bảo hành trọn đời</b><span class="cta">Tìm hiểu</span><i class="ti ti-shield-check"></i></a>
+    </div>
+  </section>
+
+  <!-- Các khối ngành hàng: mỗi khối 1 tiêu đề + "Xem tất cả" + lưới 5 cột -->
+  <div id="sections"></div>
+
+  <section class="tk-sec">
+    <div class="tk-sec-h"><h2>Bộ sưu tập</h2><a class="tk-all" href="category.html">Xem tất cả</a></div>
+    <div class="tk-cols" id="cols"></div>
+  </section>
+
+  <section class="tk-about" id="about">
+    <h1>Ponagar — Túi da vẽ tay từ năm 2010</h1>
+    <div class="body">
+      <p>Ponagar là thương hiệu túi da vẽ tay của Công ty TNHH ART 868. Mỗi sản phẩm được cắt từ da bò nguyên tấm, may thủ công và vẽ tay tại xưởng Sài Gòn, nên không có hai chiếc giống nhau.</p>
+      <h3>Sản phẩm đa dạng, mỗi chiếc một câu chuyện</h3>
+      <p>Túi xách nữ, túi nam, ví, thắt lưng, bao hộ chiếu, tranh da và quà tặng doanh nghiệp. Hơn 200 chủ đề tranh: đồng quê, phố Hội, sen, biển trời, non sông Việt Nam…</p>
+      <h3>Đặt làm riêng theo ý bạn</h3>
+      <p>Chọn màu da, chọn tranh từ thư viện của xưởng hoặc gửi ảnh để hoạ sĩ vẽ theo. Vẽ tên miễn phí khi mua trên website.</p>
+      <h3>Cam kết của Ponagar</h3>
+      <p>Bảo hành trọn đời đường may, khoá kéo, nút. Đổi hàng trong 5 ngày. Giao hàng COD toàn quốc, miễn phí từ 500.000đ.</p>
+    </div>
+    <button class="more" onclick="this.parentNode.classList.toggle('open');this.firstChild.textContent=this.parentNode.classList.contains('open')?'Thu gọn ':'Xem thêm '">Xem thêm <i class="ti ti-chevron-down"></i></button>
+  </section>
+</main>
+
+<div id="chrome-bottom"></div>
+<script>
+renderChrome('home.html');
+
+/* Menu trái: rê chuột vào 1 dòng → bảng con hiện đè lên slider */
+document.getElementById('side').innerHTML = [...CATS, { name: 'Đặt làm riêng', ic: 'ti-brush', types: ['Vẽ theo ảnh', 'Vẽ tên, chữ ký', 'Khắc logo'] }]
+  .map(c => `<div class="row"><a class="tk-side-it" href="category.html"><span class="ic"><i class="ti ${c.ic}"></i></span>${c.name}<i class="ti ti-chevron-right"></i></a>
+    <div class="tk-fly shop-mega-r">${megaCols(c)}</div></div>`).join('');
+
+/* Slider tự chạy 5 giây, bấm tab để chuyển */
+const slides = document.querySelectorAll('.tk-slide'), tabs = document.querySelectorAll('#tabs button');
+let cur = 0;
+const go = i => { cur = i; slides.forEach((s, k) => s.classList.toggle('on', k === i)); tabs.forEach((t, k) => t.classList.toggle('on', k === i)); };
+tabs.forEach((t, i) => t.onclick = () => go(i));
+setInterval(() => go((cur + 1) % slides.length), 5000);
+
+/* Khối ngành hàng */
+const SECS = [
+  { name: 'Túi xách nữ', cat: 'Túi xách nữ', n: 10 },
+  { name: 'Ví da', cat: 'Ví da', n: 5 },
+  { name: 'Túi xách nam', cat: 'Túi xách nam', n: 5 },
+  { name: 'Phụ kiện da', cat: 'Phụ kiện', n: 5 },
+  { name: 'Tranh da & quà tặng', cat: ['Tranh da', 'Quà tặng doanh nghiệp'], n: 5 },
+];
+document.getElementById('sections').innerHTML = SECS.map(s => {
+  const cats = [].concat(s.cat), c = CATS.find(x => x.name === cats[0]);
+  const items = PRODUCTS.filter(p => cats.includes(p.cat)).slice(0, s.n);
+  return `<section class="tk-sec">
+    <div class="tk-sec-h"><h2>${s.name}</h2>
+      <div class="sub">${c.types.map(t => `<a href="category.html">${t}</a>`).join('')}</div>
+      <a class="tk-all" href="category.html">Xem tất cả</a></div>
+    <div class="shop-grid">${items.map(p => cardHTML(p)).join('')}</div>
+  </section>`;
+}).join('');
+
+/* Bộ sưu tập theo chủ đề tranh (thay khối "Thương hiệu" của trang mẫu) */
+document.getElementById('cols').innerHTML = [
+  ['Đồng quê', 'ti-plant-2', 'bo', 48], ['Phố Hội', 'ti-building-arch', 'nau', 36], ['Sen Hồ', 'ti-flower', 'hong', 42], ['Biển & trời', 'ti-sailboat', 'xanh', 31], ['Non sông VN', 'ti-mountain', 'reu', 27],
+  ['Hoa & trái', 'ti-cherry', 'do', 39], ['Song Hạc', 'ti-feather', 'den', 18], ['Romance', 'ti-heart', 'hong', 25], ['Trừu tượng', 'ti-brush', 'kem', 22], ['Tuổi thơ', 'ti-kite', 'xanh', 15],
+].map(([n, ic, sw, k]) => `<a href="category.html"><i class="ti ${ic}" style="--sw:${LEATHER[sw]}"></i><span>${n}<small>${k} mẫu</small></span></a>`).join('');
+</script>
+</body>
+</html>

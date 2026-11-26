@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quản trị — Đơn hàng & MISA (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/ponagar-theme.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()"><i class="ti ti-menu-2"></i></button><h1>Đơn hàng</h1></div>
+      <div class="row-flex">
+        <button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel theo bộ lọc đang chọn')"><i class="ti ti-file-spreadsheet"></i> Xuất Excel</button>
+        <button class="btn btn-primary btn-sm" onclick="toast('Mở màn hình Bán tại quầy')"><i class="ti ti-building-store"></i> Tạo đơn tại quầy</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid">
+        <div class="stat-card" onclick="pick('Chờ xác nhận')"><div class="label">Chờ xác nhận</div><div class="value">6</div><div class="kpi-trend">Đơn mới đã báo Telegram</div></div>
+        <div class="stat-card" onclick="pick('Đang đóng gói')"><div class="label">Đang đóng gói</div><div class="value">4</div><div class="kpi-trend">2 đơn chờ thợ vẽ tên</div></div>
+        <div class="stat-card" onclick="pick('Đã xuất kho')"><div class="label">Xuất kho hôm nay</div><div class="value">11</div><div class="kpi-trend">Đã trừ tồn thực</div></div>
+        <div class="stat-card bad" onclick="location.hash='misa';document.getElementById('misa').scrollIntoView()"><div class="label">MISA báo lỗi</div><div class="value">1</div><div class="kpi-trend">Cần sửa rồi Gửi lại</div></div>
+      </div>
+
+      <div class="toolbar">
+        <div class="tabs" id="tabs"></div>
+      </div>
+      <div class="toolbar">
+        <input type="search" placeholder="Tìm mã đơn, tên khách, số điện thoại…">
+        <select><option>Mọi kênh bán</option><option>Website</option><option>Showroom Hoa Lan</option><option>Sân bay</option><option>Facebook / Zalo</option></select>
+        <select><option>Mọi kho</option><option>Showroom Hoa Lan</option><option>Xưởng</option><option>Sân bay</option></select>
+        <input type="date" value="2026-11-26">
+      </div>
+
+      <div class="panel" style="padding:6px 8px">
+        <div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Mã đơn</th><th>Khách</th><th>Sản phẩm</th><th class="right">Tổng tiền</th><th>Thanh toán</th><th>Trạng thái</th><th>Kho xuất</th><th>MISA</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table></div>
+      </div>
+
+      <div class="panel" id="misa">
+        <h2><span><i class="ti ti-refresh"></i> Đồng bộ MISA AMIS Kế toán · hôm nay</span><a class="btn btn-outline btn-sm" href="#" onclick="event.preventDefault();toast('Đã thử kết nối: OK')">Thử kết nối</a></h2>
+        <div class="stat-grid" style="margin-bottom:10px">
+          <div class="stat-card"><div class="label">Chờ gửi</div><div class="value">0</div><div class="kpi-trend">Bình thường dưới 1 phút</div></div>
+          <div class="stat-card"><div class="label">Đã gửi · chờ MISA</div><div class="value">2</div><div class="kpi-trend">Quá 15 phút sẽ báo kế toán</div></div>
+          <div class="stat-card"><div class="label">MISA đã nhận</div><div class="value">8</div><div class="kpi-trend">Kế toán vào MISA lập chứng từ</div></div>
+          <div class="stat-card bad"><div class="label">Lỗi</div><div class="value">1</div><div class="kpi-trend">PNG-10471 · mã hàng chưa có bên MISA</div></div>
+        </div>
+        <div class="box-note">Đơn chỉ sang MISA <b>khi kho bấm Xuất kho</b>. Đơn huỷ trước khi xuất kho không bao giờ gửi. Mỗi đơn là một chứng từ mang mã đơn Ponagar, không gửi trùng hai lần. MISA lỗi hoặc bảo trì: website vẫn bán bình thường, đơn xếp hàng chờ gửi sau.</div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal modal-lg" id="dlgBody" style="max-height:90vh;overflow:auto"></div>
+</div>
+
+<script>
+renderAdmin('admin-orders.html');
+
+const ST = { 'Chờ xác nhận': 'amber', 'Đã xác nhận': 'blue', 'Đang sản xuất': 'gray', 'Đang đóng gói': 'blue', 'Đã xuất kho': 'green', 'Hoàn tất': 'green', 'Đã huỷ': 'gray', 'Trả hàng': 'red' };
+const MS = { 'Chưa đến lúc': 'gray', 'Chờ gửi': 'gray', 'Đã gửi · chờ MISA': 'amber', 'MISA đã nhận': 'green', 'Lỗi': 'red', 'Không gửi': 'gray' };
+const NEXT = { 'Chờ xác nhận': 'Xác nhận đơn', 'Đã xác nhận': 'Chuyển kho đóng gói', 'Đang đóng gói': 'Xuất kho', 'Đã xuất kho': 'Đánh dấu đã giao' };
+// [mã, khách, sđt, sp idx, sl, kênh, thanh toán, trạng thái, kho, misa, ghi chú]
+const ORDERS = [
+  ['PNG-10482', 'Nguyễn Lan Anh', '0903 ••• 218', 0, 1, 'Website', 'COD', 'Chờ xác nhận', 'Showroom Hoa Lan', 'Chưa đến lúc', 'Vẽ tên: LAN ANH'],
+  ['PNG-10481', 'Trần Minh Thư', '0912 ••• 640', 4, 1, 'Website', 'VietQR · đã nhận', 'Chờ xác nhận', 'Xưởng', 'Chưa đến lúc', ''],
+  ['PNG-10480', 'Lê Hoàng Yến', '0988 ••• 102', 1, 1, 'Facebook / Zalo', 'COD', 'Đã xác nhận', 'Showroom Hoa Lan', 'Chưa đến lúc', 'Gói quà + thiệp'],
+  ['PNG-10479', 'Phạm Quốc Huy', '0935 ••• 771', 17, 1, 'Website', 'VietQR · đã nhận', 'Đang sản xuất', 'Xưởng', 'Chưa đến lúc', 'Đặt làm: đổi sang da đen'],
+  ['PNG-10478', 'Võ Thị Mai', '0977 ••• 305', 6, 2, 'Website', 'COD', 'Đang đóng gói', 'Showroom Hoa Lan', 'Chưa đến lúc', 'Vẽ tên: MAI · chờ thợ vẽ'],
+  ['PNG-10477', 'Khách lẻ', '—', 12, 1, 'Sân bay', 'Thẻ · đã thu', 'Đã xuất kho', 'Sân bay', 'Đã gửi · chờ MISA', ''],
+  ['PNG-10476', 'Công ty TNHH Hoa Sen', 'MST 0312•••', 28, 20, 'Website', 'Chuyển khoản · đã nhận', 'Đã xuất kho', 'Xưởng', 'MISA đã nhận', 'Xuất hoá đơn công ty'],
+  ['PNG-10471', 'Đặng Ngọc Hân', '0909 ••• 552', 26, 1, 'Website', 'COD', 'Đã xuất kho', 'Xưởng', 'Lỗi', 'Mẫu mới tạo hôm nay'],
+  ['PNG-10468', 'Bùi Thanh Tâm', '0918 ••• 437', 2, 1, 'Showroom Hoa Lan', 'Tiền mặt · đã thu', 'Hoàn tất', 'Showroom Hoa Lan', 'MISA đã nhận', ''],
+  ['PNG-10465', 'Hồ Gia Bảo', '0966 ••• 819', 9, 1, 'Website', 'COD', 'Đã huỷ', '—', 'Không gửi', 'Khách đổi ý trước khi xuất'],
+];
+const total = o => PRODUCTS[o[3]].price * o[4];
+
+let filter = 'Tất cả';
+function draw() {
+  document.getElementById('tabs').innerHTML = ['Tất cả', ...Object.keys(ST)].map(t =>
+    `<button class="${t === filter ? 'active' : ''}" onclick="pick('${t}')">${t}</button>`).join('');
+  document.getElementById('rows').innerHTML = ORDERS.map((o, i) => [o, i]).filter(([o]) => filter === 'Tất cả' || o[7] === filter).map(([o, i]) => {
+    const p = PRODUCTS[o[3]];
+    return `<tr class="row-link" onclick="openOrder(${i})">
+      <td><b class="mono">${o[0]}</b><span class="sub-muted">${o[5]}</span></td>
+      <td>${o[1]}<span class="sub-muted">${o[2]}</span></td>
+      <td><div class="row-flex" style="flex-wrap:nowrap"><span class="th-sw" style="--sw:${p.sw}"><i class="ti ${p.ic}"></i></span><span>${p.name}${o[4] > 1 ? ` × ${o[4]}` : ''}${o[10] ? `<span class="sub-muted">${o[10]}</span>` : ''}</span></div></td>
+      <td class="right"><b>${fmt(total(o))}</b></td>
+      <td>${o[6]}</td>
+      <td><span class="badge ${ST[o[7]]}">${o[7]}</span></td>
+      <td>${o[8]}</td>
+      <td><span class="badge ${MS[o[9]]}">${o[9]}</span>${o[9] === 'Lỗi' ? '<span class="sub-err">Mã hàng chưa có bên MISA</span>' : ''}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="8" class="empty-state">Không có đơn ở trạng thái này</td></tr>';
+}
+function pick(t) { filter = t; draw(); }
+
+function openOrder(i) {
+  const o = ORDERS[i], p = PRODUCTS[o[3]], sub = total(o);
+  const misaBox = o[9] === 'Lỗi'
+    ? `<div class="box-note" style="background:var(--danger-bg);border-color:var(--danger)"><b>MISA từ chối:</b> mã hàng <span class="mono">${sku(p)}</span> chưa có trong danh mục vật tư hàng hoá bên MISA.<br>Cách sửa: vào <b>Kế toán › Khớp danh mục</b>, gửi mã sang MISA rồi bấm Gửi lại.
+        <div class="row-flex" style="margin-top:8px"><button class="btn btn-primary btn-sm" onclick="toast('Đã gửi mã ${sku(p)} sang MISA')">Gửi mã hàng sang MISA</button><button class="btn btn-outline btn-sm" onclick="toast('Đã xếp hàng gửi lại PNG-10471')">Gửi lại</button></div></div>`
+    : `<div class="kv"><span class="muted">MISA</span><span><span class="badge ${MS[o[9]]}">${o[9]}</span></span></div>`;
+  document.getElementById('dlgBody').innerHTML = `
+    <div class="row-flex" style="justify-content:space-between"><h3 class="mono" style="margin:0">${o[0]}</h3><span class="badge ${ST[o[7]]}">${o[7]}</span></div>
+    <p class="sub">${o[5]} · 26/11/2026 09:${String(40 - i).padStart(2, '0')} · Người chốt đơn: Lan Anh</p>
+    <div class="detail-grid">
+      <div>
+        <div class="row-flex" style="flex-wrap:nowrap;align-items:flex-start"><span class="th-sw" style="--sw:${p.sw}"><i class="ti ${p.ic}"></i></span>
+          <div><b>${p.name}</b> × ${o[4]}<span class="sub-muted">SKU ${sku(p)} · ${fmt(p.price)}</span>${o[10] ? `<span class="sub-muted">${o[10]}</span>` : ''}</div></div>
+        <hr class="divider" style="border:0;border-top:1px solid var(--border);margin:14px 0">
+        <div class="kv"><span class="muted">Tạm tính</span><span>${fmt(sub)}</span><span class="muted">Giao hàng</span><span>Miễn phí</span><span class="muted">Khách trả</span><b>${fmt(sub)}</b><span class="muted">Trong đó VAT 8%</span><span>${fmt(Math.round(sub - sub / 1.08))}</span></div>
+      </div>
+      <div>
+        <div class="kv"><span class="muted">Khách</span><span>${o[1]} · ${o[2]}</span><span class="muted">Thanh toán</span><span>${o[6]}</span><span class="muted">Kho xuất</span><span>${o[8]}</span></div>
+        ${misaBox}
+        <ul class="timeline" style="margin-top:14px">
+          <li><div class="t-status">Khách đặt hàng</div><div class="t-meta">Hệ thống giữ hàng ở ${o[8]} · báo Telegram</div></li>
+          ${['Đã xác nhận', 'Đang sản xuất', 'Đang đóng gói', 'Đã xuất kho', 'Hoàn tất'].includes(o[7]) ? '<li><div class="t-status">Đã xác nhận</div><div class="t-meta">Lan Anh gọi khách</div></li>' : ''}
+          ${['Đã xuất kho', 'Hoàn tất'].includes(o[7]) ? '<li><div class="t-status">Đã xuất kho</div><div class="t-meta">Trừ tồn thực · tự đẩy chứng từ bán hàng sang MISA</div></li>' : ''}
+          ${o[7] === 'Đã huỷ' ? '<li><div class="t-status">Đã huỷ</div><div class="t-meta">Nhả hàng đang giữ · không gửi MISA</div></li>' : ''}
+        </ul>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-outline" onclick="document.getElementById('dlg').style.display='none'">Đóng</button>
+      ${NEXT[o[7]] ? `<button class="btn btn-primary" onclick="toast('${NEXT[o[7]]}: ${o[0]}');document.getElementById('dlg').style.display='none'">${NEXT[o[7]]}</button>` : ''}
+    </div>`;
+  document.getElementById('dlg').style.display = 'flex';
+}
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ponagar — Prototype</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/ponagar-theme.css">
+<style>
+  .hub{max-width:980px;margin:0 auto;padding:40px 20px}
+  .hub-head{display:flex;gap:16px;align-items:center;margin-bottom:8px}
+  .hub-head img{width:64px;height:64px;border-radius:12px}
+  .hub h1{margin:0;font-size:28px;font-family:var(--font-display)}
+  .hub .stat-card{display:block}
+  .hub .stat-card i{font-size:28px;color:var(--brand)}
+  .hub .stat-card b{display:block;font-size:16px;margin:8px 0 4px}
+  .hub .stat-card p{margin:0;color:var(--muted);font-size:13px}
+  .pal{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 0}
+  .pal span{display:flex;align-items:center;gap:8px;font-size:12.5px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-full);padding:4px 12px 4px 4px}
+  .pal i{width:22px;height:22px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1px var(--border)}
+</style>
+</head>
+<body>
+<div class="hub">
+  <div class="hub-head">
+    <img src="https://cdn.hstatic.net/themes/1000360703/1001524369/14/ponagar-mark.png?v=535" alt="Ponagar">
+    <div><span class="badge red">Prototype v0.3 · 26/11/2026</span><h1>Ponagar — Túi da vẽ tay</h1></div>
+  </div>
+  <p class="muted">Website mới cho Công ty TNHH ART 868 · ~10.000 sản phẩm · bố cục & tính năng tham chiếu thienkimhome.com · giao diện dựng trên <code class="inline">@dmcl/design-tokens</code> + <code class="inline">ponagar-theme.css</code> (màu lấy từ logo). Dữ liệu mẫu.</p>
+  <div class="pal">
+    <span><i style="--c:var(--brand)"></i>--brand · đỏ logo</span>
+    <span><i style="--c:var(--brand-dark)"></i>--brand-dark</span>
+    <span><i style="--c:var(--brand-tint)"></i>--brand-tint</span>
+    <span><i style="--c:var(--accent)"></i>--accent · kem da</span>
+    <span><i style="--c:var(--ink)"></i>--ink</span>
+    <span><i style="--c:var(--bg)"></i>--bg · nền giấy</span>
+  </div>
+
+  <h2 style="font-size:15px;margin:26px 0 10px">Website (khách hàng)</h2>
+  <div class="stat-grid">
+    <a class="stat-card" href="home.html"><i class="ti ti-home"></i><b>Trang chủ</b><p>Bố cục theo thienkimhome.com: menu danh mục + slider + 3 banner, khối sản phẩm theo ngành hàng, bộ sưu tập</p></a>
+    <a class="stat-card" href="category.html"><i class="ti ti-adjustments-horizontal"></i><b>Danh mục + bộ lọc</b><p>Lọc theo chủ đề tranh, màu da, giá, kích thước, tình trạng</p></a>
+    <a class="stat-card" href="product.html"><i class="ti ti-shopping-bag"></i><b>Chi tiết sản phẩm</b><p>Chọn màu da, size, vẽ tên miễn phí, đặt làm theo mẫu</p></a>
+    <a class="stat-card" href="cart.html"><i class="ti ti-shopping-cart"></i><b>Giỏ hàng & đặt hàng</b><p>Đặt nhanh 1 trang, COD, VietQR, gói quà</p></a>
+  </div>
+
+  <h2 style="font-size:15px;margin:10px 0 10px">Quản trị (Vue 3 + @dmcl/ui-kit)</h2>
+  <div class="stat-grid">
+    <a class="stat-card" href="admin-orders.html"><i class="ti ti-plug-connected"></i><b>Đơn hàng + đồng bộ MISA</b><p>Trạng thái đơn, kho xuất, chứng từ tự sang MISA AMIS Kế toán</p></a>
+    <a class="stat-card" href="admin-products.html"><i class="ti ti-file-spreadsheet"></i><b>Sản phẩm + Nhập Excel</b><p>Nhập 10.000 SP từ file xuất Haravan, báo lỗi từng dòng, tồn theo kho, mã hàng MISA</p></a>
+  </div>
+
+  <p class="muted" style="font-size:13px">Tài liệu: <a style="color:var(--brand);font-weight:700" href="../specs/index.html">docs/specs</a> — yêu cầu, đề xuất, báo giá, design system, cấu hình VPS.</p>
+</div>
+</body>
+</html>

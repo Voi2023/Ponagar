@@ -32,6 +32,7 @@ body{background:var(--bg)}
 .guide code{font-family:var(--font-mono);font-size:12.4px}
 .guide :not(pre)>code{background:var(--gray-bg);border-radius:5px;padding:1px 6px}
 .guide a{color:var(--brand);font-weight:600}
+.guide h3{font-size:16px;margin:18px 0 6px}
 .guide hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 .guide tr.sum td{background:var(--brand-tint);font-weight:800}
 .guide tr.grp td{background:var(--bg)}
@@ -44,108 +45,75 @@ body{background:var(--bg)}
 <main class="doc"><article class="panel guide">
 <h1>02 — Đề xuất các việc cần làm</h1>
 <blockquote>
-<p>Ngân sách nhỏ nên nguyên tắc là: <strong>một ứng dụng, một server, tận dụng tối đa thứ đã có</strong> (kit UI <code>dmcl-shared</code>, dữ liệu trên Haravan, Cloudflare miễn phí).</p>
+<p><strong>Bản v0.3 · 26/11/2026</strong> — thay bản 29/10. Phạm vi mở rộng từ "website bán hàng" thành <strong>hệ thống vận hành</strong>: website, quản trị bán hàng, kho &amp; sản xuất, nhân sự &amp; lương, kết nối MISA AMIS Kế toán. Đơn và kho quản lý ngay trong hệ thống Ponagar, <strong>không đẩy sang KiotViet / Sapo / Haravan nữa</strong>. Mô tả chức năng đầy đủ: <a href="../tai-lieu/index.html">Tài liệu chức năng v0.3</a>.</p>
+<p>Nguyên tắc giữ nguyên: <strong>một ứng dụng, một server, tận dụng tối đa thứ đã có</strong> (kit UI <code>dmcl-shared</code>, dữ liệu trên Haravan, Cloudflare miễn phí, MISA công ty đang dùng).</p>
 </blockquote>
 <h2>1. Kiến trúc gọn</h2>
 <pre><code>Khách ─► Cloudflare (DNS + CDN + SSL, miễn phí) ─► VPS 2 vCPU / 4GB
                                                     ├─ Caddy (reverse proxy)
-                                                    ├─ Nuxt 3: website (SSR) + /admin (Vue + @dmcl/ui-kit) + API
-                                                    ├─ PostgreSQL 16 (dữ liệu gốc)
+                                                    ├─ Nuxt 3: website (SSR) + API
+                                                    │   └─ /admin: Bán hàng · Kho &amp; xưởng · Nhân sự · Kế toán · Hệ thống
+                                                    │   └─ /nv: trang nhân viên trên điện thoại (chấm công, ca, lương)
+                                                    ├─ PostgreSQL 16 (dữ liệu gốc, sổ kho chỉ ghi thêm)
                                                     ├─ Meilisearch (tìm kiếm + bộ lọc)
                                                     └─ Thư mục ảnh WebP (Cloudflare cache)
-Đơn mới ─► hàng đợi ─► API phần mềm quản lý đơn (KiotViet / Sapo / Haravan / Nhanh.vn / Pancake)
-       └─► báo Zalo / Telegram / email cho shop
+Đơn xuất kho ─► hàng đợi ─► MISA AMIS Kế toán (API, kết quả trả về qua callback)
+Đơn mới, lỗi MISA, nguyên liệu sắp hết ─► Telegram cho đúng nhóm
 </code></pre>
 <ul>
-<li><strong>Một codebase Nuxt 3</strong> chứa cả website, trang quản trị và API → ít công nhất, dễ bảo trì.</li>
+<li><strong>Một codebase Nuxt 3</strong> chứa website, các cổng quản trị, trang nhân viên và API → ít công nhất, dễ bảo trì.</li>
 <li>Website <strong>render phía server (SSR)</strong> để Google đọc được (quan trọng khi rời Haravan).</li>
 <li>Admin dùng nguyên <code>AppShell</code>, <code>BaseModal</code>, <code>FormSection</code>… của <code>@dmcl/ui-kit</code> → không thiết kế lại admin.</li>
-<li>Chi tiết cấu hình server + search engine: <a href="05-cau-hinh-vps.html">05 · Cấu hình VPS</a>.</li>
+<li>Một máy chủ 4GB đủ cho cả website và các khối vận hành; theo dõi dung lượng khi dữ liệu kho, chấm công lớn dần. Chi tiết: <a href="05-cau-hinh-vps.html">05 · Cấu hình VPS</a>.</li>
 </ul>
 <h2>2. Dữ liệu 10.000 sản phẩm</h2>
 <div class="table-scroll"><table class="data">
-<thead>
-<tr>
-<th>Vấn đề</th>
-<th>Đề xuất</th>
-</tr>
-</thead>
+<thead><tr><th>Vấn đề</th><th>Đề xuất</th></tr></thead>
 <tbody>
-<tr>
-<td>Lấy dữ liệu từ ponagar.co</td>
-<td>Xuất Excel sản phẩm từ Haravan → <strong>công cụ nhập</strong> tự đọc, tải ảnh về, nén <strong>WebP</strong>.</td>
-</tr>
-<tr>
-<td>Màu da, chủ đề tranh nhập không đồng nhất</td>
-<td><strong>Danh sách chuẩn</strong> (8 màu da, các chủ đề) + gợi ý sửa khi import.</td>
-</tr>
-<tr>
-<td>Biến thể</td>
-<td><strong>SP cha → biến thể</strong> (màu da × size); giá/tồn theo biến thể.</td>
-</tr>
-<tr>
-<td>Ảnh nặng</td>
-<td>Mỗi ảnh tạo 3 cỡ (400/800/1600px), Cloudflare cache → VPS nhẹ.</td>
-</tr>
-<tr>
-<td>Giữ SEO cũ</td>
-<td>Map URL Haravan cũ (<code>/products/...</code>, <code>/collections/...</code>) → <strong>301</strong> sang URL mới.</td>
-</tr>
+<tr><td>Lấy dữ liệu từ ponagar.co</td><td>Xuất Excel sản phẩm từ Haravan → <strong>công cụ nhập</strong> tự đọc, tải ảnh về, nén <strong>WebP</strong>, báo lỗi từng dòng kèm gợi ý sửa.</td></tr>
+<tr><td>Màu da, chủ đề tranh nhập không đồng nhất</td><td><strong>Danh sách chuẩn</strong> (8 màu da, các chủ đề) + gợi ý sửa khi import.</td></tr>
+<tr><td>Biến thể</td><td><strong>SP cha → biến thể</strong> (màu da × size); giá theo biến thể.</td></tr>
+<tr><td>Tồn kho</td><td><strong>Không nhập tay.</strong> Tồn tính từ sổ kho theo từng kho (nhập, xuất, chuyển, kiểm kê). Sổ chỉ ghi thêm, không sửa dòng cũ → luôn truy được vì sao tồn ra con số này.</td></tr>
+<tr><td>Mã hàng bên MISA</td><td>Mã hàng MISA = SKU. Gửi danh mục sang MISA theo lô lần đầu, sau đó từng mẫu mới. Mã chưa khớp hiện đỏ trong danh sách sản phẩm.</td></tr>
+<tr><td>Ảnh nặng</td><td>Mỗi ảnh tạo 3 cỡ (400/800/1600px), Cloudflare cache → VPS nhẹ.</td></tr>
+<tr><td>Giữ SEO cũ</td><td>Map URL Haravan cũ (<code>/products/...</code>, <code>/collections/...</code>) → <strong>301</strong> sang URL mới.</td></tr>
 </tbody>
 </table></div>
-<h2>3. Đơn hàng → phần mềm quản lý đơn</h2>
-<p>Công ty chưa xác định phần mềm. Website làm sẵn <strong>bộ chuyển đổi (adapter)</strong>, bản đầu kết nối <strong>1 phần mềm</strong> công ty đang dùng:</p>
+<h2>3. Đơn hàng, kho &amp; kết nối MISA</h2>
+<p>Bản v0.2 đề xuất đẩy đơn sang một phần mềm bán hàng ngoài (KiotViet / Sapo / Haravan / Nhanh.vn / Pancake). Bản này <strong>bỏ hướng đó</strong>: đơn, kho, sản xuất quản lý ngay trong hệ thống Ponagar; chỉ chứng từ kế toán sang <strong>MISA AMIS Kế toán</strong>.</p>
+<h3>Ai giữ số liệu gì</h3>
 <div class="table-scroll"><table class="data">
-<thead>
-<tr>
-<th>Phần mềm</th>
-<th>Phù hợp với</th>
-<th>Kết nối</th>
-</tr>
-</thead>
+<thead><tr><th>Việc</th><th>Ponagar</th><th>MISA</th></tr></thead>
 <tbody>
-<tr>
-<td><strong>KiotViet</strong></td>
-<td>Cửa hàng bán lẻ, quản lý kho + bán tại quầy, rất phổ biến</td>
-<td>Public API (tạo đơn đặt hàng)</td>
-</tr>
-<tr>
-<td><strong>Sapo</strong> (Sapo OMNI)</td>
-<td>Bán đa kênh: web, Shopee/TikTok, Facebook, cửa hàng</td>
-<td>API</td>
-</tr>
-<tr>
-<td><strong>Haravan</strong> (OmniPower)</td>
-<td>ponagar.co <strong>đang dùng Haravan</strong> → nếu giữ Haravan làm nơi quản lý đơn/kho thì ít thay đổi thói quen nhất</td>
-<td>API</td>
-</tr>
-<tr>
-<td><strong>Nhanh.vn</strong></td>
-<td>Mạnh về kho + kết nối nhiều hãng vận chuyển</td>
-<td>API <code>order/add</code></td>
-</tr>
-<tr>
-<td><strong>Pancake POS</strong></td>
-<td>Bán chủ yếu qua Facebook/Instagram/livestream, chốt đơn inbox</td>
-<td>API</td>
-</tr>
-<tr>
-<td>Chưa có / không có API</td>
-<td>—</td>
-<td>Báo đơn qua Zalo/Telegram + <strong>xuất Excel</strong> theo ngày</td>
-</tr>
+<tr><td>Đơn hàng, giao hàng, đổi trả</td><td><strong>Gốc</strong></td><td>Nhận bản sao để hạch toán</td></tr>
+<tr><td>Tồn kho hằng ngày, giữ hàng, sản xuất</td><td><strong>Gốc</strong></td><td>Tồn sổ sách, đối chiếu cuối tháng</td></tr>
+<tr><td>Chứng từ, sổ sách, công nợ, thuế, hoá đơn điện tử</td><td>Tính sẵn thuế trên từng đơn</td><td><strong>Gốc</strong></td></tr>
+<tr><td>Chấm công, tính lương</td><td><strong>Gốc</strong></td><td>Hạch toán chi phí lương (nhập Excel)</td></tr>
 </tbody>
 </table></div>
-<p><strong>Gợi ý:</strong> nếu chưa dùng phần mềm nào → <strong>KiotViet</strong> (bán tại showroom + kho) hoặc <strong>Sapo</strong> (bán nhiều kênh online). Nếu đang quen Haravan → giữ <strong>Haravan</strong> làm nơi quản lý đơn.
-Lưu ý: cần kiểm tra <strong>gói đang thuê có mở API</strong> không (một số gói thấp không có).</p>
-<p><strong>Cách đẩy đơn:</strong> đơn lưu trên web trước → đẩy sang phần mềm qua hàng đợi → lỗi thì <strong>tự thử lại 5 lần</strong>, rồi báo đỏ trong admin để bấm <strong>"Gửi lại"</strong>. Không bao giờ mất đơn khi phần mềm bên kia lỗi.
-Mỗi sản phẩm trên web lưu <strong>mã SP bên phần mềm quản lý</strong> để đơn đẩy sang khớp đúng hàng.</p>
-<h2>4. Tính năng học từ thienkimhome (làm theo kiểu Ponagar)</h2>
+<p>Dữ liệu chỉ đi <strong>một chiều</strong> Ponagar → MISA. MISA lỗi hoặc bảo trì: website vẫn bán bình thường, đơn xếp hàng chờ gửi sau.</p>
+<h3>Khi nào gửi sang MISA</h3>
+<div class="table-scroll"><table class="data">
+<thead><tr><th>Sự kiện</th><th>Gửi sang MISA</th></tr></thead>
+<tbody>
+<tr><td>Khách đặt, đơn chờ xác nhận</td><td>Chưa gửi (chỉ giữ hàng)</td></tr>
+<tr><td>Đơn huỷ trước khi xuất kho</td><td>Không bao giờ gửi</td></tr>
+<tr><td>Kho bấm <strong>Xuất kho</strong> / bán tại quầy thu tiền</td><td>Chứng từ bán hàng</td></tr>
+<tr><td>Khách trả hàng (đã duyệt, kho đã nhận)</td><td>Chứng từ trả lại hàng bán</td></tr>
+<tr><td>Nhập mua nhà cung cấp (GĐ3)</td><td>Chứng từ mua hàng</td></tr>
+</tbody>
+</table></div>
+<p><strong>Cách gửi:</strong> chứng từ vào hàng đợi → gửi trong khoảng 1 phút → lỗi mạng thì <strong>tự thử lại 5 lần</strong>. MISA xử lý không đồng thời nên kết quả thật trả về sau qua địa chỉ callback: đơn có hai trạng thái <em>Đã gửi · chờ MISA</em> và <em>MISA đã nhận</em>. MISA từ chối thì đơn hiện đỏ kèm lý do tiếng Việt và nút <strong>Gửi lại</strong>. Mỗi chứng từ mang mã đơn Ponagar làm khoá chống trùng: một đơn không bao giờ sang MISA hai lần. Bên MISA, kế toán duyệt ở <em>Đề nghị lập chứng từ</em> rồi mới ghi sổ.</p>
+<p><strong>Cần xác nhận với MISA trước GĐ2:</strong> gói AMIS Kế toán của công ty có mở API kết nối không; thời gian duyệt ClientID; API danh mục cho đẩy hàng hoá mới sang hay chỉ lấy về. Nếu không có API: xuất Excel đúng mẫu nhập của MISA theo ngày.</p>
+<h2>4. Giao diện học từ thienkimhome (làm theo kiểu Ponagar)</h2>
 <ul>
-<li>Menu lớn nhiều tầng, trang <strong>danh mục × chủ đề</strong> làm trang SEO (vd: <em>túi da vẽ tay đồng quê</em>).</li>
-<li>Bộ lọc có <strong>số đếm</strong>, sắp xếp, phân trang; khối <strong>ưu đãi có đồng hồ đếm ngược</strong>.</li>
-<li>Thanh <strong>Gọi / Zalo / Messenger</strong> dính màn hình, nút <strong>"Gọi lại cho tôi"</strong>.</li>
-<li>Khác biệt của Ponagar: <strong>câu chuyện bức tranh</strong>, <strong>vẽ tên miễn phí</strong>, <strong>đặt làm riêng</strong>, video xưởng.</li>
+<li><strong>Header một thanh</strong>: danh mục, tìm kiếm, số gọi mua hàng, cửa hàng gần bạn, cẩm nang, giỏ hàng, thành viên.</li>
+<li><strong>Đầu trang chủ</strong>: menu danh mục bên trái (rê chuột hiện bảng con), banner chạy có tab ở giữa, 3 banner ưu đãi bên phải.</li>
+<li><strong>Mỗi ngành hàng một khối</strong> lưới 5 cột; thẻ sản phẩm có nhãn <em>Giảm x%</em>, giá cũ gạch, ô <em>Tặng thêm</em>, số sao đánh giá.</li>
+<li>Trang <strong>danh mục × chủ đề</strong> làm trang SEO (vd: <em>túi da vẽ tay đồng quê</em>); bộ lọc có số đếm, sắp xếp, phân trang.</li>
+<li>Footer nền trắng 4 cột + hàng địa chỉ showroom; nút <strong>Gọi / Zalo / Messenger</strong> dính màn hình.</li>
+<li>Màu đỏ logo Ponagar thay màu cam của trang mẫu. Khác biệt của Ponagar: <strong>câu chuyện bức tranh</strong>, <strong>vẽ tên miễn phí</strong>, <strong>đặt làm riêng</strong>, bộ sưu tập theo chủ đề tranh thay cho khối thương hiệu.</li>
+<li>Xem bản click được: <a href="../prototype/home.html">prototype trang chủ</a>.</li>
 </ul>
 <h2>5. SEO</h2>
 <ul>
@@ -153,58 +121,28 @@ Mỗi sản phẩm trên web lưu <strong>mã SP bên phần mềm quản lý</s
 <li>Sitemap tự sinh (chia file ≤ 5.000 URL), canonical cho trang lọc, <strong>301 từ URL Haravan cũ</strong>.</li>
 <li>GA4 + Meta Pixel + Google Search Console.</li>
 </ul>
-<h2>6. Lộ trình (~5 tuần)</h2>
+<h2>6. Lộ trình (4 giai đoạn, ~17–19 tuần)</h2>
+<p>Mỗi giai đoạn chạy thật được ngay khi bàn giao. Giá từng giai đoạn: <a href="03-bao-gia.html">03 · Báo giá</a>.</p>
 <div class="table-scroll"><table class="data">
-<thead>
-<tr>
-<th>Tuần</th>
-<th>Việc</th>
-</tr>
-</thead>
+<thead><tr><th>Giai đoạn</th><th>Việc</th><th>Thời gian</th><th>Cần trước</th></tr></thead>
 <tbody>
-<tr>
-<td>1</td>
-<td>Chốt prototype, dựng VPS, nhập thử 500 SP từ Haravan</td>
-</tr>
-<tr>
-<td>2–3</td>
-<td>Website + admin + tìm kiếm/bộ lọc</td>
-</tr>
-<tr>
-<td>4</td>
-<td>Nhập đủ 10.000 SP, kết nối phần mềm quản lý đơn, SEO, 301</td>
-</tr>
-<tr>
-<td>5</td>
-<td>Khách kiểm thử, sửa lỗi, chuyển tên miền, bàn giao</td>
-</tr>
+<tr><td><strong>GĐ1</strong> · Website &amp; đơn hàng</td><td>Tuần 1: chốt prototype, dựng VPS, nhập thử 500 SP · Tuần 2–3: website + quản trị đơn, sản phẩm + tìm kiếm/bộ lọc · Tuần 4: nhập đủ 10.000 SP, SEO, 301 · Tuần 5: khách kiểm thử, chuyển tên miền, bàn giao</td><td>~5 tuần</td><td>File xuất Haravan, logo, thông tin showroom</td></tr>
+<tr><td><strong>GĐ2</strong> · Kho thành phẩm &amp; MISA</td><td>Nhiều kho, tồn theo kho, giữ hàng, đóng gói &amp; xuất kho, chuyển kho, kiểm kê, bán tại quầy, đổi trả, đẩy chứng từ MISA, đối soát COD</td><td>~4–5 tuần</td><td>GĐ1 · MISA duyệt ClientID</td></tr>
+<tr><td><strong>GĐ3</strong> · Nguyên liệu &amp; sản xuất</td><td>Nguyên liệu, nhà cung cấp, nhập mua, định mức, lệnh sản xuất, KCS, giá vốn, đối chiếu tồn MISA</td><td>~4 tuần</td><td>GĐ2 · định mức da từng mẫu</td></tr>
+<tr><td><strong>GĐ4</strong> · Nhân sự &amp; lương</td><td>Hồ sơ, xếp ca, chấm công trên điện thoại, đơn từ, lương khoán, hoa hồng, bảng lương, phiếu lương</td><td>~4–5 tuần</td><td>GĐ3 (lương khoán lấy sản lượng từ lệnh sản xuất) · đơn giá khoán</td></tr>
 </tbody>
 </table></div>
+<p>GĐ2 làm trước GĐ3 vì đẩy chứng từ sang MISA chỉ cần tồn thành phẩm, chưa cần nguyên liệu. Nếu cần chấm công sớm, có thể tách phần hồ sơ, xếp ca, chấm công của GĐ4 làm trước.</p>
 <h2>7. Rủi ro &amp; cách giảm</h2>
 <div class="table-scroll"><table class="data">
-<thead>
-<tr>
-<th>Rủi ro</th>
-<th>Cách giảm</th>
-</tr>
-</thead>
+<thead><tr><th>Rủi ro</th><th>Cách giảm</th></tr></thead>
 <tbody>
-<tr>
-<td>Ngân sách thấp, phạm vi dễ phình</td>
-<td>Chốt danh sách tính năng ở trang 03; phát sinh tính riêng</td>
-</tr>
-<tr>
-<td>Phần mềm quản lý không có API</td>
-<td>Dùng báo đơn Zalo/Telegram + xuất Excel</td>
-</tr>
-<tr>
-<td>Rớt thứ hạng khi rời Haravan</td>
-<td>Map 301 đầy đủ, giữ tiêu đề/mô tả SEO cũ</td>
-</tr>
-<tr>
-<td>VPS nhỏ quá tải mùa sale</td>
-<td>Cloudflare cache trang + ảnh; nâng gói VPS khi cần</td>
-</tr>
+<tr><td>Phạm vi lớn, dễ phình</td><td>Chia 4 giai đoạn, chốt danh sách chức năng ở tài liệu v0.3; phát sinh tính riêng</td></tr>
+<tr><td>Gói MISA không mở API, hoặc duyệt ClientID chậm</td><td>GĐ1 không phụ thuộc MISA. Hỏi MISA ngay khi ký. Phương án dự phòng: xuất Excel đúng mẫu nhập của MISA theo ngày</td></tr>
+<tr><td>Tồn hệ thống lệch tồn thực</td><td>Sổ kho chỉ ghi thêm, mọi lần nhập/xuất có người bấm; kiểm kê định kỳ; bán tại quầy bắt buộc qua hệ thống</td></tr>
+<tr><td>Dữ liệu lương, giá vốn nhạy cảm</td><td>Phân quyền theo vai trò, nhật ký thao tác, mã truy cập MISA lưu mã hoá</td></tr>
+<tr><td>Rớt thứ hạng khi rời Haravan</td><td>Map 301 đầy đủ, giữ tiêu đề/mô tả SEO cũ</td></tr>
+<tr><td>VPS nhỏ quá tải mùa sale hoặc dữ liệu lớn dần</td><td>Cloudflare cache trang + ảnh; theo dõi dung lượng; nâng gói VPS khi cần</td></tr>
 </tbody>
 </table></div>
 </article></main>
