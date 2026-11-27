@@ -71,6 +71,7 @@
   --brand:#DB2717; --brand-dark:#AB1E12; --brand-deep:#282C34; --brand-tint:#FCEDEB; --logo:#FE321F;
   --accent:#798585; --bg:#F7F7F5; --surface:#fff; --border:#E6E6E2; --gray-bg:#EEEEEB;
   --ink:#282C34; --muted:#6B7378; --ok:#0a7d3c;
+  --ban:#DB2717; --kho:#0B7285; --ns:#6741D9;   /* màu 3 cổng quản trị, khớp prototype/assets/admin.css */
   --font:"Be Vietnam Pro","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
   --display:"Be Vietnam Pro","Segoe UI",system-ui,sans-serif;
 }
@@ -126,6 +127,22 @@ section+section{border-top:1px solid var(--border)}
 .mod.hl{background:var(--brand);color:#fff;border-color:var(--brand)}
 .mod.hl .who{color:rgba(255,255,255,.8)}
 .mod.hl .no{color:rgba(255,255,255,.2)}
+.pt{display:inline-block;font-style:normal;font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 9px;margin:0 4px 0 0;color:#fff;white-space:nowrap;vertical-align:1px}
+.pt-ban{background:var(--ban)}.pt-kho{background:var(--kho)}.pt-ns{background:var(--ns)}.pt-mb{background:var(--accent)}
+.mod.hl .pt{box-shadow:0 0 0 1.5px rgba(255,255,255,.7)}
+.role .pts{display:block;margin-top:6px}
+.portals{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.portal{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.portal .top{background:var(--c);color:#fff;padding:18px 22px 16px}
+.portal .top small{display:block;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.portal .top h3{font-size:22px;margin:4px 0 2px}
+.portal .top span{font-size:13.5px;opacity:.9}
+.portal .body{padding:16px 22px 20px;display:flex;flex-direction:column;gap:12px;flex:1}
+.portal ul{margin:0;padding-left:18px;font-size:14.5px}
+.portal li{margin:3px 0}
+.portal .who{font-size:13px;color:var(--muted)}
+.portal .go{margin-top:auto;font-weight:700;font-size:14px;color:var(--c);text-decoration:none}
+.portal .go:hover{text-decoration:underline}
 .sys{margin-top:14px;font-size:14.5px;color:var(--muted)}
 .sys b{color:var(--ink)}
 
@@ -223,6 +240,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 @media (max-width:900px){
   .gains,.mods,.roles{grid-template-columns:1fr 1fr}
+  .portals{grid-template-columns:1fr}
   .safe,.road,.next{grid-template-columns:1fr 1fr}
   .web,.cost{grid-template-columns:1fr}
   .flow{grid-template-columns:1fr;gap:18px}
@@ -239,7 +257,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   .cover h1{font-size:36px;margin-top:40px}
   .cover p{font-size:16px}
   .stats{grid-template-columns:1fr 1fr}
-  .gains,.mods,.roles,.safe,.road,.next{grid-template-columns:1fr}
+  .gains,.mods,.roles,.safe,.road,.next,.portals{grid-template-columns:1fr}
   .price .big{font-size:42px}
   .mock .grid{grid-template-columns:repeat(3,1fr)}
   .mock .grid div:nth-child(3){border-right:0}
@@ -249,7 +267,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   body{background:#fff}
   .ctas{display:none}
   section{padding:28px 0;break-inside:avoid}
-  .mod,.ph,.gain,.role{break-inside:avoid}
+  .mod,.ph,.gain,.role,.portal{break-inside:avoid}
 }
 </style>
 </head>
@@ -268,6 +286,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     </div>
     <div class="ctas">
       <a class="btn solid" href="prototype/home.html">Xem giao diện website →</a>
+      <a class="btn line" href="#cong">3 cổng quản trị</a>
       <a class="btn line" href="specs/03-bao-gia.html">Báo giá chi tiết</a>
       <a class="btn line" href="tai-lieu/index.html">Tài liệu chức năng đầy đủ</a>
     </div>
@@ -289,22 +308,56 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   <section>
     <div class="wrap">
       <div class="sec-h"><span class="kick">Hệ thống gồm những gì</span><h2>Sáu khối chức năng</h2>
-        <p class="lead">Mỗi khối có trang riêng trong phần quản trị. Thợ lắp đặt và nhân viên dùng thêm một trang gọn trên điện thoại. Phạm vi dưới đây là đề xuất, <span class="ask">chờ Techhomes xác nhận</span>.</p></div>
+        <p class="lead">Sáu khối nằm trong <a href="#cong">ba cổng quản trị</a>, mỗi cổng một màu để không nhầm: <i class="pt pt-ban">Bán hàng</i><i class="pt pt-kho">Kho</i><i class="pt pt-ns">Nhân sự</i>. Thợ lắp đặt và nhân viên dùng thêm một trang gọn trên điện thoại. Phạm vi dưới đây là đề xuất, <span class="ask">chờ Techhomes xác nhận</span>.</p></div>
       <div class="mods">
-        <div class="mod hl"><span class="no">01</span><h3>Website bán hàng</h3><div class="who">Khách lẻ · Nhà thầu · Đại lý</div>
+        <div class="mod hl"><span class="no">01</span><h3>Website bán hàng</h3><div class="who">Khách lẻ · Nhà thầu · Đại lý · quản lý nội dung ở <i class="pt pt-ban">Bán hàng</i></div>
           <ul><li>Menu theo ngành hàng và thương hiệu: Hafele, Blum, Bosch…</li><li>Lọc theo hãng, giá, kích thước, tính năng, tình trạng</li><li>Tìm theo mã hàng Hafele (533.09.989) hay Blum (22F1809)</li><li>Hiện giá niêm yết, giá bán, % giảm</li><li>Nút "Yêu cầu báo giá" và "Đặt lịch lắp đặt"</li><li>Catalogue PDF, tin tức, dự án đã làm</li></ul></div>
-        <div class="mod"><span class="no">02</span><h3>Quản trị bán hàng</h3><div class="who">Chủ · Quản lý · Bán hàng</div>
+        <div class="mod"><span class="no">02</span><h3>Quản trị bán hàng</h3><div class="who"><i class="pt pt-ban">Cổng Bán hàng</i> Chủ · Quản lý · Bán hàng</div>
           <ul><li>Đơn từ web, Zalo, điện thoại, tại showroom về một chỗ</li><li>Lập báo giá, khách đồng ý là chuyển thành đơn</li><li>Khách chia nhóm: lẻ, nhà thầu, đại lý</li><li>Bảng giá chiết khấu riêng cho từng nhóm</li><li>Khuyến mãi, banner, bài viết, dự án</li><li>Báo cáo doanh thu theo showroom, theo hãng</li></ul></div>
-        <div class="mod"><span class="no">03</span><h3>Kho</h3><div class="who">Kho · Quản lý showroom</div>
+        <div class="mod"><span class="no">03</span><h3>Kho</h3><div class="who"><i class="pt pt-kho">Cổng Kho</i> Kho · Quản lý showroom</div>
           <ul><li>Tồn riêng 3 kho: Phú Nhuận, Q.10, Thủ Đức</li><li>Nhập mua từ Hafele Việt Nam, Blum và các hãng</li><li>Chuyển kho giữa các showroom, kiểm kê</li><li>Ghi số serial bếp, máy rửa chén, khóa điện tử</li><li>Tồn thật hiện lên website</li></ul></div>
-        <div class="mod"><span class="no">04</span><h3>Lắp đặt &amp; bảo hành</h3><div class="who">Quản lý · Thợ lắp đặt</div>
+        <div class="mod"><span class="no">04</span><h3>Lắp đặt &amp; bảo hành</h3><div class="who"><i class="pt pt-ban">Cổng Bán hàng</i> Quản lý · Điều phối · Thợ</div>
           <ul><li>Lịch lắp đặt, phân thợ theo ngày</li><li>Phiếu lắp đặt, thợ chụp ảnh nghiệm thu</li><li>Biểu phí lắp đặt có sẵn khi báo giá</li><li>Phiếu bảo hành theo số serial</li><li>Tiếp nhận và theo dõi yêu cầu bảo hành</li></ul></div>
-        <div class="mod"><span class="no">05</span><h3>Nhân sự &amp; lương</h3><div class="who">Quản lý · Kế toán · Nhân viên</div>
+        <div class="mod"><span class="no">05</span><h3>Nhân sự &amp; lương</h3><div class="who"><i class="pt pt-ns">Cổng Nhân sự</i> Quản lý · Kế toán · Nhân viên</div>
           <ul><li>Chấm công</li><li>Hoa hồng cho nhân viên bán hàng</li><li>Công lắp đặt tính theo phiếu cho thợ</li><li>Bảng lương tháng</li></ul></div>
-        <div class="mod"><span class="no">06</span><h3>Kế toán &amp; MISA</h3><div class="who">Kế toán</div>
+        <div class="mod"><span class="no">06</span><h3>Kế toán &amp; MISA</h3><div class="who"><i class="pt pt-ban">Cổng Bán hàng</i> Kế toán</div>
           <ul><li>Đơn bán, phiếu nhập/xuất kho, phiếu thu tự sang MISA AMIS Kế toán</li><li>Chứng từ xếp hàng đợi, lỗi thì báo và gửi lại</li><li>Không bao giờ gửi trùng</li><li>Không cần KiotViet hay Sapo</li></ul></div>
       </div>
       <p class="sys"><b>Dùng chung cho cả hệ thống:</b> mỗi người một tài khoản, quyền theo vai trò; nhật ký ghi lại ai sửa giá, sửa tồn, sửa lương, lúc nào; sao lưu tự động hằng ngày.</p>
+    </div>
+  </section>
+
+  <section id="cong">
+    <div class="wrap">
+      <div class="sec-h"><span class="kick">Quản trị</span><h2>Ba cổng, mỗi cổng một màu</h2>
+        <p class="lead">Mỗi bộ phận vào đúng cổng của mình, chỉ thấy menu của việc mình làm. Màu thanh bên đổi theo cổng nên nhìn là biết đang ở đâu. Ai có quyền nhiều cổng thì chuyển bằng một nút ở đầu menu.</p></div>
+      <div class="portals">
+        <div class="portal" style="--c:var(--ban)">
+          <div class="top"><small>Màu đỏ</small><h3>Cổng Bán hàng</h3><span>Đơn, báo giá, khách, lắp đặt, MISA</span></div>
+          <div class="body">
+            <ul><li>Tổng quan trong ngày: doanh thu, đơn chờ, việc cần làm</li><li>Đơn hàng, báo giá nhà thầu, bán tại showroom, đổi trả</li><li>Khách hàng & bảng giá theo nhóm, sản phẩm, khuyến mãi, nội dung web</li><li>Lịch lắp đặt, phiếu lắp đặt, bảo hành</li><li>Đồng bộ MISA, tài khoản & quyền, nhật ký</li></ul>
+            <div class="who">Chủ · Quản lý showroom · Bán hàng · Điều phối lắp đặt · Kế toán</div>
+            <a class="go" href="prototype/admin-dashboard.html">Xem tổng quan Bán hàng →</a>
+          </div>
+        </div>
+        <div class="portal" style="--c:var(--kho)">
+          <div class="top"><small>Màu xanh ngọc</small><h3>Cổng Kho</h3><span>Tồn 3 showroom, xuất kho, serial</span></div>
+          <div class="body">
+            <ul><li>Tổng quan kho: chọn showroom đang làm, đơn chờ xuất, tồn thấp, hàng sắp về</li><li>Tồn kho theo mã ở Phú Nhuận, Q.10, Thủ Đức; kiểm kê; nhập–xuất–tồn</li><li>Xuất kho cho đơn: quét mã, quét serial, xuất xong tự sang MISA</li><li>Chuyển kho giữa các showroom</li><li>Tra số serial: nhập → bán → lắp → bảo hành</li></ul>
+            <div class="who">Thủ kho · Quản lý showroom · Chủ · Kế toán (xem)</div>
+            <a class="go" href="prototype/admin-kho.html">Xem tổng quan Kho →</a>
+          </div>
+        </div>
+        <div class="portal" style="--c:var(--ns)">
+          <div class="top"><small>Màu tím</small><h3>Cổng Nhân sự</h3><span>Chấm công, hoa hồng, lương</span></div>
+          <div class="body">
+            <ul><li>Tổng quan nhân sự: ai đang làm ở đâu hôm nay, đơn chờ duyệt, quỹ lương dự kiến</li><li>Chấm công, xếp ca, nghỉ phép, đổi ca</li><li>Hoa hồng bán hàng và công lắp đặt theo phiếu</li><li>Bảng lương tháng: Nháp → Đã duyệt → Đã trả, phiếu lương từng người</li></ul>
+            <div class="who">Kế toán · Quản lý showroom · Chủ · Điều phối (công thợ)</div>
+            <a class="go" href="prototype/admin-ns.html">Xem tổng quan Nhân sự →</a>
+          </div>
+        </div>
+      </div>
+      <p class="sys"><b>Ai vào cổng nào</b> do chủ cấp trong Tài khoản &amp; quyền; danh sách trên là đề xuất, <span class="ask">chờ Techhomes xác nhận</span>. Thợ lắp đặt không vào cổng nào: thợ dùng trang nhân viên trên điện thoại để xem lịch, chụp ảnh nghiệm thu, chấm công.</p>
     </div>
   </section>
 
@@ -328,12 +381,12 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="wrap">
       <div class="sec-h"><span class="kick">Ai dùng gì</span><h2>Mỗi người một phần việc</h2></div>
       <div class="roles">
-        <div class="role"><span class="av">C</span><div><b>Chủ</b><span>Xem toàn bộ 3 showroom, phân quyền, duyệt bảng lương, xem lãi gộp</span></div></div>
-        <div class="role"><span class="av">Q</span><div><b>Quản lý</b><span>Đơn hàng, báo giá, bảng giá theo nhóm khách, lịch lắp đặt</span></div></div>
-        <div class="role"><span class="av">B</span><div><b>Bán hàng</b><span>Tư vấn, báo giá cho nhà thầu, chốt đơn online và tại showroom</span></div></div>
-        <div class="role"><span class="av">K</span><div><b>Kho</b><span>Nhập hàng từ hãng, chuyển kho, kiểm kê, ghi serial</span></div></div>
-        <div class="role"><span class="av">T</span><div><b>Kế toán</b><span>Thu tiền, chứng từ sang MISA, lập bảng lương</span></div></div>
-        <div class="role"><span class="av">L</span><div><b>Thợ lắp đặt</b><span>Xem lịch lắp, chụp ảnh nghiệm thu, xem công trên điện thoại</span></div></div>
+        <div class="role"><span class="av">C</span><div><b>Chủ</b><span>Xem toàn bộ 3 showroom, phân quyền, duyệt bảng lương, xem lãi gộp</span><span class="pts"><i class="pt pt-ban">Bán hàng</i><i class="pt pt-kho">Kho</i><i class="pt pt-ns">Nhân sự</i></span></div></div>
+        <div class="role"><span class="av">Q</span><div><b>Quản lý</b><span>Đơn hàng, báo giá, bảng giá theo nhóm khách, lịch lắp đặt</span><span class="pts"><i class="pt pt-ban">Bán hàng</i><i class="pt pt-kho">Kho</i><i class="pt pt-ns">Nhân sự</i></span></div></div>
+        <div class="role"><span class="av">B</span><div><b>Bán hàng</b><span>Tư vấn, báo giá cho nhà thầu, chốt đơn online và tại showroom</span><span class="pts"><i class="pt pt-ban">Bán hàng</i></span></div></div>
+        <div class="role"><span class="av">K</span><div><b>Kho</b><span>Nhập hàng từ hãng, chuyển kho, kiểm kê, ghi serial</span><span class="pts"><i class="pt pt-kho">Kho</i></span></div></div>
+        <div class="role"><span class="av">T</span><div><b>Kế toán</b><span>Thu tiền, chứng từ sang MISA, lập bảng lương</span><span class="pts"><i class="pt pt-ban">Bán hàng</i><i class="pt pt-kho">Kho</i><i class="pt pt-ns">Nhân sự</i></span></div></div>
+        <div class="role"><span class="av">L</span><div><b>Thợ lắp đặt</b><span>Xem lịch lắp, chụp ảnh nghiệm thu, xem công trên điện thoại</span><span class="pts"><i class="pt pt-mb">Trang nhân viên</i></span></div></div>
       </div>
     </div>
   </section>
