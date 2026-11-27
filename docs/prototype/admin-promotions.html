@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Khuyến mãi & mã giảm giá (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+table.data .mono{white-space:nowrap}
+.sw{position:relative;display:inline-block;width:38px;height:22px}
+.sw input{opacity:0;width:0;height:0}
+.sw span{position:absolute;inset:0;background:var(--border);border-radius:var(--radius-full);cursor:pointer;transition:.15s}
+.sw span::before{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:var(--surface);transition:.15s}
+.sw input:checked+span{background:var(--brand)}
+.sw input:checked+span::before{transform:translateX(16px)}
+.sw input:focus-visible+span{outline:2px solid var(--brand);outline-offset:2px}
+.use{min-width:110px}.use .progress-bar{margin-top:4px}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Khuyến mãi & mã giảm giá</h1></div>
+      <div class="row-flex">
+        <button class="btn btn-primary btn-sm" onclick="openPromo(-1)"><i class="ti ti-plus"></i> Tạo chương trình</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid" id="kpi"></div>
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+      <div class="toolbar">
+        <input type="search" id="q" placeholder="Tìm mã, tên chương trình…" aria-label="Tìm khuyến mãi" oninput="draw()">
+        <select id="fType" aria-label="Loại khuyến mãi" onchange="draw()"><option value="">Mọi loại</option></select>
+      </div>
+      <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+        <thead><tr><th>Chương trình · mã</th><th>Mức giảm</th><th>Áp cho</th><th>Điều kiện</th><th>Hiệu lực</th><th>Lượt dùng</th><th>Trạng thái</th><th>Bật</th></tr></thead>
+        <tbody id="rows"></tbody></table></div></div>
+      <div class="box-note">Tiền giảm chia đều theo tỉ lệ giá cho từng dòng hàng <b>trước khi tính thuế</b> (xem ví dụ trong mã TECH5). Khuyến mãi và giá nhóm khách (nhà thầu, đại lý) không cộng dồn: khách được giá thấp hơn trong hai giá — <span class="badge amber">đề xuất, chờ Techhomes xác nhận</span>. Miễn phí lắp đặt: khách trả 0đ, công thợ vẫn tính. Ưu đãi có giờ kết thúc thì web tự hiện đồng hồ đếm ngược.</div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal modal-lg"></div></div>
+
+<script>
+renderAdmin('admin-promotions.html');
+const NOW = new Date('2026-11-27T10:00');
+const TYPES = { pct: 'Giảm %', amt: 'Giảm số tiền', gift: 'Combo · quà tặng kèm', install: 'Miễn phí lắp đặt' };
+const SBADGE = { 'Đang chạy': 'green', 'Sắp chạy': 'blue', 'Tạm dừng': 'amber', 'Đã kết thúc': 'gray' };
+// code rỗng = tự áp, không cần nhập mã
+const PROMOS = [
+  { code: 'TECH5', name: 'Giảm 5% toàn đơn', type: 'pct', val: 5, scope: 'Toàn đơn', cond: 'Đơn từ 10.000.000đ · mỗi khách 1 lần', start: '2026-11-01T00:00', end: '2026-12-31T23:59', used: 214, limit: 1000, on: true, saved: 41850000 },
+  { code: '', name: 'Black Friday · máy rửa chén Häfele giảm thêm 10%', type: 'pct', val: 10, scope: 'Danh sách mã · 535.29.700, 538.21.310', cond: 'Tự áp, hiện đồng hồ đếm ngược', start: '2026-11-27T20:00', end: '2026-11-28T23:59', used: 0, limit: 40, on: true, saved: 0 },
+  { code: 'BLUM500', name: 'Giảm 500.000đ phụ kiện Blum', type: 'amt', val: 500000, scope: 'Thương hiệu · Blum', cond: 'Hàng Blum trong đơn từ 5.000.000đ', start: '2026-11-01T00:00', end: '2026-11-30T23:59', used: 87, limit: 300, on: true, saved: 43500000 },
+  { code: '', name: 'Mua bếp từ tặng bộ nồi Häfele 4 món', type: 'gift', val: 'Bộ nồi 4 món (dòng 0đ)', scope: 'Ngành hàng · Bếp từ', cond: 'Tự áp, đến khi hết 60 bộ quà', start: '2026-11-10T00:00', end: '2026-12-10T23:59', used: 41, limit: 60, on: true, saved: 0 },
+  { code: '', name: 'Miễn phí lắp đặt khóa điện tử', type: 'install', val: 'Phí lắp 0đ', scope: 'Ngành hàng · Khóa điện tử', cond: 'Nội thành TP.HCM', start: '2026-11-15T00:00', end: '2026-12-15T23:59', used: 63, limit: 0, on: true, saved: 0 },
+  { code: 'ZALO200', name: 'Giảm 200.000đ khách từ Zalo OA', type: 'amt', val: 200000, scope: 'Toàn đơn', cond: 'Đơn từ 3.000.000đ', start: '2026-11-01T00:00', end: '2026-12-31T23:59', used: 18, limit: 200, on: false, saved: 3600000 },
+  { code: 'GIANGSINH1TR', name: 'Giáng sinh giảm 1.000.000đ', type: 'amt', val: 1000000, scope: 'Toàn đơn', cond: 'Đơn từ 20.000.000đ', start: '2026-12-15T00:00', end: '2026-12-25T23:59', used: 0, limit: 200, on: true, saved: 0 },
+  { code: 'KHAITRUONGTD', name: 'Khai trương chi nhánh Thủ Đức giảm 7%', type: 'pct', val: 7, scope: 'Toàn đơn · chỉ showroom Thủ Đức', cond: 'Mua tại showroom', start: '2026-10-01T00:00', end: '2026-10-31T23:59', used: 156, limit: 0, on: true, saved: 98400000 },
+];
+const status = p => !p.on ? 'Tạm dừng' : NOW < new Date(p.start) ? 'Sắp chạy' : NOW > new Date(p.end) ? 'Đã kết thúc' : 'Đang chạy';
+const dt = s => { const d = new Date(s); return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}${d.getHours() || d.getMinutes() ? ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') : ''}`; };
+const val = p => p.type === 'pct' ? `−${p.val}%` : p.type === 'amt' ? `−${fmt(p.val)}` : p.val;
+let filter = 'Tất cả';
+function pick(t) { filter = t; draw(); }
+document.getElementById('fType').innerHTML += Object.entries(TYPES).map(([k, t]) => `<option value="${k}">${t}</option>`).join('');
+
+function draw() {
+  const q = document.getElementById('q').value.toLowerCase(), ft = document.getElementById('fType').value;
+  const run = PROMOS.filter(p => status(p) === 'Đang chạy');
+  document.getElementById('kpi').innerHTML = [
+    ['Đang chạy', run.length, `${run.filter(p => p.code).length} mã giảm giá · ${run.filter(p => !p.code).length} chương trình tự áp`],
+    ['Sắp chạy', PROMOS.filter(p => status(p) === 'Sắp chạy').length, 'Black Friday bắt đầu 20:00 hôm nay'],
+    ['Lượt dùng tháng 11', PROMOS.filter(p => p.start >= '2026-11').reduce((a, p) => a + p.used, 0), 'Tính trên đơn không huỷ'],
+    ['Tiền đã giảm tháng 11', fmt(PROMOS.filter(p => p.start >= '2026-11').reduce((a, p) => a + p.saved, 0)), 'Chưa gồm quà tặng, phí lắp miễn'],
+  ].map(([l, v, t]) => `<div class="stat-card"><div class="label">${l}</div><div class="value">${v}</div><div class="kpi-trend">${t}</div></div>`).join('');
+  document.getElementById('tabs').innerHTML = ['Tất cả', ...Object.keys(SBADGE)].map(t => `<button class="${t === filter ? 'active' : ''}" onclick="pick('${t}')">${t}</button>`).join('');
+  document.getElementById('rows').innerHTML = PROMOS.map((p, i) => [p, i]).filter(([p]) => (filter === 'Tất cả' || status(p) === filter) && (!ft || p.type === ft) && (!q || (p.code + p.name).toLowerCase().includes(q))).map(([p, i]) => {
+    const st = status(p), pc = p.limit ? Math.round(p.used / p.limit * 100) : 0;
+    return `<tr class="row-link" onclick="openPromo(${i})">
+      <td><b>${p.name}</b><span class="sub-muted">${p.code ? `Mã <span class="mono">${p.code}</span>` : 'Tự áp · không cần mã'}</span></td>
+      <td><b>${val(p)}</b><span class="sub-muted">${TYPES[p.type]}</span></td>
+      <td>${p.scope}</td><td style="font-size:12.5px">${p.cond}</td>
+      <td style="white-space:nowrap">${dt(p.start)} – ${dt(p.end)}</td>
+      <td class="use">${p.used}${p.limit ? ` / ${p.limit}<div class="progress-bar"><div style="width:${pc}%"></div></div>` : '<span class="sub-muted">Không giới hạn</span>'}</td>
+      <td><span class="badge ${SBADGE[st]}">${st}</span></td>
+      <td onclick="event.stopPropagation()"><label class="sw"><input type="checkbox" ${p.on ? 'checked' : ''} aria-label="Bật ${p.name}" onchange="PROMOS[${i}].on=this.checked;draw();toast((this.checked?'Đã bật ':'Đã tạm dừng ')+'${p.code || p.name}')"><span></span></label></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="8" class="empty-state">Không có chương trình phù hợp</td></tr>';
+}
+
+// Ví dụ chia tiền giảm theo tỉ lệ giá rồi mới tách thuế — cùng số với mục Tính thuế trong tài liệu
+function splitExample(pct) {
+  const L = [PRODUCTS[0], PRODUCTS[24]], sum = L.reduce((a, p) => a + p.price, 0), totalOff = Math.round(sum * pct / 100);
+  let left = totalOff;
+  const rows = L.map((p, i) => {
+    const off = i === L.length - 1 ? left : Math.round(totalOff * p.price / sum); left -= off;
+    const pay = p.price - off, net = Math.round(pay / 1.08);
+    return [p.name, p.price, -off, pay, net, pay - net];
+  });
+  const tot = rows.reduce((a, r) => a.map((v, k) => k ? v + r[k] : 'Tổng'), ['Tổng', 0, 0, 0, 0, 0]);
+  return `<table class="data" style="font-size:12.5px"><thead><tr><th>Dòng hàng</th><th class="right">Giá bán</th><th class="right">Giảm ${pct}%</th><th class="right">Khách trả</th><th class="right">Chưa thuế</th><th class="right">Thuế 8%</th></tr></thead>
+    <tbody>${[...rows, tot].map(r => `<tr><td>${r[0]}</td>${r.slice(1).map(v => `<td class="right">${v.toLocaleString('vi-VN')}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+
+function openPromo(i) {
+  const p = PROMOS[i] || { code: '', name: '', type: 'pct', val: '', scope: 'Toàn đơn', cond: '', start: '2026-11-28T00:00', end: '2026-12-31T23:59', used: 0, limit: 0, on: true };
+  const isNew = i < 0;
+  openModal('dlg', `<div class="row-flex" style="justify-content:space-between"><h3 style="margin:0">${isNew ? 'Tạo chương trình khuyến mãi' : p.name}</h3>${isNew ? '' : `<span class="badge ${SBADGE[status(p)]}">${status(p)}</span>`}</div>
+    <p class="sub">${isNew ? 'Để trống mã nếu chương trình tự áp cho mọi khách đủ điều kiện.' : `Đã dùng ${p.used} lượt${p.limit ? ' / ' + p.limit : ''} · sửa sẽ ghi vào nhật ký thao tác`}</p>
+    <div class="grid-2">
+      <div class="field"><label for="fN">Tên chương trình</label><input id="fN" value="${p.name}"></div>
+      <div class="field"><label for="fC">Mã giảm giá</label><input id="fC" class="mono" value="${p.code}" placeholder="Để trống = tự áp" oninput="this.value=this.value.toUpperCase().replace(/\\s/g,'')"></div>
+      <div class="field"><label for="fT">Loại</label><select id="fT">${Object.entries(TYPES).map(([k, t]) => `<option value="${k}" ${k === p.type ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+      <div class="field"><label for="fV">Mức giảm / quà tặng</label><input id="fV" value="${p.val}" placeholder="VD: 5 (%), 500000 (đ), Bộ nồi 4 món"></div>
+      <div class="field"><label for="fS">Áp cho</label><select id="fS">${['Toàn đơn', 'Ngành hàng', 'Thương hiệu', 'Danh sách mã'].map(s => `<option ${p.scope.startsWith(s) ? 'selected' : ''}>${s}</option>`).join('')}</select><span class="sub-muted">${p.scope}</span></div>
+      <div class="field"><label for="fK">Điều kiện</label><input id="fK" value="${p.cond}" placeholder="VD: Đơn từ 10.000.000đ"></div>
+      <div class="field"><label for="f1">Bắt đầu</label><input id="f1" type="datetime-local" value="${p.start}"></div>
+      <div class="field"><label for="f2">Kết thúc</label><input id="f2" type="datetime-local" value="${p.end}"></div>
+      <div class="field"><label for="fL">Giới hạn lượt (0 = không giới hạn)</label><input id="fL" type="number" min="0" value="${p.limit}"></div>
+      <div class="field"><label for="fCh">Kênh</label><select id="fCh"><option>Web + showroom</option><option>Chỉ web</option><option>Chỉ showroom</option></select></div>
+    </div>
+    <label class="row-flex" style="font-size:13px"><input type="checkbox" ${p.cond.includes('đếm ngược') ? 'checked' : ''}> Hiện đồng hồ đếm ngược trên web</label>
+    ${p.code === 'TECH5' ? `<div style="margin-top:14px"><b>Ví dụ chia tiền giảm trên một đơn</b><p class="muted" style="font-size:12.5px;margin:4px 0 8px">Giảm chia theo tỉ lệ giá từng dòng, rồi mới tách thuế. Chưa thuế = khách trả ÷ 1,08, làm tròn đến đồng; thuế = khách trả − chưa thuế.</p>${splitExample(5)}</div>` : ''}
+    <p class="sub-err" id="fErr"></p>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Huỷ</button><button class="btn btn-primary" onclick="save(${i})">${isNew ? 'Tạo chương trình' : 'Lưu thay đổi'}</button></div>`);
+}
+function save(i) {
+  const name = fN.value.trim(), code = fC.value.trim();
+  const err = !name ? 'Nhập tên chương trình' : f2.value <= f1.value ? 'Ngày kết thúc phải sau ngày bắt đầu'
+    : code && PROMOS.some((p, k) => k !== i && p.code === code) ? `Mã ${code} đã có` : '';
+  if (err) { fErr.textContent = err; return; }
+  const v = fT.value === 'pct' || fT.value === 'amt' ? +fV.value || 0 : fV.value;
+  const rec = { name, code, type: fT.value, val: v, scope: i >= 0 && PROMOS[i].scope.startsWith(fS.value) ? PROMOS[i].scope : fS.value, cond: fK.value, start: f1.value, end: f2.value, limit: +fL.value || 0 };
+  if (i >= 0) Object.assign(PROMOS[i], rec); else PROMOS.unshift({ ...rec, used: 0, on: true, saved: 0 });
+  closeModal('dlg'); draw(); toast(i >= 0 ? `Đã lưu ${name} · ghi nhật ký` : `Đã tạo ${name}`);
+}
+draw();
+</script>
+</body>
+</html>

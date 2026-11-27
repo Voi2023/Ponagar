@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Nhân sự — Tổng quan (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+.loc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.loc{border:1px solid var(--border);border-radius:var(--radius);padding:12px;background:var(--bg)}
+.loc b.t{display:flex;justify-content:space-between;margin-bottom:6px;font-size:13.5px}
+.loc .r{display:flex;justify-content:space-between;gap:6px;font-size:12.6px;padding:4px 0}
+.quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.quick a{display:flex;gap:10px;align-items:center;border:1px solid var(--border);border-radius:var(--radius);padding:14px;background:var(--surface);box-shadow:var(--shadow);font-weight:700}
+.quick a:hover{border-color:var(--brand);color:var(--brand-dark)}
+.quick i{font-size:24px;color:var(--brand)}
+.av{width:56px;height:56px;border-radius:50%;background:var(--brand-tint);color:var(--brand-dark);display:grid;place-items:center;font-weight:800;font-size:18px;flex:none}
+.ros td,.ros th{text-align:center;font-size:12.3px;padding:7px 6px}
+.ros td:first-child,.ros th:first-child{text-align:left}
+.ros .today{background:var(--brand-tint)}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Tổng quan nhân sự</h1></div>
+      <div class="row-flex">
+        <span class="badge amber"><i class="ti ti-hourglass"></i> Còn 4 ngày đến hạn chốt công (01/12)</span>
+        <button class="btn btn-primary btn-sm" onclick="toast('Tạo hồ sơ nhân viên mới · hệ thống sinh PIN tạm 4 số')"><i class="ti ti-user-plus"></i> Thêm nhân viên</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid" id="stats"></div>
+
+      <div class="quick">
+        <a href="admin-attendance.html"><i class="ti ti-clock-check"></i><span>Chấm công<span class="sub-muted">Bảng công, xếp ca, đơn từ</span></span></a>
+        <a href="admin-commission.html"><i class="ti ti-coin"></i><span>Hoa hồng & công lắp<span class="sub-muted">Kỳ tháng 10 đã chốt</span></span></a>
+        <a href="admin-payroll.html"><i class="ti ti-cash"></i><span>Bảng lương<span class="sub-muted">Tháng 10 · đã duyệt, chờ trả</span></span></a>
+      </div>
+
+      <div class="panel">
+        <h2><span><i class="ti ti-map-pin"></i> Hôm nay 27/11 · ai đang làm ở đâu</span><a class="btn btn-outline btn-sm" href="admin-attendance.html">Xem chấm công</a></h2>
+        <div class="loc-grid" id="locs"></div>
+      </div>
+
+      <div class="panel">
+        <h2><span><i class="ti ti-inbox"></i> Chờ duyệt</span><span class="muted" style="font-size:12px;font-weight:400">Duyệt ở đây hoặc bấm ngay trên tin Telegram</span></h2>
+        <div class="table-scroll"><table class="data wide"><thead><tr><th>Loại</th><th>Người gửi</th><th>Ngày</th><th>Nội dung</th><th>Trạng thái</th><th></th></tr></thead><tbody id="pend"></tbody></table></div>
+      </div>
+
+      <div class="panel">
+        <h2><span><i class="ti ti-calendar-week"></i> Lịch ca tuần này · 23/11 – 29/11</span><span class="muted" style="font-size:12px;font-weight:400">Đăng ký ca tuần sau hạn 18:00 hôm nay · 4/4 người đã gửi</span></h2>
+        <div class="table-scroll"><table class="data ros" id="ros"></table></div>
+      </div>
+
+      <div class="panel">
+        <h2><span><i class="ti ti-address-book"></i> Hồ sơ nhân viên</span>
+          <select id="dept" aria-label="Lọc bộ phận" onchange="draw()" style="padding:7px 10px;border:1px solid var(--border);border-radius:9px;font-size:13px"><option value="">Mọi bộ phận</option><option>Showroom</option><option>Kho</option><option>Lắp đặt</option><option>Văn phòng</option></select></h2>
+        <div class="table-scroll"><table class="data wide"><thead><tr><th>Nhân viên</th><th>Bộ phận</th><th>Showroom</th><th>Số điện thoại</th><th>Ngày vào</th><th>Cách tính lương</th><th>Điện thoại chấm công</th></tr></thead><tbody id="dir"></tbody></table></div>
+        <p class="muted" style="font-size:12px;margin:10px 0 0">Mức lương chỉ chủ và kế toán thấy. Quản lý chỉ thấy người thuộc showroom, bộ phận mình. Cách trả lương thực tế từng bộ phận: <span class="badge amber">chờ Techhomes xác nhận</span></p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal modal-lg"></div></div>
+
+<script>
+renderAdmin('admin-ns.html');
+
+const PEOPLE = STAFF.filter(s => s.id !== 'NV00');
+const dept = s => s.role.startsWith('Thợ') || s.role.startsWith('Điều phối') ? 'Lắp đặt' : s.role === 'Kho' ? 'Kho' : s.role === 'Kế toán' ? 'Văn phòng' : 'Showroom';
+// Hồ sơ: [sđt, ngày vào, cách tính lương, lương cơ bản, ngân hàng, điện thoại chấm công]
+const PROFILE = {
+  NV01: ['0903 118 204', '03/2021', 'Lương tháng + hoa hồng', 12000000, 'Vietcombank ••• 2041', 'Đã duyệt · iPhone 13'],
+  NV02: ['0938 552 107', '08/2023', 'Lương tháng + hoa hồng', 8000000, 'Techcombank ••• 7712', 'Đã duyệt · Galaxy A54'],
+  NV03: ['0909 731 655', '01/2024', 'Lương tháng + hoa hồng', 8000000, 'ACB ••• 3390', 'Đã duyệt · iPhone 12'],
+  NV04: ['0977 402 818', '06/2022', 'Lương tháng + hoa hồng', 8000000, 'Vietcombank ••• 5528', 'Đã duyệt · Oppo Reno8'],
+  NV05: ['0918 260 443', '11/2020', 'Lương tháng', 7500000, 'BIDV ••• 1187', 'Đã duyệt · Redmi Note 12'],
+  NV06: ['0935 604 912', '04/2023', 'Lương tháng', 7000000, 'MB ••• 6605', 'Đổi máy · chờ duyệt'],
+  NV07: ['0903 990 371', '09/2021', 'Lương tháng', 9000000, 'Vietcombank ••• 4419', 'Đã duyệt · iPhone 14'],
+  NV08: ['0912 334 876', '02/2022', 'Lương công + công lắp đặt', 6000000, 'Agribank ••• 0928', 'Đã duyệt · Galaxy A34'],
+  NV09: ['0988 145 230', '07/2023', 'Lương công + công lắp đặt', 6000000, 'Techcombank ••• 2256', 'Đã duyệt · Vivo Y36'],
+  NV10: ['0966 208 554', '10/2024', 'Lương công + công lắp đặt', 6000000, 'Sacombank ••• 8831', 'Đã duyệt · Galaxy A15'],
+  NV11: ['0907 615 302', '05/2020', 'Lương tháng', 10000000, 'Vietcombank ••• 9150', 'Đã duyệt · iPhone 15'],
+};
+const NOW = { NV01: ['07:52', 'Đúng giờ', 'green'], NV02: ['08:09', 'Trễ 9 phút', 'amber'], NV05: ['07:58', 'Đúng giờ', 'green'], NV11: ['08:01', 'Đúng giờ', 'green'], NV03: ['—', 'Nghỉ phép', 'blue'], NV06: ['07:55', 'Đúng giờ', 'green'], NV04: ['—', 'Ca chiều 14:00', 'gray'], NV07: ['07:45', 'Đúng giờ', 'green'], NV08: ['08:42', 'Công trình Q.3', 'blue'], NV09: ['08:20', 'Ngoài điểm · chờ duyệt', 'amber'], NV10: ['08:15', 'Công trình Thủ Đức', 'blue'] };
+const LOCS = [['Showroom Phú Nhuận', ['NV01', 'NV02', 'NV05', 'NV11']], ['Chi nhánh Quận 10', ['NV03', 'NV06']], ['Chi nhánh Thủ Đức', ['NV04']], ['Tổ lắp đặt', ['NV07', 'NV08', 'NV09', 'NV10']]];
+const PEND = [
+  { type: 'Nghỉ phép', id: 'NV05', day: '03/12', what: 'Khám sức khoẻ định kỳ · còn 12 ngày phép', st: 'Chờ duyệt' },
+  { type: 'Đổi ca', id: 'NV02', day: '01/12', what: 'Đổi ca sáng với Minh Thư · cả hai đã đồng ý', st: 'Chờ duyệt' },
+  { type: 'Ứng lương', id: 'NV09', day: '26/11', what: '1.500.000đ · đóng học phí cho con · tối đa 4.640.000đ', st: 'Chờ duyệt' },
+  { type: 'Đi trễ có lý do', id: 'NV02', day: '27/11', what: 'Giao catalogue cho khách BG-0315 trên đường tới', st: 'Chờ duyệt' },
+  { type: 'Chấm công ngoài điểm', id: 'NV09', day: '27/11', what: 'Lấy hàng tại kho Q.10 trước khi đi lắp · có ảnh', st: 'Chờ duyệt' },
+  { type: 'Quên chấm', id: 'NV06', day: '26/11', what: 'Quên bấm Ra ca, về lúc 17:10', st: 'Chờ duyệt' },
+  { type: 'Tăng ca', id: 'NV04', day: '28/11', what: 'Bàn giao 20 bộ AVENTOS cho Nội thất An Phát', st: 'Chờ duyệt' },
+];
+const WEEK = ['T2 23', 'T3 24', 'T4 25', 'T5 26', 'T6 27', 'T7 28', 'CN 29'];
+const ROS = { NV01: ['Nghỉ', 'Sáng', 'Sáng', 'Sáng', 'Sáng', 'Chiều', 'Chiều'], NV02: ['Chiều', 'Nghỉ', 'Chiều', 'Sáng', 'Sáng', 'Sáng', 'Chiều'], NV03: ['Sáng', 'Chiều', 'Nghỉ', 'Chiều', 'Nghỉ phép', 'Sáng', 'Chiều'], NV04: ['Sáng', 'Chiều', 'Sáng', 'Nghỉ', 'Chiều', 'Chiều', 'Sáng'] };
+
+function draw() {
+  const n = PEND.filter(p => p.st === 'Chờ duyệt').length, w = Object.values(NOW).filter(x => x[0] !== '—').length;
+  document.getElementById('stats').innerHTML = [
+    ['Đi làm hôm nay', `${w}/${PEOPLE.length}`, '2 thợ đang ở công trình'],
+    ['Đi trễ', 1, 'Quốc Bảo · 9 phút'],
+    ['Nghỉ phép', 1, 'Thanh Vy · Q.10'],
+    ['Chờ duyệt', n, `${PEND.filter(p => p.st === 'Chờ duyệt' && p.type === 'Ứng lương').length} ứng lương · còn lại đơn từ`, n ? 'bad' : ''],
+    ['Quỹ lương tháng 11 dự kiến', '≈ 121,8 tr', 'Tạm tính đến 27/11 · tháng 10: 120,3 tr'],
+  ].map(([l, v, t, c]) => `<div class="stat-card ${c || ''}"><div class="label">${l}</div><div class="value">${v}</div><div class="kpi-trend">${t}</div></div>`).join('');
+
+  document.getElementById('locs').innerHTML = LOCS.map(([name, ids]) => `<div class="loc"><b class="t">${name}<span class="badge gray">${ids.filter(id => NOW[id][0] !== '—').length}/${ids.length}</span></b>
+    ${ids.map(id => `<div class="r"><span>${staff(id).name} <span class="muted">${NOW[id][0]}</span></span><span class="badge ${NOW[id][2]}">${NOW[id][1]}</span></div>`).join('')}</div>`).join('');
+
+  document.getElementById('pend').innerHTML = PEND.map((p, i) => `<tr><td><b>${p.type}</b></td><td>${staff(p.id).name}<span class="sub-muted">${storeName(staff(p.id).store)}</span></td><td>${p.day}</td><td>${p.what}</td>
+    <td><span class="badge ${{ 'Chờ duyệt': 'amber', 'Đã duyệt': 'green', 'Từ chối': 'gray' }[p.st]}">${p.st}</span></td>
+    <td style="white-space:nowrap">${p.st === 'Chờ duyệt' ? `<button class="btn btn-outline btn-sm" onclick="decide(${i},'Từ chối')">Từ chối</button> <button class="btn btn-primary btn-sm" onclick="decide(${i},'Đã duyệt')">Duyệt</button>` : ''}</td></tr>`).join('');
+
+  document.getElementById('ros').innerHTML = `<thead><tr><th>Nhân viên</th>${WEEK.map((d, k) => `<th class="${k === 4 ? 'today' : ''}">${d}</th>`).join('')}</tr></thead><tbody>
+    ${Object.entries(ROS).map(([id, r]) => `<tr><td><b>${staff(id).name}</b><span class="sub-muted">${storeName(staff(id).store)}</span></td>${r.map((c, k) => `<td class="${k === 4 ? 'today' : ''}">${c === 'Nghỉ' ? '<span class="muted">Nghỉ</span>' : c === 'Nghỉ phép' ? '<span class="badge blue">P</span>' : c}</td>`).join('')}</tr>`).join('')}
+    <tr><td>Kho · văn phòng</td><td colspan="6">Hành chính 08:00–17:00 (lịch cố định)</td><td><span class="muted">Nghỉ</span></td></tr>
+    <tr><td>Tổ lắp đặt</td><td colspan="7"><a href="admin-install-calendar.html">Theo Lịch lắp đặt</a></td></tr></tbody>`;
+
+  const dp = document.getElementById('dept').value;
+  document.getElementById('dir').innerHTML = PEOPLE.filter(s => !dp || dept(s) === dp).map(s => { const p = PROFILE[s.id]; return `<tr class="row-link" onclick="profile('${s.id}')">
+    <td><b>${s.name}</b><span class="sub-muted">${s.id} · ${s.role}</span></td><td>${dept(s)}</td><td>${storeName(s.store)}</td><td>${p[0]}</td><td>${p[1]}</td><td>${p[2]}</td>
+    <td>${p[5].startsWith('Đã') ? `<span class="badge green">Đã duyệt</span>` : '<span class="badge amber">Chờ duyệt</span>'}</td></tr>`; }).join('');
+}
+function decide(i, st) { PEND[i].st = st; draw(); toast(`${PEND[i].type} · ${staff(PEND[i].id).name}: ${st}`); }
+function profile(id) {
+  const s = staff(id), p = PROFILE[id];
+  openModal('dlg', `<div class="row-flex" style="gap:14px;flex-wrap:nowrap"><span class="av">${s.name.split(' ').map(w => w[0]).join('')}</span><div><h3 style="margin:0">${s.name} <span class="badge green">Đang làm</span></h3><p class="sub" style="margin:2px 0 0">${s.id} · ${s.role}${dept(s) !== s.role ? ' · ' + dept(s) : ''} · ${STORES[s.store].name}</p></div></div>
+    <div class="grid-2" style="margin-top:16px">
+      <div class="kv"><span class="muted">Số điện thoại</span><span>${p[0]}</span><span class="muted">Ngày vào làm</span><span>${p[1]}</span><span class="muted">Cách tính lương</span><span>${p[2]}</span><span class="muted">Lương cơ bản</span><span>${fmt(p[3])} <span class="muted">· hiệu lực 01/2026</span></span><span class="muted">Nhận lương</span><span>${p[4]}</span></div>
+      <div class="kv"><span class="muted">Đăng nhập</span><span>Trang nhân viên · SĐT + PIN 4 số</span><span class="muted">Điện thoại</span><span>${p[5]}</span><span class="muted">Lịch sử lương</span><span>${fmt(Math.round(p[3] * 0.92 / 100000) * 100000)} → ${fmt(p[3])} từ 01/01/2026</span></div>
+    </div>
+    <div class="box-note">Đổi mức lương phải nhập ngày hiệu lực; bảng lương tháng cũ không đổi. Nghỉ việc: chuyển Đã nghỉ, khoá đăng nhập, không xoá hồ sơ.</div>
+    <div class="actions">
+      <button class="btn btn-outline" onclick="toast('Đã cấp lại PIN tạm cho ${s.name}')">Cấp lại PIN</button>
+      ${p[5].startsWith('Đã') ? '' : `<button class="btn btn-outline" onclick="PROFILE['${id}'][5]='Đã duyệt · máy mới';closeModal('dlg');draw();toast('Đã duyệt thiết bị mới cho ${s.name}')">Duyệt thiết bị</button>`}
+      <button class="btn btn-outline" onclick="toast('Đổi mức lương: nhập số mới và ngày hiệu lực')">Đổi mức lương</button>
+      <button class="btn btn-primary" onclick="closeModal('dlg')">Đóng</button>
+    </div>`);
+}
+draw();
+</script>
+</body>
+</html>

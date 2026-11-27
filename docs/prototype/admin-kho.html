@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Cổng Kho — Tổng quan kho (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<script src="assets/kho-data.js"></script>
+<style>
+.stat-card{cursor:pointer}
+table.data .mono{white-space:nowrap}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.quick a{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.quick a:hover{border-color:var(--brand)}
+.quick i{font-size:26px;color:var(--brand)}
+.quick b{display:block}
+@media (max-width:1100px){.quick{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Tổng quan kho</h1></div>
+      <div class="row-flex">
+        <label class="muted" for="store" style="font-size:12.5px">Kho đang làm việc</label>
+        <select id="store" class="input" style="padding:8px 10px" onchange="draw()">
+          <option value="">Tất cả kho</option><option value="0" selected>Phú Nhuận</option><option value="1">Q.10</option><option value="2">Thủ Đức</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="toast('Mở camera quét mã vạch / serial')"><i class="ti ti-scan"></i> Quét mã</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="box-note" style="margin-top:0">Mọi phiếu tạo ra mặc định thuộc kho đang chọn. Thủ kho chỉ thấy kho mình được gán; quản lý và chủ có thêm lựa chọn <b>Tất cả kho</b>. Dùng được trên điện thoại để quét mã vạch, serial khi đi lấy hàng.</div>
+      <div class="stat-grid" id="kpi"></div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h2><span><i class="ti ti-package-export"></i> Đơn chờ xuất kho</span><a class="btn btn-outline btn-sm" href="admin-picking.html">Mở hàng đợi</a></h2>
+          <div class="table-scroll"><table class="data"><thead><tr><th>Mã đơn</th><th>Hẹn giao</th><th>Hàng</th><th>Trạng thái</th></tr></thead><tbody id="picks"></tbody></table></div>
+        </div>
+        <div class="panel">
+          <h2><span><i class="ti ti-alert-triangle"></i> Tồn thấp</span><a class="btn btn-outline btn-sm" href="admin-stock.html#canh-bao">Xem tất cả</a></h2>
+          <div class="table-scroll"><table class="data"><thead><tr><th>Sản phẩm</th><th class="right">Có thể bán / tối thiểu</th><th>Gợi ý</th></tr></thead><tbody id="low"></tbody></table></div>
+          <p class="muted" style="font-size:12px;margin:8px 0 0">Mỗi sáng 8:00 hệ thống gửi danh sách này qua Telegram.</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h2><span><i class="ti ti-truck-delivery"></i> Hàng sắp về từ nhà phân phối</span></h2>
+          <div class="table-scroll"><table class="data"><thead><tr><th>Sản phẩm</th><th class="right">SL</th><th>Nhà phân phối</th><th>Ngày về</th></tr></thead><tbody id="inc"></tbody></table></div>
+          <p class="muted" style="font-size:12px;margin:8px 0 0">Danh sách nhà phân phối đang mua: chờ Techhomes xác nhận.</p>
+        </div>
+        <div class="panel">
+          <h2><span><i class="ti ti-transfer"></i> Phiếu chuyển kho đang mở</span><a class="btn btn-outline btn-sm" href="admin-transfers.html">Chuyển kho</a></h2>
+          <div class="table-scroll"><table class="data"><thead><tr><th>Phiếu</th><th>Tuyến</th><th>Hàng</th><th>Trạng thái</th></tr></thead><tbody id="trf"></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="quick">
+        <a href="admin-stock.html"><i class="ti ti-packages"></i><span><b>Tồn kho 3 showroom</b><span class="sub-muted">Tồn thực · đang giữ · có thể bán · đang về</span></span></a>
+        <a href="admin-picking.html"><i class="ti ti-package-export"></i><span><b>Xuất kho cho đơn</b><span class="sub-muted">Lấy hàng, quét serial, in tem</span></span></a>
+        <a href="admin-transfers.html"><i class="ti ti-transfer"></i><span><b>Chuyển kho</b><span class="sub-muted">Kho đi bấm Xuất, kho đến bấm Nhận</span></span></a>
+        <a href="admin-serials.html"><i class="ti ti-barcode"></i><span><b>Số serial</b><span class="sub-muted">Tra serial, SĐT, mã đơn</span></span></a>
+        <a href="admin-stock.html#kiem-ke"><i class="ti ti-clipboard-check"></i><span><b>Kiểm kê</b><span class="sub-muted">Đếm, so hệ thống, quản lý duyệt</span></span></a>
+        <a href="admin-stock.html#nxt"><i class="ti ti-report-analytics"></i><span><b>Nhập – Xuất – Tồn</b><span class="sub-muted">Báo cáo theo kho, khoảng ngày</span></span></a>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+renderAdmin('admin-kho.html');
+const TST = { 'Nháp': 'gray', 'Đang chuyển': 'blue', 'Lệch': 'red', 'Đã nhận': 'green' };
+const PST = { 'Chờ nhận': 'amber', 'Đang lấy hàng': 'blue', 'Đủ hàng · chờ xuất': 'green' };
+const thumb = (p, sub) => `<div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${p.img}" alt=""><span>${p.name}<span class="sub-muted">${sub}</span></span></div>`;
+const empty = n => `<tr><td colspan="${n}" class="empty-state" style="padding:20px">Không có</td></tr>`;
+
+function draw() {
+  const v = document.getElementById('store').value, s = v === '' ? null : +v, at = i => s == null || i === s;
+  const tag = i => s == null ? ` · ${storeName(i)}` : '';
+  const picks = PICKS.filter(o => at(o.s)), low = LOW.filter(l => at(l[1])), inc = INCOMING.filter(r => at(r[1]));
+  const trf = TRANSFERS.filter(t => t.st !== 'Đã nhận' && (at(t.from) || at(t.to)));
+  const moving = trf.filter(t => t.st === 'Đang chuyển');
+  const kkDiff = STOCKTAKES.filter(k => k.st === 'Chờ duyệt' && at(k.s)).reduce((a, k) => a + k.lines.filter(l => l[1]).length, 0)
+    + trf.filter(t => t.st === 'Lệch').length;
+  document.getElementById('kpi').innerHTML = [
+    ['Đơn chờ xuất', picks.length, `${picks.filter(o => o.due === '27/11').length} đơn hẹn giao hôm nay`, 'admin-picking.html'],
+    ['Phiếu chuyển đang đi', moving.length, `${moving.reduce((a, t) => a + t.lines.reduce((b, l) => b + l[1], 0), 0)} sản phẩm đang đi đường`, 'admin-transfers.html'],
+    ['Hàng sắp về', inc.reduce((a, r) => a + r[2], 0), `${inc.length} dòng đặt nhà phân phối`, 'admin-stock.html'],
+    ['Tồn thấp', low.length, 'Dưới mức tối thiểu', 'admin-stock.html#canh-bao', low.length && 'bad'],
+    ['Chênh lệch chờ xử lý', kkDiff, 'Dòng lệch kiểm kê + phiếu chuyển lệch', 'admin-stock.html#kiem-ke', kkDiff && 'bad'],
+  ].map(([l, n, t, h, bad]) => `<div class="stat-card ${bad || ''}" onclick="location.href='${h}'"><div class="label">${l}</div><div class="value">${n}</div><div class="kpi-trend">${t}</div></div>`).join('');
+
+  document.getElementById('picks').innerHTML = picks.map(o => `<tr class="row-link" onclick="location.href='admin-picking.html'">
+    <td><b class="mono">${o.o}</b><span class="sub-muted">${o.ship}${tag(o.s)}</span></td><td>${o.due === '27/11' ? '<b>Hôm nay</b>' : o.due}</td>
+    <td>${o.lines.map(([id, q]) => `${byId(id).name} × ${q}`).join('<br>')}</td><td><span class="badge ${PST[o.st]}">${o.st}</span></td></tr>`).join('') || empty(4);
+
+  document.getElementById('low').innerHTML = low.map(([id, st, min, g]) => {
+    const p = byId(id);
+    return `<tr><td>${thumb(p, 'Mã ' + sku(p) + tag(st))}</td><td class="right"><b style="color:var(--danger)">${avail(p, st)}</b> / ${min}</td><td style="font-size:12.5px">${g}</td></tr>`;
+  }).join('') || empty(3);
+
+  document.getElementById('inc').innerHTML = inc.map(([id, st, q, npp, d, note]) => `<tr><td>${thumb(byId(id), note + tag(st))}</td><td class="right"><b>${q}</b></td><td>${npp}</td><td>${d}</td></tr>`).join('') || empty(4);
+
+  document.getElementById('trf').innerHTML = trf.map(t => `<tr class="row-link" onclick="location.href='admin-transfers.html'">
+    <td><b class="mono">${t.id}</b><span class="sub-muted">${t.at}</span></td><td>${storeName(t.from)} → ${storeName(t.to)}</td>
+    <td>${t.lines.map(([id, q]) => `${byId(id).name} × ${q}`).join('<br>')}</td><td><span class="badge ${TST[t.st]}">${t.st}</span></td></tr>`).join('') || empty(4);
+}
+draw();
+</script>
+</body>
+</html>

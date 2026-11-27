@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Báo giá (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" aria-label="Mở menu" onclick="toggleSide()"><i class="ti ti-menu-2"></i></button><h1>Báo giá</h1></div>
+      <div class="row-flex">
+        <button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel danh sách báo giá theo bộ lọc')"><i class="ti ti-file-spreadsheet"></i> Xuất Excel</button>
+        <button class="btn btn-primary btn-sm" onclick="toast('Mở form lập báo giá: chọn khách, dán danh sách mã hàng')"><i class="ti ti-plus"></i> Lập báo giá</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid">
+        <div class="stat-card" onclick="pick('Chờ báo giá')"><div class="label">Chờ báo giá</div><div class="value">3</div><div class="kpi-trend">1 yêu cầu chưa gửi quá 1 ngày</div></div>
+        <div class="stat-card" onclick="pick('Đã gửi')"><div class="label">Đã gửi · chờ khách</div><div class="value">3</div><div class="kpi-trend">Tổng 194,3 triệu đang chờ trả lời</div></div>
+        <div class="stat-card" onclick="pick('Khách đồng ý')"><div class="label">Khách đồng ý</div><div class="value">1</div><div class="kpi-trend">Sẵn sàng chuyển thành đơn</div></div>
+        <div class="stat-card"><div class="label">Tỉ lệ thành đơn · 30 ngày</div><div class="value">38%</div><div class="kpi-trend">Tính cả Hết hạn và Từ chối</div></div>
+      </div>
+
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+      <div class="toolbar">
+        <input type="search" id="q" placeholder="Tìm mã báo giá, tên khách, công ty…" aria-label="Tìm báo giá" oninput="draw()">
+        <select id="fGroup" aria-label="Nhóm khách" onchange="draw()"><option value="">Mọi nhóm khách</option><option>Khách lẻ</option><option>Nhà thầu</option><option>Đại lý</option></select>
+        <select id="fSrc" aria-label="Nguồn" onchange="draw()"><option value="">Mọi nguồn</option><option>Web</option><option>Form tủ bếp</option><option>Zalo</option><option>Điện thoại</option></select>
+      </div>
+
+      <div class="panel" style="padding:6px 8px">
+        <div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Mã</th><th>Khách</th><th>Nhóm</th><th class="right">Tổng tiền</th><th>Người lập</th><th>Hiệu lực đến</th><th>Trạng thái</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table></div>
+      </div>
+      <div class="box-note">Báo giá <b>chưa giữ hàng</b>; hàng chỉ được giữ khi đã thành đơn. Hạn hiệu lực mặc định 7 ngày (đề xuất). Hết hạn mà giá hãng đổi thì lập báo giá mới. Giá nhóm tự áp theo <a href="admin-customers.html#bang-gia" style="text-decoration:underline">bảng giá nhóm</a>.</div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')">
+  <div class="modal modal-lg"></div>
+</div>
+
+<script>
+renderAdmin('admin-quotes.html');
+
+const ST = { 'Chờ báo giá': 'amber', 'Đã gửi': 'blue', 'Khách đồng ý': 'green', 'Đã thành đơn': 'green', 'Hết hạn': 'gray', 'Từ chối': 'gray' };
+// Mức giảm theo nhóm — giả định, chờ Techhomes xác nhận (xem Khách hàng & bảng giá)
+const DISC = { 'Khách lẻ': {}, 'Nhà thầu': { Hafele: 5 }, 'Đại lý': { Hafele: 10, Blum: 5 } };
+const disc = (p, g) => DISC[g][p.brand] || 0;
+const groupPrice = (p, g) => Math.round(p.price * (1 - disc(p, g) / 100));
+const EXTRA_LIMIT = 3;   // % giảm thêm bán hàng tự quyết — giả định
+
+// lines: [chỉ số PRODUCTS, SL]; opts: nhiều phương án (báo giá tủ bếp)
+const QUOTES = [
+  { code: 'BG-0315', cus: 'KTS Ngô Phương Thảo', phone: '0938 ••• 415', group: 'Nhà thầu', src: 'Web', by: 'NV02', created: '25/11', until: '02/12', st: 'Chờ báo giá', note: 'Biệt thự Thảo Điền · gửi từ giỏ hàng', opts: [{ lines: [[3, 2], [5, 2], [0, 2]] }], install: 'Lắp bếp từ, máy hút mùi, máy rửa chén × 2 bộ' },
+  { code: 'BG-0314', cus: 'Phan Thị Ngọc Lan', phone: '0907 ••• 663', group: 'Khách lẻ', src: 'Form tủ bếp', by: 'NV03', created: '26/11', until: '03/12', st: 'Chờ báo giá', note: 'Tủ bếp căn hộ Q.7 · đã tải ảnh mặt bằng', opts: [{ name: 'Phương án A · chữ L', lines: [[12, 4], [29, 1], [33, 1], [1, 1]] }, { name: 'Phương án B · chữ U có đảo', lines: [[12, 6], [14, 1], [29, 1], [33, 1], [0, 1]] }], install: 'Lắp phụ kiện tủ theo biểu phí' },
+  { code: 'BG-0313', cus: 'Xưởng tủ bếp Hưng Thịnh', phone: '0919 ••• 207', group: 'Nhà thầu', src: 'Zalo', by: 'NV04', created: '27/11', until: '04/12', st: 'Chờ báo giá', note: 'Dán danh sách 3 mã', opts: [{ lines: [[17, 120], [13, 15], [16, 6]] }] },
+  { code: 'BG-0312', cus: 'Cty TNHH Nội thất An Phát', phone: 'MST 0315•••', group: 'Nhà thầu', src: 'Điện thoại', by: 'NV01', created: '20/11', until: '27/11', st: 'Đã thành đơn', note: 'Chung cư Vinhomes Grand Park · block S2', opts: [{ lines: [[12, 20]] }], order: 'TH-20480' },
+  { code: 'BG-0311', cus: 'Cửa hàng Kim Phát Biên Hoà', phone: '0251 ••• 880', group: 'Đại lý', src: 'Zalo', by: 'NV01', created: '24/11', until: '01/12', st: 'Khách đồng ý', note: 'Nhập lại bán ở Biên Hoà', opts: [{ lines: [[24, 3], [25, 5], [26, 5]] }] },
+  { code: 'BG-0310', cus: 'Cty CP Xây dựng Đông Á', phone: 'MST 0312•••', group: 'Nhà thầu', src: 'Điện thoại', by: 'NV02', created: '23/11', until: '30/11', st: 'Đã gửi', note: 'Văn phòng Q.1 · cửa kính', opts: [{ lines: [[18, 4], [20, 6], [22, 6]] }] },
+  { code: 'BG-0309', cus: 'Trần Quang Vinh', phone: '0903 ••• 554', group: 'Khách lẻ', src: 'Web', by: 'NV03', created: '22/11', until: '29/11', st: 'Đã gửi', note: '', opts: [{ lines: [[34, 1], [35, 2], [36, 2]] }] },
+  { code: 'BG-0308', cus: 'KTS Ngô Phương Thảo', phone: '0938 ••• 415', group: 'Nhà thầu', src: 'Zalo', by: 'NV02', created: '21/11', until: '28/11', st: 'Đã gửi', note: 'Nhà phố Bình Thạnh', opts: [{ lines: [[2, 1], [4, 1], [10, 1], [8, 1]] }] },
+  { code: 'BG-0305', cus: 'Lý Minh Tuấn', phone: '0975 ••• 128', group: 'Khách lẻ', src: 'Web', by: 'NV04', created: '10/11', until: '17/11', st: 'Hết hạn', note: 'Khách không phản hồi', opts: [{ lines: [[23, 1]] }] },
+  { code: 'BG-0303', cus: 'Xưởng tủ bếp Hưng Thịnh', phone: '0919 ••• 207', group: 'Nhà thầu', src: 'Điện thoại', by: 'NV04', created: '05/11', until: '12/11', st: 'Từ chối', note: 'Khách chọn hàng hãng khác', opts: [{ lines: [[15, 10]] }] },
+];
+const optTotal = (o, g) => o.lines.reduce((a, [i, n]) => a + groupPrice(PRODUCTS[i], g) * n, 0);
+
+let filter = 'Tất cả';
+function pick(t) { filter = t; draw(); }
+function draw() {
+  const q = document.getElementById('q').value.toLowerCase(), g = document.getElementById('fGroup').value, src = document.getElementById('fSrc').value;
+  document.getElementById('tabs').innerHTML = ['Tất cả', ...Object.keys(ST)].map(t => `<button class="${t === filter ? 'active' : ''}" onclick="pick('${t}')">${t}</button>`).join('');
+  document.getElementById('rows').innerHTML = QUOTES.map((x, i) => [x, i])
+    .filter(([x]) => (filter === 'Tất cả' || x.st === filter) && (!g || x.group === g) && (!src || x.src === src) && (x.code + x.cus).toLowerCase().includes(q))
+    .map(([x, i]) => `<tr class="row-link" onclick="openQuote(${i})">
+      <td><b class="mono">${x.code}</b><span class="sub-muted">${x.src} · ${x.created}</span></td>
+      <td>${x.cus}<span class="sub-muted">${x.note || x.phone}</span></td>
+      <td>${x.group}</td>
+      <td class="right"><b>${fmt(optTotal(x.opts[0], x.group))}</b>${x.opts.length > 1 ? `<span class="sub-muted">${x.opts.length} phương án</span>` : ''}</td>
+      <td>${staff(x.by).name}</td>
+      <td>${x.until}${x.st === 'Đã gửi' && x.until === '28/11' ? '<span class="sub-err">Sắp hết hạn</span>' : ''}</td>
+      <td><span class="badge ${ST[x.st]}">${x.st}</span>${x.order ? `<span class="sub-muted">→ <a href="admin-orders.html" class="mono" style="text-decoration:underline">${x.order}</a></span>` : ''}</td>
+    </tr>`).join('') || '<tr><td colspan="7" class="empty-state">Không có báo giá phù hợp</td></tr>';
+}
+
+let cur = 0, opt = 0;
+function openQuote(i, o = 0) {
+  cur = i; opt = o;
+  const x = QUOTES[i], op = x.opts[o], sub = optTotal(op, x.group), list = op.lines.reduce((a, [k, n]) => a + PRODUCTS[k].price * n, 0);
+  const act = { 'Chờ báo giá': ['Gửi báo giá (PDF + link)', `toast('Đã tạo PDF có logo Techhomes và link xem online · gửi ${x.cus} qua Zalo')`],
+    'Đã gửi': ['Khách đồng ý', `toast('${x.code}: chuyển sang Khách đồng ý')`],
+    'Khách đồng ý': ['Chuyển thành đơn', `toast('Đã tạo đơn TH-20483 từ ${x.code}${x.opts.length > 1 ? ' · ' + op.name : ''} · giữ đúng giá đã báo, giữ hàng ngay')`],
+    'Hết hạn': ['Lập báo giá mới', `toast('Sao chép ${x.code} thành báo giá mới theo giá hãng hiện tại')`] }[x.st];
+  openModal('dlg', `
+    <div class="row-flex" style="justify-content:space-between"><h3 class="mono" style="margin:0">${x.code}</h3><span class="badge ${ST[x.st]}">${x.st}</span></div>
+    <p class="sub">${x.cus} · ${x.phone} · nhóm <b>${x.group}</b> · lập bởi ${staff(x.by).name} ngày ${x.created}/2026 · hiệu lực đến ${x.until}/2026</p>
+    ${x.opts.length > 1 ? `<div class="tabs" style="margin-bottom:12px">${x.opts.map((p, k) => `<button class="${k === o ? 'active' : ''}" onclick="openQuote(${i},${k})">${p.name}</button>`).join('')}</div>` : ''}
+    <div class="table-scroll"><table class="data">
+      <thead><tr><th>Mã hàng</th><th class="right">SL</th><th class="right">Giá bán</th><th class="right">Giá nhóm</th><th class="right">Thành tiền</th></tr></thead>
+      <tbody>${op.lines.map(([k, n]) => { const p = PRODUCTS[k], d = disc(p, x.group);
+        return `<tr><td><div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${p.img}" alt=""><span>${p.name}<span class="sub-muted mono">${sku(p)}</span></span></div></td>
+          <td class="right">${n}</td><td class="right">${fmt(p.price)}</td>
+          <td class="right">${fmt(groupPrice(p, x.group))}<span class="sub-muted">${d ? `−${d}% ${p.brand}` : 'không giảm'}</span></td>
+          <td class="right"><b>${fmt(groupPrice(p, x.group) * n)}</b></td></tr>`; }).join('')}
+      ${x.install ? `<tr><td colspan="4"><i class="ti ti-tool"></i> ${x.install}</td><td class="right muted">Theo biểu phí</td></tr>` : ''}
+      </tbody></table></div>
+    <div class="grid-2" style="margin-top:14px">
+      <div>
+        <div class="field"><label for="extra">Chiết khấu thêm (%)</label><input id="extra" type="number" min="0" max="30" value="0" oninput="extra(this.value)" ${x.st === 'Đã thành đơn' ? 'disabled' : ''}></div>
+        <p class="muted" id="extraNote" style="font-size:12px;margin-top:-8px">Quá ${EXTRA_LIMIT}% cần quản lý duyệt · mức này <span class="badge amber">chờ Techhomes xác nhận</span></p>
+      </div>
+      <div class="kv">
+        <span class="muted">Theo giá bán</span><span>${fmt(list)}</span>
+        <span class="muted">Giảm giá nhóm</span><span>−${fmt(list - sub)}</span>
+        <span class="muted">Giảm thêm</span><span id="exAmt">0đ</span>
+        <span class="muted">Khách trả</span><b id="pay" style="color:var(--ink)">${fmt(sub)}</b>
+        <span class="muted">Trong đó VAT 8%</span><span id="vat">${fmt(Math.round(sub - sub / 1.08))}</span>
+      </div>
+    </div>
+    ${x.order ? `<div class="box-note">Đã thành đơn <a href="admin-orders.html" class="mono" style="text-decoration:underline;font-weight:700">${x.order}</a> ngày 26/11 · liên kết hai chiều. Đơn giữ đúng giá đã báo; nhóm Nhà thầu chưa có mức giảm cho Blum nên giá nhóm = giá bán (giả định).</div>` : ''}
+    <div class="actions">
+      <button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button>
+      ${x.st !== 'Đã thành đơn' ? `<button class="btn btn-outline" onclick="toast('Xem trước PDF báo giá ${x.code}')"><i class="ti ti-file-type-pdf"></i> Xem PDF</button>` : `<a class="btn btn-primary" href="admin-orders.html">Mở đơn ${x.order}</a>`}
+      ${act ? `<button class="btn btn-primary" onclick="${act[1]};closeModal('dlg')">${act[0]}</button>` : ''}
+    </div>`);
+}
+function extra(v) {
+  const x = QUOTES[cur], sub = optTotal(x.opts[opt], x.group), e = Math.round(sub * (+v || 0) / 100), pay = sub - e;
+  document.getElementById('exAmt').textContent = '−' + fmt(e);
+  document.getElementById('pay').textContent = fmt(pay);
+  document.getElementById('vat').textContent = fmt(Math.round(pay - pay / 1.08));
+  document.getElementById('extraNote').innerHTML = +v > EXTRA_LIMIT ? '<span class="sub-err">Vượt mức cho phép: gửi quản lý duyệt trước khi gửi khách</span>' : `Quá ${EXTRA_LIMIT}% cần quản lý duyệt · mức này <span class="badge amber">chờ Techhomes xác nhận</span>`;
+}
+draw();
+</script>
+</body>
+</html>

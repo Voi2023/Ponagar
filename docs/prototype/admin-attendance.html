@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Nhân sự — Chấm công (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+.mg{border-collapse:collapse;font-size:11.5px;min-width:1100px;width:100%}
+.mg th,.mg td{border:1px solid var(--border);padding:4px 2px;text-align:center;min-width:26px}
+.mg th{background:var(--bg);color:var(--muted);font-weight:600}
+.mg th.sun{color:var(--brand)}
+.mg td.nm{text-align:left;padding:4px 8px;white-space:nowrap;min-width:120px}
+.mg td.x{color:var(--ok)} .mg td.T{background:var(--warn-bg);color:var(--warn);font-weight:700}
+.mg td.P,.mg td.KL{background:var(--info-bg);color:var(--info);font-weight:700}
+.mg td.TC{background:var(--ok-bg);color:var(--ok);font-weight:700} .mg td.Q{background:var(--danger-bg);color:var(--danger);font-weight:700}
+.mg td.N{background:var(--brand-tint);color:var(--brand-dark);font-weight:700} .mg td.off{color:var(--muted);background:var(--gray-bg)}
+.mg td.today{outline:2px solid var(--brand);outline-offset:-2px}
+.mg td.ed{position:relative}.mg td.ed::after{content:"";position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--warn)}
+.loc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.who-row{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.who-row:last-child{border-bottom:0}
+.sc{border-collapse:collapse;width:100%;font-size:12.5px}
+.sc th,.sc td{border:1px solid var(--border);padding:6px;text-align:center}
+.sc td.nm{text-align:left;white-space:nowrap}
+.sc button{width:100%;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm);padding:6px 2px;font:inherit;font-size:12px;cursor:pointer}
+.sc button.reg{background:var(--ok-bg);border-color:var(--ok)}
+.sc td.fixed{color:var(--muted);background:var(--gray-bg)}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Chấm công</h1></div>
+      <div class="row-flex">
+        <button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel bảng chấm công tháng 11/2026')"><i class="ti ti-file-spreadsheet"></i> Xuất Excel</button>
+        <button class="btn btn-primary btn-sm" onclick="toast('Chưa tới hạn: ngày 01/12 nhân viên xác nhận công, sau đó quản lý bấm Chốt công tháng 11')"><i class="ti ti-lock"></i> Chốt công tháng 11</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid" id="stats"></div>
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+
+      <section id="v0">
+        <div class="loc-grid" id="locs"></div>
+        <div class="box-note">Chỉ chấm được khi điện thoại ở <b>Wi-Fi showroom</b> hoặc trong <b>bán kính 100 m</b>. Mỗi người một điện thoại đã duyệt. Thợ đi thẳng công trình: Vào ca bằng nút Bắt đầu của phiếu lắp đặt đầu tiên (đề xuất) hoặc Chấm công ngoài điểm, chụp ảnh, chờ duyệt. Vào trễ quá 5 phút ghi <b>Trễ</b>. Quên ra ca: hệ thống tự đóng lúc hết ca, đánh dấu <b>Cần xác nhận</b>.</div>
+      </section>
+
+      <section id="v1">
+        <div class="panel" style="padding:10px">
+          <h2 style="padding:6px 6px 0"><span>Bảng công tháng 11/2026 · đến hết 27/11</span><span class="row-flex" style="font-size:11.5px;font-weight:400;gap:10px"><span>✓ đủ công</span><span><b style="color:var(--warn)">T</b> trễ</span><span><b style="color:var(--info)">P</b> phép · <b style="color:var(--info)">KL</b> không lương</span><span><b style="color:var(--ok)">TC</b> tăng ca</span><span><b style="color:var(--brand-dark)">N</b> ngoài điểm</span><span><b style="color:var(--danger)">?</b> cần xác nhận</span><span><i class="ti ti-point-filled" style="color:var(--warn)"></i> đã sửa</span></span></h2>
+          <div class="table-scroll"><table class="mg" id="grid"></table></div>
+        </div>
+        <div class="box-note">Bấm một ô để xem giờ vào, giờ ra. Quản lý sửa công phải nhập lý do; ô đã sửa có chấm cam và xem được giá trị cũ. Ngày 01/12 nhân viên bấm <b>Xác nhận công</b> hoặc <b>Báo sai</b>; sau khi chốt muốn sửa phải mở lại (chỉ chủ). Tháng 10/2026: <span class="badge green">Đã chốt 01/11</span></div>
+      </section>
+
+      <section id="v2">
+        <div class="panel">
+          <h2><span>Xếp ca tuần 30/11 – 06/12/2026</span>
+            <span class="row-flex"><select id="loc" aria-label="Điểm làm việc" onchange="draw()" style="padding:7px 10px;border:1px solid var(--border);border-radius:9px"><option value="0">Showroom Phú Nhuận</option><option value="1">Chi nhánh Quận 10</option><option value="2">Chi nhánh Thủ Đức</option></select>
+            <button class="btn btn-primary btn-sm" onclick="toast('Đã công bố lịch tuần 30/11 – 06/12 · nhân viên nhận thông báo')"><i class="ti ti-speakerphone"></i> Công bố</button></span></h2>
+          <div class="table-scroll"><table class="sc" id="roster"></table></div>
+          <div id="gaps"></div>
+          <p class="muted" style="font-size:12px;margin:10px 0 0">Ô xanh = nhân viên đã đăng ký (hạn gửi 18:00 thứ Sáu). Bấm ô để đổi: trống → Sáng → Chiều → trống. Ca mẫu: <b>Sáng</b> 08:00–15:00 · <b>Chiều</b> 14:00–21:00 · <b>Hành chính</b> 08:00–17:00, nghỉ 12:00–13:00. Kho, văn phòng làm giờ cố định. Lịch đi công trình của thợ xếp ở Lịch lắp đặt.</p>
+        </div>
+      </section>
+
+      <section id="v3">
+        <div class="panel" style="padding:6px 8px">
+          <div class="table-scroll"><table class="data wide">
+            <thead><tr><th>Loại đơn</th><th>Người gửi</th><th>Ngày</th><th>Lý do</th><th>Khi duyệt</th><th>Trạng thái</th><th></th></tr></thead>
+            <tbody id="reqs"></tbody>
+          </table></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal"></div></div>
+
+<script>
+renderAdmin('admin-attendance.html');
+
+const PEOPLE = STAFF.filter(s => s.id !== 'NV00');
+const DAY0 = 0, TODAY = 27;               // 01/11/2026 là Chủ nhật
+const dow = n => (DAY0 + n - 1) % 7;       // 0 = CN
+const OFF = { NV01: 1, NV02: 2, NV03: 3, NV04: 4 };   // nhân viên showroom nghỉ 1 ngày trong tuần, còn lại nghỉ CN
+const EXC = { NV02: { 3: 'T', 17: 'T', 27: 'T' }, NV03: { 12: 'P', 27: 'P' }, NV04: { 9: 'KL', 21: 'TC' }, NV06: { 26: 'Q' }, NV08: { 5: 'T', 14: 'TC', 19: 'T' }, NV09: { 27: 'N' }, NV10: { 11: 'T', 23: 'P' }, NV05: { 10: 'x' } };
+const EDITED = { NV05: { 10: 'Cũ: T (08:12) · Quản lý sửa: quên đổi Wi-Fi, đã có camera xác nhận 07:58' } };
+const PHEP = { NV01: 9, NV02: 10, NV03: 7, NV04: 11, NV05: 12, NV06: 12, NV07: 10, NV08: 11, NV09: 12, NV10: 10, NV11: 12 };
+const cell = (id, n) => n > TODAY ? '' : dow(n) === (OFF[id] ?? 0) ? 'off' : (EXC[id] || {})[n] || 'x';
+
+// Hôm nay 27/11: [id, giờ vào, trạng thái, cách chấm, màu]
+const NOW = [
+  ['NV01', '07:52', 'Đúng giờ', 'Wi-Fi showroom', 'green'], ['NV02', '08:09', 'Trễ 9 phút', 'Wi-Fi showroom', 'amber'], ['NV05', '07:58', 'Đúng giờ', 'Wi-Fi showroom', 'green'], ['NV11', '08:01', 'Đúng giờ', 'Wi-Fi showroom', 'green'],
+  ['NV03', '—', 'Nghỉ phép', 'Đơn nghỉ phép đã duyệt', 'blue'], ['NV06', '07:55', 'Đúng giờ', 'Wi-Fi showroom · hôm qua quên ra ca', 'green'],
+  ['NV04', '—', 'Chưa vào ca', 'Ca chiều 14:00', 'gray'],
+  ['NV07', '07:45', 'Đúng giờ', 'Wi-Fi Phú Nhuận', 'green'], ['NV08', '08:42', 'Ở công trình', 'Bắt đầu PL-2611-07 · Q.3', 'blue'], ['NV09', '08:20', 'Ngoài điểm · chờ duyệt', 'Ảnh + lý do: lấy hàng tại kho Q.10', 'amber'], ['NV10', '08:15', 'Ở công trình', 'Bắt đầu PL-2611-08 · Thủ Đức', 'blue'],
+];
+const LOCS = [['Showroom Phú Nhuận', ['NV01', 'NV02', 'NV05', 'NV11']], ['Chi nhánh Quận 10', ['NV03', 'NV06']], ['Chi nhánh Thủ Đức', ['NV04']], ['Tổ lắp đặt', ['NV07', 'NV08', 'NV09', 'NV10']]];
+
+const DAYS = ['T2 30/11', 'T3 01/12', 'T4 02/12', 'T5 03/12', 'T6 04/12', 'T7 05/12', 'CN 06/12'];
+const REG = { NV01: ['', 'S', 'S', 'S', 'S', 'C', 'C'], NV02: ['C', '', 'C', 'C', 'S', 'S', 'S'], NV03: ['S', 'C', '', 'S', 'C', 'S', 'C'], NV04: ['C', 'S', 'C', '', 'S', 'C', 'S'] };
+const SHIFT = JSON.parse(JSON.stringify(REG));
+
+const REQS = [
+  { type: 'Nghỉ phép', id: 'NV03', day: '27/11', why: 'Việc gia đình', eff: 'Bảng công ghi P · trừ 1 ngày phép', st: 'Đã duyệt' },
+  { type: 'Nghỉ phép', id: 'NV05', day: '03/12', why: 'Khám sức khoẻ định kỳ', eff: 'Bảng công ghi P · trừ 1 ngày phép', st: 'Chờ duyệt' },
+  { type: 'Đi trễ có lý do', id: 'NV02', day: '27/11', why: 'Đi giao catalogue cho khách BG-0315 trên đường tới', eff: 'Không tính phạt đi trễ', st: 'Chờ duyệt' },
+  { type: 'Chấm công ngoài điểm', id: 'NV09', day: '27/11', why: 'Lấy hàng tại kho Q.10 trước khi đi lắp · có ảnh', eff: 'Bổ sung giờ vào 08:20', st: 'Chờ duyệt' },
+  { type: 'Quên chấm', id: 'NV06', day: '26/11', why: 'Quên bấm Ra ca, về lúc 17:10', eff: 'Bổ sung giờ ra 17:10', st: 'Chờ duyệt' },
+  { type: 'Tăng ca', id: 'NV04', day: '28/11', why: 'Bàn giao 20 bộ AVENTOS cho Nội thất An Phát', eff: 'Giờ ngoài ca tính hệ số tăng ca', st: 'Chờ duyệt' },
+  { type: 'Đổi ca', id: 'NV02', day: '01/12', why: 'Đổi ca sáng với Minh Thư · cả hai đã đồng ý', eff: 'Hai người đổi ca cho nhau', st: 'Chờ duyệt' },
+  { type: 'Nghỉ không lương', id: 'NV04', day: '09/11', why: 'Về quê', eff: 'Bảng công ghi KL', st: 'Đã duyệt' },
+];
+
+let tab = 0;
+function draw() {
+  const pend = REQS.filter(r => r.st === 'Chờ duyệt').length;
+  document.getElementById('stats').innerHTML = [
+    ['Đang làm hôm nay', `${NOW.filter(n => n[1] !== '—').length}/${PEOPLE.length}`, '2 thợ đang ở công trình', 0],
+    ['Đi trễ hôm nay', NOW.filter(n => n[2].startsWith('Trễ')).length, 'Quốc Bảo · 9 phút', 1],
+    ['Nghỉ phép', NOW.filter(n => n[2] === 'Nghỉ phép').length, 'Thanh Vy · Q.10', 0],
+    ['Đơn từ chờ duyệt', pend, 'Duyệt ở đây hoặc trên Telegram', 3, pend ? 'bad' : ''],
+  ].map(([l, v, t, k, c]) => `<div class="stat-card ${c || ''}" onclick="tab=${k};draw()"><div class="label">${l}</div><div class="value">${v}</div><div class="kpi-trend">${t}</div></div>`).join('');
+  document.getElementById('tabs').innerHTML = ['Hôm nay 27/11', 'Bảng công tháng', 'Xếp ca tuần tới', `Đơn từ (${pend})`].map((t, i) => `<button class="${i === tab ? 'active' : ''}" onclick="tab=${i};draw()">${t}</button>`).join('');
+  [0, 1, 2, 3].forEach(i => document.getElementById('v' + i).style.display = i === tab ? '' : 'none');
+
+  document.getElementById('locs').innerHTML = LOCS.map(([n, ids]) => `<div class="panel" style="margin:0"><h2>${n}<span class="badge gray">${ids.filter(id => NOW.find(x => x[0] === id)[1] !== '—').length}/${ids.length}</span></h2>
+    ${ids.map(id => { const x = NOW.find(r => r[0] === id); return `<div class="who-row"><span><b>${staff(id).name}</b><span class="sub-muted">${staff(id).role} · ${x[3]}</span></span><span style="text-align:right">${x[1]}<br><span class="badge ${x[4]}">${x[2]}</span></span></div>`; }).join('')}</div>`).join('');
+
+  const N = Array.from({ length: 30 }, (_, i) => i + 1);
+  document.getElementById('grid').innerHTML = `<thead><tr><th style="text-align:left;padding-left:8px">Nhân viên</th>${N.map(n => `<th class="${dow(n) === 0 ? 'sun' : ''}">${n}<br>${'CN T2 T3 T4 T5 T6 T7'.split(' ')[dow(n)]}</th>`).join('')}<th>Công</th><th>Trễ</th><th>Phép còn</th></tr></thead><tbody>${PEOPLE.map(s => {
+    const cs = N.map(n => cell(s.id, n));
+    const cong = cs.filter(c => ['x', 'T', 'TC', 'N', 'Q'].includes(c)).length;
+    return `<tr><td class="nm"><b>${s.name}</b><span class="sub-muted">${s.role} · ${storeName(s.store)}</span></td>${cs.map((c, k) => `<td class="${c} ${k + 1 === TODAY ? 'today' : ''} ${(EDITED[s.id] || {})[k + 1] ? 'ed' : ''}" ${c ? `onclick="dayInfo('${s.id}',${k + 1})" style="cursor:pointer"` : ''}>${{ x: '✓', off: '·', Q: '?', '': '' }[c] ?? c}</td>`).join('')}
+      <td><b>${cong}</b></td><td>${cs.filter(c => c === 'T').length}</td><td>${PHEP[s.id]}</td></tr>`;
+  }).join('')}</tbody>`;
+
+  const loc = +document.getElementById('loc').value, ids = Object.keys(SHIFT).filter(id => staff(id).store === loc);
+  const fixed = PEOPLE.filter(s => s.store === loc && !SHIFT[s.id] && !s.role.startsWith('Thợ'));
+  document.getElementById('roster').innerHTML = `<thead><tr><th>Nhân viên</th>${DAYS.map(d => `<th>${d}</th>`).join('')}</tr></thead><tbody>${ids.map(id => `<tr><td class="nm"><b>${staff(id).name}</b><span class="sub-muted">${staff(id).role}</span></td>${SHIFT[id].map((v, d) => `<td><button class="${v && v === REG[id][d] ? 'reg' : ''}" onclick="cycle('${id}',${d})" aria-label="Ca ${staff(id).name} ${DAYS[d]}">${{ S: 'Sáng', C: 'Chiều', '': '—' }[v]}</button></td>`).join('')}</tr>`).join('')}
+    ${fixed.map(s => `<tr><td class="nm">${s.name}<span class="sub-muted">${s.role}</span></td>${DAYS.map((_, d) => `<td class="fixed">${d === 6 ? 'Nghỉ' : 'Hành chính'}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  const gaps = DAYS.flatMap((d, k) => ['S', 'C'].filter(s => !ids.some(id => SHIFT[id][k] === s)).map(s => `${s === 'S' ? 'Sáng' : 'Chiều'} ${d}`));
+  document.getElementById('gaps').innerHTML = gaps.length ? `<div class="box-note" style="background:var(--warn-bg);border-color:var(--warn)"><b>Ca thiếu người:</b> ${gaps.join(' · ')}</div>` : '<div class="box-note">Đủ người mọi ca.</div>';
+
+  document.getElementById('reqs').innerHTML = REQS.map((r, i) => `<tr><td><b>${r.type}</b></td><td>${staff(r.id).name}<span class="sub-muted">${storeName(staff(r.id).store)}</span></td><td>${r.day}</td><td>${r.why}</td><td class="muted">${r.eff}</td>
+    <td><span class="badge ${{ 'Chờ duyệt': 'amber', 'Đã duyệt': 'green', 'Từ chối': 'gray' }[r.st]}">${r.st}</span></td>
+    <td style="white-space:nowrap">${r.st === 'Chờ duyệt' ? `<button class="btn btn-outline btn-sm" onclick="decide(${i},'Từ chối')">Từ chối</button> <button class="btn btn-primary btn-sm" onclick="decide(${i},'Đã duyệt')">Duyệt</button>` : ''}</td></tr>`).join('');
+}
+function cycle(id, d) { const o = ['', 'S', 'C']; SHIFT[id][d] = o[(o.indexOf(SHIFT[id][d]) + 1) % 3]; draw(); }
+function decide(i, st) { REQS[i].st = st; draw(); toast(`${REQS[i].type} · ${staff(REQS[i].id).name}: ${st}${st === 'Đã duyệt' ? ' · ' + REQS[i].eff : ''}`); }
+function dayInfo(id, n) {
+  const c = cell(id, n), ed = (EDITED[id] || {})[n];
+  const t = { x: ['07:56', '17:04'], T: ['08:12', '17:15'], TC: ['07:58', '20:30'], N: ['08:20', '—'], Q: ['07:55', '17:00 (tự đóng)'], P: ['—', '—'], KL: ['—', '—'], off: ['—', '—'] }[c];
+  openModal('dlg', `<h3>${staff(id).name} · ${String(n).padStart(2, '0')}/11/2026</h3><p class="sub">${{ x: 'Đủ công', T: 'Đi trễ', TC: 'Có tăng ca', N: 'Chấm ngoài điểm', Q: 'Quên ra ca · cần xác nhận', P: 'Nghỉ phép', KL: 'Nghỉ không lương', off: 'Ngày nghỉ tuần' }[c]}</p>
+    <div class="kv"><span class="muted">Giờ vào</span><span>${t[0]}</span><span class="muted">Giờ ra</span><span>${t[1]}</span>${ed ? `<span class="muted">Đã sửa</span><span>${ed}</span>` : ''}</div>
+    <div class="field" style="margin-top:12px"><label for="why">Lý do sửa (bắt buộc)</label><input id="why" placeholder="Ví dụ: camera xác nhận vào 07:58"></div>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button><button class="btn btn-primary" onclick="if(!document.getElementById('why').value.trim()){toast('Nhập lý do trước khi sửa công');return}closeModal('dlg');toast('Đã sửa công, ô hiện chấm cam và giữ giá trị cũ')">Sửa công</button></div>`);
+}
+draw();
+</script>
+</body>
+</html>

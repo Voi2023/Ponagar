@@ -15,6 +15,9 @@
   .hub .stat-card i{font-size:28px;color:var(--brand)}
   .hub .stat-card b{display:block;font-size:16px;margin:8px 0 4px}
   .hub .stat-card p{margin:0;color:var(--muted);font-size:13px}
+  .hub-portal{display:flex;align-items:baseline;gap:10px;font-size:16px;margin:30px 0 4px;padding-left:12px;border-left:5px solid var(--pc)}
+  .hub-portal span{font-size:12px;font-weight:400;color:var(--muted)}
+  .hub-sub{font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 0 8px}
   .pal{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 0}
   .pal span{display:flex;align-items:center;gap:8px;font-size:12.5px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-full);padding:4px 12px 4px 4px}
   .pal i{width:22px;height:22px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1px var(--border)}
@@ -44,10 +47,54 @@
     <a class="stat-card" href="cart.html"><i class="ti ti-shopping-cart"></i><b>Giỏ hàng & đặt hàng</b><p>Giao & lắp tận nơi hoặc nhận tại showroom, chọn ngày lắp, COD, VietQR, công nợ nhà thầu</p></a>
   </div>
 
-  <h2 style="font-size:15px;margin:10px 0 10px">Quản trị</h2>
+  <h2 class="hub-portal" style="--pc:#DB2717">Quản trị bán hàng<span>màu đỏ Techhomes</span></h2>
+  <h3 class="hub-sub">Bán hàng</h3>
   <div class="stat-grid">
+    <a class="stat-card" href="admin-dashboard.html"><i class="ti ti-layout-dashboard"></i><b>Tổng quan</b><p>Doanh số hôm nay theo showroom, đơn chờ xử lý, việc cần làm</p></a>
     <a class="stat-card" href="admin-orders.html"><i class="ti ti-plug-connected"></i><b>Đơn hàng + đồng bộ MISA</b><p>Trạng thái đơn (chờ hàng về, đã lắp đặt), kho xuất theo showroom, chứng từ tự sang MISA AMIS Kế toán</p></a>
+    <a class="stat-card" href="admin-quotes.html"><i class="ti ti-file-invoice"></i><b>Báo giá</b><p>Báo giá nhà thầu BG-03xx, giá theo nhóm khách, chuyển thành đơn</p></a>
+    <a class="stat-card" href="admin-pos.html"><i class="ti ti-building-store"></i><b>Bán tại showroom</b><p>Bán tại quầy, quét mã, thu tiền mặt/thẻ/VietQR, khách cầm về</p></a>
+    <a class="stat-card" href="admin-returns.html"><i class="ti ti-arrow-back-up"></i><b>Đổi trả</b><p>Yêu cầu đổi trả, kho nhận hàng, hoàn tiền, chứng từ trả lại hàng bán</p></a>
+    <a class="stat-card" href="admin-customers.html"><i class="ti ti-users"></i><b>Khách hàng & bảng giá</b><p>Khách lẻ, nhà thầu, đại lý; bảng giá theo nhóm khách</p></a>
+  </div>
+  <h3 class="hub-sub">Sản phẩm</h3>
+  <div class="stat-grid">
     <a class="stat-card" href="admin-products.html"><i class="ti ti-file-spreadsheet"></i><b>Sản phẩm + Nhập Excel</b><p>Nhập ~10.000 mã từ dữ liệu web cũ / Excel, báo lỗi từng dòng, tồn 3 showroom, khớp mã hàng MISA</p></a>
+    <a class="stat-card" href="admin-promotions.html"><i class="ti ti-discount-2"></i><b>Khuyến mãi</b><p>Mã giảm giá, chương trình theo thương hiệu, giới hạn mức giảm</p></a>
+    <a class="stat-card" href="admin-content.html"><i class="ti ti-photo"></i><b>Banner, bài viết, dự án</b><p>Banner trang chủ, bài viết, ảnh công trình đã lắp</p></a>
+  </div>
+  <h3 class="hub-sub">Lắp đặt & bảo hành</h3>
+  <div class="stat-grid">
+    <a class="stat-card" href="admin-install-calendar.html"><i class="ti ti-calendar-event"></i><b>Lịch lắp đặt</b><p>Xếp lịch, phân thợ theo khu vực và ngày khách chọn</p></a>
+    <a class="stat-card" href="admin-install-tickets.html"><i class="ti ti-tool"></i><b>Phiếu lắp đặt</b><p>Ảnh nghiệm thu, chữ ký khách, phí phát sinh, serial</p></a>
+    <a class="stat-card" href="admin-warranty.html"><i class="ti ti-shield-check"></i><b>Bảo hành</b><p>Tra theo serial, tiếp nhận, gửi hãng, quá hạn</p></a>
+  </div>
+  <h3 class="hub-sub">Kế toán</h3>
+  <div class="stat-grid">
+    <a class="stat-card" href="admin-misa.html"><i class="ti ti-refresh"></i><b>Đồng bộ MISA</b><p>Hàng đợi chứng từ (chờ gửi, chờ MISA, đã nhận, lỗi · Gửi lại), đối soát ngày, kết nối</p></a>
+    <a class="stat-card" href="admin-misa.html#khop"><i class="ti ti-link"></i><b>Khớp mã hàng</b><p>Mã hàng, kho, khách, mã dịch vụ đã/chưa khớp với danh mục MISA</p></a>
+  </div>
+  <h3 class="hub-sub">Hệ thống</h3>
+  <div class="stat-grid">
+    <a class="stat-card" href="admin-users.html"><i class="ti ti-shield-lock"></i><b>Tài khoản & quyền</b><p>Tài khoản theo vai trò, showroom, cổng; ma trận quyền; Telegram; sao lưu</p></a>
+    <a class="stat-card" href="admin-audit.html"><i class="ti ti-history"></i><b>Nhật ký thao tác</b><p>Ai · làm gì · lúc nào · trước → sau; lọc theo người, loại việc, ngày</p></a>
+  </div>
+  <h2 class="hub-portal" style="--pc:#0B7285">Cổng Kho<span>màu xanh ngọc</span></h2>
+  <h3 class="hub-sub">Kho</h3>
+  <div class="stat-grid" style="--brand:#0B7285">
+    <a class="stat-card" href="admin-kho.html"><i class="ti ti-building-warehouse"></i><b>Tổng quan kho</b><p>Việc kho hôm nay: đơn chờ xuất, hàng về, chuyển kho, tồn thấp</p></a>
+    <a class="stat-card" href="admin-stock.html"><i class="ti ti-packages"></i><b>Tồn kho 3 showroom</b><p>Tồn, đang giữ, có thể bán theo từng showroom; kiểm kê</p></a>
+    <a class="stat-card" href="admin-picking.html"><i class="ti ti-package-export"></i><b>Xuất kho cho đơn</b><p>Soạn hàng, ghi serial, bấm Xuất kho (mốc gửi MISA)</p></a>
+    <a class="stat-card" href="admin-transfers.html"><i class="ti ti-transfer"></i><b>Chuyển kho</b><p>Phiếu chuyển giữa Phú Nhuận, Q.10, Thủ Đức</p></a>
+    <a class="stat-card" href="admin-serials.html"><i class="ti ti-barcode"></i><b>Số serial</b><p>Tra serial theo đơn, khách, bảo hành</p></a>
+  </div>
+  <h2 class="hub-portal" style="--pc:#6741D9">Cổng Nhân sự<span>màu tím</span></h2>
+  <h3 class="hub-sub">Nhân sự</h3>
+  <div class="stat-grid" style="--brand:#6741D9">
+    <a class="stat-card" href="admin-ns.html"><i class="ti ti-users-group"></i><b>Tổng quan nhân sự</b><p>Ca hôm nay, đơn từ chờ duyệt, kỳ lương</p></a>
+    <a class="stat-card" href="admin-attendance.html"><i class="ti ti-clock-check"></i><b>Chấm công</b><p>Chấm công theo ca, sửa công, đơn từ</p></a>
+    <a class="stat-card" href="admin-commission.html"><i class="ti ti-coin"></i><b>Hoa hồng & công lắp</b><p>Hoa hồng bán hàng, công lắp đặt theo phiếu</p></a>
+    <a class="stat-card" href="admin-payroll.html"><i class="ti ti-cash"></i><b>Bảng lương</b><p>Lập, duyệt, chốt kỳ lương; xuất Excel cho MISA</p></a>
   </div>
 
   <p class="muted" style="font-size:13px">Tài liệu: <a style="color:var(--brand);font-weight:700" href="../specs/index.html">docs/specs</a> — yêu cầu, đề xuất, báo giá, design system, cấu hình VPS.</p>

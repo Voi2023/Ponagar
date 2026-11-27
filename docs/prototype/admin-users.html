@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Tài khoản & quyền (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+  .mx td,.mx th{text-align:center}
+  .mx td:first-child,.mx th:first-child{text-align:left}
+  .mx tr.portal td{background:var(--brand-tint)}
+  .checks{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13.3px}
+  .checks label{display:flex;align-items:center;gap:6px;margin:0;text-transform:none;letter-spacing:0;font-size:13.3px;font-weight:500;color:var(--ink)}
+  .checks input{width:auto}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Tài khoản & quyền</h1></div>
+      <div class="row-flex"><button class="btn btn-primary btn-sm" onclick="openUser(-1)"><i class="ti ti-user-plus"></i> Thêm tài khoản</button></div>
+    </header>
+    <main class="app-content">
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+
+      <section data-tab="acc">
+        <div class="toolbar">
+          <input type="search" id="q" placeholder="Tìm tên, email…" aria-label="Tìm tài khoản" oninput="drawAcc()">
+          <select id="fRole" aria-label="Vai trò" onchange="drawAcc()"><option value="">Mọi vai trò</option></select>
+          <select id="fStore" aria-label="Showroom" onchange="drawAcc()"><option value="">Mọi showroom</option></select>
+          <select id="fLock" aria-label="Trạng thái" onchange="drawAcc()"><option value="">Mọi trạng thái</option><option value="0">Đang dùng</option><option value="1">Đã khoá</option></select>
+        </div>
+        <div class="panel" style="padding:6px 8px">
+          <div class="table-scroll"><table class="data wide">
+            <thead><tr><th>Người dùng</th><th>Vai trò</th><th>Showroom / kho</th><th>Cổng</th><th>2FA</th><th>Đăng nhập cuối</th><th>Trạng thái</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table></div>
+        </div>
+        <div class="box-note">Thợ lắp đặt dùng <b>trang nhân viên</b> (đăng nhập bằng PIN), tạo từ Hồ sơ nhân viên ở Cổng Nhân sự. Người nghỉ việc: khoá tài khoản, không xoá. Bắt buộc 2FA với chủ, quản lý, kế toán.</div>
+      </section>
+
+      <section data-tab="perm" hidden>
+        <div class="panel"><h2><span><i class="ti ti-shield-lock"></i> Ai làm được gì · quyền mặc định theo vai trò</span><span class="badge amber">đề xuất, chờ Techhomes xác nhận</span></h2>
+          <div class="table-scroll"><table class="data wide mx"><thead id="mxHead"></thead><tbody id="mxRows"></tbody></table></div>
+          <p class="muted" style="font-size:12.5px"><span class="badge green">✓</span> làm được · <span class="badge blue">xem</span> chỉ xem · chữ khác = làm được một phần · – không thấy. Chủ bật tắt từng quyền cho từng tài khoản (bấm vào người ở tab Tài khoản).</p>
+        </div>
+        <div class="panel"><h2><span><i class="ti ti-lock"></i> Quyền nhạy cảm · tách riêng, cấp cho từng người</span></h2>
+          <div class="table-scroll"><table class="data mx"><thead id="snHead"></thead><tbody id="snRows"></tbody></table></div>
+        </div>
+      </section>
+
+      <section data-tab="noti" hidden>
+        <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Nhóm Telegram</th><th>Thành viên</th><th>Nhận tin (bật tắt từng loại)</th><th></th></tr></thead><tbody id="nRows"></tbody>
+        </table></div></div>
+        <div class="box-note">Mỗi nhóm việc một nhóm chat Telegram. Khách nhận tin qua <b>email</b> (xác nhận đơn, hẹn giao, hẹn lắp). Zalo ZNS là tuỳ chọn thêm, tính phí theo tin <span class="badge amber">chờ Techhomes xác nhận</span></div>
+      </section>
+
+      <section data-tab="backup" hidden>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="label">Sao lưu gần nhất</div><div class="value" style="color:var(--ok)"><i class="ti ti-circle-check"></i> 02:00</div><div class="kpi-trend">Hôm nay 27/11/2026 · 4 phút 12 giây</div></div>
+          <div class="stat-card"><div class="label">Số bản giữ</div><div class="value">14 / 14</div><div class="kpi-trend">Bản cũ nhất 14/11/2026</div></div>
+          <div class="stat-card"><div class="label">Bản ngoài máy chủ</div><div class="value" style="color:var(--ok)"><i class="ti ti-cloud-check"></i> OK</div><div class="kpi-trend">Đồng bộ lúc 02:06</div></div>
+          <div class="stat-card"><div class="label">Ảnh nghiệm thu, chữ ký</div><div class="value">18,6 GB</div><div class="kpi-trend">Đã nén · ổ còn 61% trống</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="panel"><h2><span><i class="ti ti-database"></i> 14 bản sao lưu cơ sở dữ liệu</span></h2>
+            <div class="table-scroll"><table class="data"><thead><tr><th>Ngày</th><th class="right">Dung lượng</th><th>Ngoài máy chủ</th><th></th></tr></thead><tbody id="bRows"></tbody></table></div>
+          </div>
+          <div class="panel"><h2><span><i class="ti ti-lock-square"></i> Lưu mã hoá</span></h2>
+            <ul style="margin:0;padding-left:18px;font-size:13.3px;line-height:1.9"><li>Dữ liệu lương</li><li>Mã truy cập MISA</li><li>Tài khoản ngân hàng nhân viên</li></ul>
+            <p class="muted" style="font-size:12.5px">Chạy tự động mỗi đêm; chủ chỉ cần thấy đèn xanh. Chi tiết máy chủ: <a href="../specs/index.html" style="color:var(--brand);font-weight:700">05 · Cấu hình VPS</a>.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')">
+  <div class="modal modal-lg" style="max-height:90vh;overflow:auto"></div>
+</div>
+
+<script>
+renderAdmin('admin-users.html');
+
+const ROLES = ['Chủ', 'Quản lý showroom', 'Bán hàng', 'Kho', 'Điều phối lắp đặt', 'Thợ lắp đặt', 'Kế toán'];
+// Cổng được vào theo vai trò (đề xuất): B = Bán hàng (đỏ), K = Kho, N = Nhân sự
+const PORTAL = { 'Chủ': 'BKN', 'Quản lý showroom': 'BKN', 'Bán hàng': 'B', 'Kho': 'K', 'Điều phối lắp đặt': 'BN', 'Thợ lắp đặt': '', 'Kế toán': 'BKN' };
+const PNAME = { B: 'Bán hàng', K: 'Kho', N: 'Nhân sự' };
+const P2FA = ['Chủ', 'Quản lý showroom', 'Kế toán'];
+const SENS = ['Xem giá nhập', 'Sửa bảng giá nhóm', 'Xem lương', 'Duyệt kiểm kê', 'Kết nối MISA', 'Mở lại kỳ đã chốt'];
+const SENS_DEF = { 'Chủ': [1, 1, 1, 1, 1, 1], 'Quản lý showroom': [1, 1, 0, 1, 0, 0], 'Kế toán': [1, 0, 1, 0, 1, 1] };
+const slug = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/\s+/g, '.');
+const LAST = ['Hôm nay 08:02', 'Hôm nay 08:15', 'Hôm nay 08:31', 'Hôm nay 08:44', 'Hôm nay 07:50', 'Hôm nay 08:05', 'Hôm nay 07:58', 'Hôm nay 07:30', 'Hôm nay 07:42', 'Hôm qua 17:20', 'Hôm nay 08:10', 'Hôm nay 06:55'];
+const USERS = [...STAFF.map((s, i) => ({ ...s, email: s.role === 'Chủ' ? 'chu@techhomes.vn' : slug(s.name) + '@techhomes.vn', stores: s.role === 'Chủ' || s.role === 'Kế toán' ? [0, 1, 2] : [s.store], last: LAST[i], lock: 0, tfa: P2FA.includes(s.role) || i % 3 === 0 })),
+  { id: 'NV12', name: 'Thanh Phong', role: 'Bán hàng', store: 1, stores: [1], email: 'thanh.phong@techhomes.vn', last: '30/10/2026 17:45', lock: 1, tfa: 0, note: 'Nghỉ việc 31/10/2026' }];
+
+let tab = 'acc';
+const TABS = [['acc', 'Tài khoản'], ['perm', 'Phân quyền'], ['noti', 'Thông báo'], ['backup', 'Sao lưu']];
+function showTab(t) {
+  tab = t;
+  document.getElementById('tabs').innerHTML = TABS.map(([k, n]) => `<button class="${k === t ? 'active' : ''}" onclick="showTab('${k}')">${n}</button>`).join('');
+  document.querySelectorAll('section[data-tab]').forEach(s => s.hidden = s.dataset.tab !== t);
+}
+const portalChips = r => PORTAL[r] ? [...PORTAL[r]].map(k => `<span class="chip">${PNAME[k]}</span>`).join(' ') : '<span class="chip">Trang nhân viên · PIN</span>';
+
+function drawAcc() {
+  const q = document.getElementById('q').value.toLowerCase(), r = document.getElementById('fRole').value, s = document.getElementById('fStore').value, l = document.getElementById('fLock').value;
+  document.getElementById('rows').innerHTML = USERS.map((u, i) => [u, i]).filter(([u]) => (!q || (u.name + u.email).toLowerCase().includes(q)) && (!r || u.role === r) && (s === '' || u.stores.includes(+s)) && (l === '' || u.lock === +l)).map(([u, i]) => `
+    <tr class="row-link" onclick="openUser(${i})">
+      <td><b>${u.name}</b><span class="sub-muted">${u.email} · ${u.id}</span></td>
+      <td>${u.role}</td>
+      <td>${u.stores.length === 3 ? 'Cả ba showroom' : u.stores.map(storeName).join(', ')}</td>
+      <td>${portalChips(u.role)}</td>
+      <td>${u.tfa ? '<span class="badge green">Bật</span>' : P2FA.includes(u.role) ? '<span class="badge red">Bắt buộc</span>' : '<span class="badge gray">Tắt</span>'}</td>
+      <td>${u.last}</td>
+      <td>${u.lock ? `<span class="badge gray">Đã khoá</span><span class="sub-muted">${u.note}</span>` : '<span class="badge green">Đang dùng</span>'}</td>
+    </tr>`).join('') || '<tr><td colspan="7" class="empty-state">Không có tài khoản khớp bộ lọc</td></tr>';
+}
+
+function openUser(i) {
+  const u = USERS[i] || { name: '', email: '', role: 'Bán hàng', stores: [0], lock: 0, tfa: 0 }, def = SENS_DEF[u.role] || [];
+  openModal('dlg', `
+    <h3>${i < 0 ? 'Thêm tài khoản' : u.name}</h3>
+    <p class="sub">${i < 0 ? 'Nhập email, chọn vai trò; quyền mặc định theo vai trò, bật tắt từng quyền lẻ nếu cần khác.' : `${u.id} · đăng nhập cuối ${u.last}`}</p>
+    <div class="grid-2">
+      <div class="field"><label for="uName">Họ tên</label><input id="uName" value="${u.name}"></div>
+      <div class="field"><label for="uMail">Email</label><input id="uMail" type="email" value="${u.email}" placeholder="ten@techhomes.vn"></div>
+    </div>
+    <div class="field"><label for="uRole">Vai trò</label><select id="uRole">${ROLES.filter(r => r !== 'Chủ' || u.role === 'Chủ').map(r => `<option ${r === u.role ? 'selected' : ''}>${r}</option>`).join('')}</select>
+      <span class="sub-muted">Cổng được vào: ${portalChips(u.role)}</span></div>
+    <div class="field"><label>Showroom / kho được thấy</label><div class="checks">${STORES.map((s, k) => `<label><input type="checkbox" ${u.stores.includes(k) ? 'checked' : ''}> ${s.name}</label>`).join('')}</div></div>
+    <div class="field"><label>Quyền nhạy cảm</label><div class="checks">${SENS.map((s, k) => `<label><input type="checkbox" ${def[k] ? 'checked' : ''}> ${s}</label>`).join('')}</div></div>
+    <div class="checks" style="margin-bottom:10px">
+      <label><input type="checkbox" ${u.tfa ? 'checked' : ''} ${P2FA.includes(u.role) ? 'disabled' : ''}> Xác thực 2 lớp (2FA)${P2FA.includes(u.role) ? ' · bắt buộc với vai trò này' : ''}</label>
+      ${i >= 0 ? `<label><input type="checkbox" ${u.lock ? 'checked' : ''}> Khoá tài khoản (giữ lịch sử, không xoá)</label>` : ''}
+    </div>
+    <p class="muted" style="font-size:12.5px">Mọi thay đổi quyền được ghi vào <a href="admin-audit.html" style="color:var(--brand);font-weight:700">Nhật ký thao tác</a>.</p>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Huỷ</button>
+      <button class="btn btn-primary" onclick="toast('${i < 0 ? 'Đã tạo tài khoản, gửi email đặt mật khẩu' : 'Đã lưu quyền của ' + u.name + ' · ghi nhật ký'}');closeModal('dlg')">${i < 0 ? 'Tạo tài khoản' : 'Lưu'}</button></div>`);
+}
+
+// Bảng "Ai làm được gì" trong tài liệu chức năng (#ai-lam-gi) + dòng cổng truy cập
+const MX = [
+  ['Xem và xác nhận đơn', '✓ ✓ ✓ xem xem – xem'],
+  ['Lập báo giá, chuyển thành đơn', '✓ ✓ ✓ – – – –'],
+  ['Giảm giá vượt mức của nhóm khách', '✓ duyệt – – – – –'],
+  ['Huỷ đơn, duyệt đổi trả, hoàn tiền', '✓ ✓ – – – – hoàn_tiền'],
+  ['Sửa sản phẩm, giá, bảng giá nhóm, khuyến mãi', '✓ ✓ – – – – –'],
+  ['Nhập, xuất, chuyển kho, ghi serial', '✓ ✓ – ✓ – – –'],
+  ['Duyệt kiểm kê, xuất huỷ', '✓ ✓ – – – – xem'],
+  ['Xem giá vốn, giá nhập', '✓ ✓ – – – – ✓'],
+  ['Xếp lịch lắp đặt, phân thợ, duyệt phiếu', '✓ ✓ – – ✓ – –'],
+  ['Làm phiếu lắp đặt, ảnh nghiệm thu', 'xem xem – – xem việc_của_mình –'],
+  ['Tiếp nhận, xử lý bảo hành', '✓ ✓ tiếp_nhận gửi_hãng ✓ việc_được_giao –'],
+  ['Xếp ca, sửa công, duyệt đơn từ', '✓ ✓ – – tổ_lắp_đặt – –'],
+  ['Lập bảng lương', 'duyệt – – – – – ✓'],
+  ['Kết nối MISA, gửi lại đơn lỗi', '✓ – – – – – ✓'],
+  ['Chấm công, xem lương của mình', '– ✓ ✓ ✓ ✓ ✓ ✓'],
+  ['Tài khoản, phân quyền, nhật ký', '✓ – – – – – –'],
+];
+const cell = v => v === '✓' ? '<span class="badge green">✓</span>' : v === 'xem' ? '<span class="badge blue">xem</span>' : v === '–' ? '<span class="muted">–</span>' : `<span class="badge amber">${v.replace(/_/g, ' ')}</span>`;
+document.getElementById('mxHead').innerHTML = `<tr><th>Việc</th>${ROLES.map(r => `<th>${r}</th>`).join('')}</tr>`;
+document.getElementById('mxRows').innerHTML = Object.entries(PNAME).map(([k, n]) => `<tr class="portal"><td><b>Vào cổng ${n}</b></td>${ROLES.map(r => `<td>${PORTAL[r].includes(k) ? '<span class="badge green">✓</span>' : '<span class="muted">–</span>'}</td>`).join('')}</tr>`).join('')
+  + MX.map(([t, v]) => `<tr><td>${t}</td>${v.split(' ').map(x => `<td>${cell(x)}</td>`).join('')}</tr>`).join('');
+const SENS_ROLES = ['Chủ', 'Quản lý showroom', 'Kế toán'];
+document.getElementById('snHead').innerHTML = `<tr><th>Quyền</th>${SENS_ROLES.map(r => `<th>${r}</th>`).join('')}<th>Vai trò khác</th></tr>`;
+document.getElementById('snRows').innerHTML = SENS.map((s, k) => `<tr><td>${s}</td>${SENS_ROLES.map(r => `<td>${cell(SENS_DEF[r][k] ? '✓' : '–')}</td>`).join('')}<td><span class="muted">–</span></td></tr>`).join('');
+
+const NOTI = [
+  ['Bán hàng', 'Techhomes · Bán hàng', ['NV01', 'NV02', 'NV03', 'NV04'], ['Đơn mới', 'Yêu cầu báo giá', 'Yêu cầu gọi lại', 'Đơn chuyển khoản quá 24 giờ', 'Nhà thầu đăng ký chờ duyệt']],
+  ['Kho', 'Techhomes · Kho', ['NV05', 'NV06'], ['Đơn chờ chuẩn bị', 'Tồn thấp mỗi sáng', 'Hàng về cho đơn chờ', 'Hàng gửi hãng quá hạn']],
+  ['Lắp đặt', 'Techhomes · Lắp đặt', ['NV07', 'NV08', 'NV09', 'NV10'], ['Việc chờ xếp lịch', 'Đặt lịch lắp đặt từ web', 'Phiếu trễ hẹn', 'Yêu cầu bảo hành mới']],
+  ['Kế toán', 'Techhomes · Kế toán', ['NV11', 'NV00'], ['Đơn lỗi MISA', 'Tóm tắt đối soát mỗi sáng 8:00', 'Yêu cầu hoàn tiền', 'Ứng lương đã duyệt']],
+  ['Quản lý', 'Techhomes · Quản lý', ['NV00', 'NV01'], ['Đơn từ chờ duyệt', 'Giảm giá vượt mức', 'Kiểm kê lệch lớn', 'Bảo hành quá hạn']],
+];
+document.getElementById('nRows').innerHTML = NOTI.map(([g, chat, mem, kinds]) => `<tr>
+  <td><b>${g}</b><span class="sub-muted"><i class="ti ti-brand-telegram"></i> ${chat}</span></td>
+  <td>${mem.map(id => staff(id).name).join(', ')}</td>
+  <td><div class="checks">${kinds.map(k => `<label><input type="checkbox" checked onchange="toast((this.checked ? 'Bật' : 'Tắt') + ' tin “${k}” cho nhóm ${g}')"> ${k}</label>`).join('')}</div></td>
+  <td><button class="btn btn-outline btn-sm" onclick="toast('Đã gửi tin thử vào nhóm ${chat}')">Gửi tin thử</button></td></tr>`).join('');
+
+document.getElementById('bRows').innerHTML = Array.from({ length: 14 }, (_, k) => `<tr><td>${String(27 - k).padStart(2, '0')}/11/2026 02:00</td><td class="right">${(412 - k * 2.6).toFixed(1).replace('.', ',')} MB</td><td><span class="badge green">Đã có</span></td>
+  <td><button class="btn btn-outline btn-sm" onclick="toast('Tải bản sao lưu ${27 - k}/11 · chỉ chủ tải được')">Tải về</button></td></tr>`).join('');
+
+document.getElementById('fRole').innerHTML += ROLES.map(r => `<option>${r}</option>`).join('');
+document.getElementById('fStore').innerHTML += STORES.map((s, i) => `<option value="${i}">${s.name}</option>`).join('');
+showTab(tab); drawAcc();
+</script>
+</body>
+</html>

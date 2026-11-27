@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Cổng Kho — Chuyển kho (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<script src="assets/kho-data.js"></script>
+<style>
+table.data .mono{white-space:nowrap}
+.route{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.ends{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-bottom:14px}
+.ends>div{border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+.ends i{font-size:22px;color:var(--brand)}
+.rcv{width:70px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm)}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Chuyển kho</h1></div>
+      <div class="row-flex">
+        <select id="store" aria-label="Kho đang làm việc" class="input" style="padding:8px 10px" onchange="draw()">
+          <option value="">Tất cả kho</option><option value="0">Phú Nhuận</option><option value="1">Q.10</option><option value="2">Thủ Đức</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel báo cáo chuyển kho tháng 11 cho kế toán')"><i class="ti ti-file-spreadsheet"></i> Báo cáo tháng</button>
+        <button class="btn btn-primary btn-sm" onclick="openNew()"><i class="ti ti-plus"></i> Tạo phiếu chuyển</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid" id="kpi"></div>
+      <div class="toolbar"><div class="tabs" id="tabs"></div><input type="search" id="q" placeholder="Tìm mã phiếu, sản phẩm…" aria-label="Tìm phiếu" oninput="draw()"></div>
+      <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+        <thead><tr><th>Phiếu</th><th>Tuyến</th><th>Hàng</th><th>Kho đi xuất</th><th>Kho đến nhận</th><th>Trạng thái</th></tr></thead>
+        <tbody id="rows"></tbody></table></div></div>
+      <div class="box-note">Phiếu chuyển có hai đầu: <b>kho đi bấm Xuất chuyển, kho đến bấm Nhận</b>. Giữa hai bước hàng ở trạng thái <i>Đang đi đường</i>: đã rời kho đi, chưa vào kho đến, chưa bán được. Nhận thiếu: phần chênh treo lại, quản lý phải xử lý (tìm lại hoặc lập phiếu huỷ). Chuyển kho không sang MISA từng phiếu; kế toán lấy báo cáo chuyển kho theo tháng nếu cần.</div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal modal-lg"></div></div>
+
+<script>
+renderAdmin('admin-transfers.html');
+const ST = { 'Nháp': 'gray', 'Đang chuyển': 'blue', 'Đã nhận': 'green', 'Lệch': 'red' };
+let filter = 'Tất cả';
+function pick(t) { filter = t; draw(); }
+const thumb = (p, sub) => `<div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${p.img}" alt=""><span>${p.name}<span class="sub-muted">${sub ?? 'Mã ' + sku(p)}</span></span></div>`;
+const units = t => t.lines.reduce((a, l) => a + l[1], 0);
+
+function draw() {
+  const v = document.getElementById('store').value, q = document.getElementById('q').value.toLowerCase();
+  const mine = TRANSFERS.filter(t => v === '' || t.from === +v || t.to === +v);
+  const cnt = st => mine.filter(t => t.st === st).length;
+  document.getElementById('kpi').innerHTML = [
+    ['Nháp', cnt('Nháp'), 'Chưa xuất khỏi kho đi'],
+    ['Đang đi đường', cnt('Đang chuyển'), `${mine.filter(t => t.st === 'Đang chuyển').reduce((a, t) => a + units(t), 0)} sản phẩm chưa bán được`],
+    ['Lệch chờ xử lý', cnt('Lệch'), 'Quản lý tìm lại hoặc lập phiếu huỷ', 'bad'],
+    ['Đã nhận tháng 11', 12 + cnt('Đã nhận'), 'Phiếu đã khép hai đầu'],
+  ].map(([l, n, t, c]) => `<div class="stat-card ${n && c ? c : ''}"><div class="label">${l}</div><div class="value">${n}</div><div class="kpi-trend">${t}</div></div>`).join('');
+  document.getElementById('tabs').innerHTML = ['Tất cả', ...Object.keys(ST)].map(t => `<button class="${t === filter ? 'active' : ''}" onclick="pick('${t}')">${t}</button>`).join('');
+  document.getElementById('rows').innerHTML = mine.filter(t => (filter === 'Tất cả' || t.st === filter) && (!q || (t.id + t.lines.map(l => byId(l[0]).name).join()).toLowerCase().includes(q))).map(t => `
+    <tr class="row-link" onclick="openT('${t.id}')">
+      <td><b class="mono">${t.id}</b><span class="sub-muted">${t.note || ''}</span></td>
+      <td><span class="route">${storeName(t.from)} <i class="ti ti-arrow-right"></i> ${storeName(t.to)}</span></td>
+      <td>${t.lines.map(([id, n, r]) => `${byId(id).name} × ${n}${t.st === 'Lệch' && r < n ? ` <span class="sub-err">Nhận ${r}, thiếu ${n - r}</span>` : ''}`).join('<br>')}</td>
+      <td>${t.st === 'Nháp' ? '<span class="muted">Chưa xuất</span>' : `${staff(t.by).name}<span class="sub-muted">${t.at}</span>`}</td>
+      <td>${t.rcv ? t.rcv : '<span class="muted">—</span>'}</td>
+      <td><span class="badge ${ST[t.st]}">${t.st === 'Đang chuyển' ? 'Đang đi đường' : t.st}</span></td>
+    </tr>`).join('') || '<tr><td colspan="6" class="empty-state">Không có phiếu</td></tr>';
+}
+
+function openT(id) {
+  const t = TRANSFERS.find(x => x.id === id), going = t.st === 'Đang chuyển';
+  const rows = t.lines.map(([pid, n, r, sns], i) => {
+    const p = byId(pid), diff = r - n;
+    return `<tr><td>${thumb(p)}</td><td class="right">${n}</td>
+      <td class="right">${going ? `<input class="rcv" type="number" min="0" max="${n}" value="${n}" id="r${i}" aria-label="Số thực nhận ${p.name}">` : t.st === 'Nháp' ? '—' : r}</td>
+      <td style="font-size:12px">${sns.map(x => `<span class="mono">${x}</span>`).join('<br>') || (hasSerial(p) ? '<span class="sub-err">Chưa quét serial</span>' : '<span class="muted">Không theo serial</span>')}</td>
+      <td class="right">${['Đã nhận', 'Lệch'].includes(t.st) && diff ? `<b style="color:var(--danger)">${diff}</b>` : '—'}</td></tr>`;
+  }).join('');
+  const act = {
+    'Nháp': `<button class="btn btn-outline" onclick="closeModal('dlg');toast('Đã xoá phiếu nháp ${t.id}')">Xoá nháp</button><button class="btn btn-primary" onclick="setSt('${t.id}','Đang chuyển')">Xuất chuyển</button>`,
+    'Đang chuyển': `<button class="btn btn-primary" onclick="receive('${t.id}')">Xác nhận nhận hàng</button>`,
+    'Lệch': `<button class="btn btn-outline" onclick="closeModal('dlg');toast('Lập phiếu huỷ phần thiếu của ${t.id} — chờ quản lý duyệt')">Lập phiếu huỷ phần thiếu</button><button class="btn btn-primary" onclick="TRANSFERS.find(x => x.id === '${t.id}').lines.forEach(l => l[2] = l[1]);setSt('${t.id}','Đã nhận')">Đã tìm thấy · nhận bổ sung</button>`,
+  }[t.st] || '';
+  openModal('dlg', `<div class="row-flex" style="justify-content:space-between"><h3 class="mono" style="margin:0">${t.id}</h3><span class="badge ${ST[t.st]}">${t.st === 'Đang chuyển' ? 'Đang đi đường' : t.st}</span></div>
+    <p class="sub">${t.note || 'Phiếu chuyển kho'}</p>
+    <div class="ends"><div><span class="muted" style="font-size:12px">KHO ĐI</span><br><b>${STORES[t.from].name}</b><span class="sub-muted">${t.st === 'Nháp' ? 'Chưa bấm Xuất chuyển' : `Xuất chuyển: ${staff(t.by).name} · ${t.at}`}</span></div>
+      <i class="ti ti-truck"></i>
+      <div><span class="muted" style="font-size:12px">KHO ĐẾN</span><br><b>${STORES[t.to].name}</b><span class="sub-muted">${t.rcv ? 'Nhận: ' + t.rcv : 'Chưa nhận'}</span></div></div>
+    <table class="data"><thead><tr><th>Sản phẩm</th><th class="right">Gửi</th><th class="right">Thực nhận</th><th>Serial</th><th class="right">Chênh</th></tr></thead><tbody>${rows}</tbody></table>
+    ${going ? '<p class="muted" style="font-size:12.5px">Kho đến đếm, quét serial. Nhận đủ thì giữ nguyên số; nhận thiếu thì sửa số thực nhận, phần chênh sẽ treo chờ quản lý.</p>' : ''}
+    ${t.st === 'Lệch' ? '<div class="box-note">Phần thiếu đang treo trên phiếu, chưa cộng vào kho nào. Quản lý tìm lại hoặc lập phiếu huỷ. Kiểm kê KK-2511-02 ở Q.10 cũng ghi lệch 1 bản lề CLIP top.</div>' : ''}
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button>${act}</div>`);
+}
+function setSt(id, st) {
+  const t = TRANSFERS.find(x => x.id === id);
+  if (st === 'Đang chuyển') { t.by = 'NV05'; t.at = '27/11 vừa xong'; }
+  if (st === 'Đã nhận' && !t.rcv) t.rcv = `${staff(t.to === 1 ? 'NV06' : 'NV05').name} · 27/11 vừa xong`;
+  t.st = st; closeModal('dlg'); draw();
+  toast(st === 'Đang chuyển' ? `${id}: hàng rời ${storeName(t.from)}, chuyển sang Đang đi đường` : `${id}: đã nhận, cộng tồn ${storeName(t.to)}`);
+}
+function receive(id) {
+  const t = TRANSFERS.find(x => x.id === id);
+  t.lines.forEach((l, i) => l[2] = Math.min(l[1], Math.max(0, +document.getElementById('r' + i).value)));
+  t.rcv = `${staff(t.to === 1 ? 'NV06' : 'NV05').name} · 27/11 vừa xong`;
+  const short = t.lines.some(l => l[2] < l[1]);
+  if (short) t.note = 'Nhận thiếu — treo chờ quản lý xử lý';
+  setSt(id, short ? 'Lệch' : 'Đã nhận');
+}
+
+function openNew() {
+  const v = document.getElementById('store').value || '0';
+  openModal('dlg', `<h3>Tạo phiếu chuyển kho</h3><p class="sub">Kho đi tạo phiếu, quét hàng và serial rồi bấm Xuất chuyển. Mặc định kho đi là kho đang làm việc.</p>
+    <div class="grid-2"><div class="field"><label for="nF">Kho đi</label><select id="nF">${[0, 1, 2].map(s => `<option value="${s}" ${s == v ? 'selected' : ''}>${STORES[s].name}</option>`).join('')}</select></div>
+      <div class="field"><label for="nT">Kho đến</label><select id="nT">${[0, 1, 2].map(s => `<option value="${s}" ${s == 2 ? 'selected' : ''}>${STORES[s].name}</option>`).join('')}</select></div></div>
+    <div class="grid-2"><div class="field"><label for="nP">Sản phẩm</label><select id="nP">${PRODUCTS.map(p => `<option value="${p.id}" ${p.id === 6 ? 'selected' : ''}>${p.name} · ${p.code}</option>`).join('')}</select></div>
+      <div class="field"><label for="nN">Số lượng</label><input id="nN" type="number" min="1" value="2"></div></div>
+    <div class="field"><label for="nS">Serial (thiết bị có serial, mỗi dòng một số)</label><textarea id="nS" rows="2" placeholder="Quét serial từng chiếc"></textarea></div>
+    <p class="sub-err" id="nErr"></p>
+    <div class="actions"><button class="btn btn-outline" onclick="saveNew('Nháp')">Lưu nháp</button><button class="btn btn-primary" onclick="saveNew('Đang chuyển')">Xuất chuyển</button></div>`);
+}
+function saveNew(st) {
+  const f = +nF.value, to = +nT.value, p = byId(+nP.value), n = +nN.value, sns = nS.value.split('\n').map(s => s.trim()).filter(Boolean);
+  const err = f === to ? 'Kho đi và kho đến phải khác nhau'
+    : !(n > 0) ? 'Số lượng phải lớn hơn 0'
+    : n > avail(p, f) ? `${storeName(f)} chỉ còn ${avail(p, f)} có thể bán — hệ thống không cho tồn âm`
+    : st !== 'Nháp' && hasSerial(p) && sns.length !== n ? `Cần quét đủ ${n} serial trước khi Xuất chuyển` : '';
+  if (err) { nErr.textContent = err; return; }
+  const id = 'CK-2711-0' + (TRANSFERS.filter(t => t.id.startsWith('CK-2711')).length + 1);
+  TRANSFERS.unshift({ id, from: f, to, st, lines: [[p.id, n, 0, sns]], by: 'NV05', at: '27/11 vừa xong', note: '' });
+  closeModal('dlg'); draw(); toast(st === 'Nháp' ? `Đã lưu nháp ${id}` : `${id}: đã xuất chuyển, hàng Đang đi đường tới ${storeName(to)}`);
+}
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Lịch lắp đặt (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+.cal-wrap{display:grid;grid-template-columns:260px 1fr;gap:16px;align-items:start}
+.queue .job{border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:var(--radius-sm);padding:9px 10px;margin-bottom:8px;background:var(--surface);cursor:grab;font-size:12.8px;width:100%;text-align:left;font:inherit}
+.queue .job.sel{outline:2px solid var(--brand);background:var(--brand-tint)}
+.cal{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;min-width:860px}
+.cal th,.cal td{border:1px solid var(--border);padding:4px;vertical-align:top}
+.cal th{background:var(--bg);font-size:11.5px;color:var(--muted)}
+.cal th.today{background:var(--brand-tint);color:var(--brand-dark)}
+.cal td.who{width:150px;background:var(--bg)}
+.slot{min-height:46px;border-radius:var(--radius-sm);padding:2px;margin-bottom:3px;background:var(--bg)}
+.slot.drop-ok{background:var(--ok-bg);cursor:copy;outline:1px dashed var(--ok)}
+.slot .lbl{font-size:10px;color:var(--muted);display:block}
+.blk{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--info);background:var(--info-bg);border-radius:4px;padding:3px 5px;margin-top:2px;font:inherit;font-size:11.3px;cursor:pointer}
+.blk.done{border-color:var(--ok);background:var(--ok-bg)}
+.blk.warn{border-color:var(--danger);background:var(--danger-bg)}
+.blk.bh{border-color:var(--warn);background:var(--warn-bg)}
+.skill{font-size:10.5px;display:block;color:var(--muted)}
+@media (max-width:980px){.cal-wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Lịch lắp đặt</h1></div>
+      <div class="row-flex">
+        <button class="btn btn-outline btn-sm" onclick="toast('Tuần trước: 16/11 – 22/11')"><i class="ti ti-chevron-left"></i></button>
+        <b style="font-size:13px">Tuần 23/11 – 29/11/2026</b>
+        <button class="btn btn-outline btn-sm" onclick="toast('Tuần sau: 30/11 – 06/12')"><i class="ti ti-chevron-right"></i></button>
+        <button class="btn btn-primary btn-sm" onclick="toast('Đã xác nhận lịch: khách nhận tin hẹn, thợ nhận việc trên điện thoại')"><i class="ti ti-send"></i> Xác nhận lịch</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid" id="stats"></div>
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+
+      <section id="v-lich">
+        <div class="cal-wrap">
+          <div class="panel queue" style="padding:14px">
+            <h2 style="margin-bottom:6px"><span><i class="ti ti-inbox"></i> Chờ xếp lịch</span><span class="badge amber" id="qn"></span></h2>
+            <p class="muted" style="font-size:12px;margin:0 0 10px">Từ đơn web, đơn showroom, đặt lịch lắp đặt và bảo hành tại nhà. Chọn (hoặc kéo) một việc rồi bấm vào ô Sáng / Chiều của thợ.</p>
+            <div id="queue"></div>
+            <div id="hint" class="box-note" style="display:none"></div>
+          </div>
+          <div class="panel" style="padding:10px;overflow-x:auto"><table class="cal" id="cal"></table></div>
+        </div>
+        <div class="box-note">Hệ thống báo khi: <b>trùng giờ</b>, <b>thợ không có kỹ năng</b> cho việc này, <b>hàng chưa xuất kho</b> trước ngày lắp. Một việc có thể giao hai thợ, công chia theo tỉ lệ điều phối nhập (mặc định chia đều). Thợ là nhân viên hay thợ ngoài nhận khoán: <span class="badge amber">chờ Techhomes xác nhận</span></div>
+      </section>
+
+      <section id="v-phi" style="display:none">
+        <div class="panel">
+          <h2><span><i class="ti ti-list-details"></i> Biểu phí lắp đặt · hiệu lực từ 01/11/2026</span><button class="btn btn-outline btn-sm" onclick="toast('Tạo biểu phí mới: nhập ngày hiệu lực, đơn cũ giữ phí cũ')"><i class="ti ti-plus"></i> Biểu phí mới</button></h2>
+          <p class="muted" style="margin-top:-6px"><span class="badge amber">Số tiền minh hoạ, chờ Techhomes xác nhận</span> Techhomes gửi biểu phí hiện hành trên web cũ để nhập. Công thợ lấy theo bảng đơn giá công (số giả định).</p>
+          <div class="table-scroll"><table class="data wide">
+            <thead><tr><th>Loại việc</th><th>Tính theo</th><th>Kỹ năng</th><th class="right">Phí khách trả</th><th class="right">Công thợ</th></tr></thead>
+            <tbody id="fees"></tbody>
+          </table></div>
+          <div class="box-note">Phí lắp đặt là <b>dòng dịch vụ trên đơn</b>, có thuế suất riêng, sang MISA cùng đơn. Miễn phí lắp (khuyến mãi): khách trả 0đ, công thợ vẫn tính. Dùng chung cho web, báo giá, đơn và bảng lương.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal modal-lg"></div></div>
+
+<script>
+renderAdmin('admin-install-calendar.html');
+
+const DAYS = ['T2 23/11', 'T3 24/11', 'T4 25/11', 'T5 26/11', 'T6 27/11', 'T7 28/11', 'CN 29/11'], TODAY = 4;
+const TECH = [
+  { id: 'NV08', skills: ['Thiết bị bếp', 'Khóa điện tử'], area: 'Phú Nhuận, Q.3, Bình Thạnh' },
+  { id: 'NV09', skills: ['Khóa điện tử', 'Phụ kiện tủ bếp Blum, Hafele'], area: 'Q.10, Q.5, Tân Bình' },
+  { id: 'NV10', skills: ['Thiết bị bếp', 'Cửa kính, phòng tắm kính'], area: 'Thủ Đức, Q.9, Bình Dương' },
+];
+// ma, khach, khu vuc, sp idx (PRODUCTS), ky nang, ngay khach muon, da xuat kho, tho[], ngay, buoi, xong
+const JOBS = [
+  { code: 'TH-20466', cust: 'Lý Thanh Trúc', area: 'Bình Thạnh', p: 5, skill: 'Thiết bị bếp', want: 0, out: true, techs: ['NV08'], day: 0, s: 'Sáng', done: true },
+  { code: 'TH-20463', cust: 'Ngô Đức Anh', area: 'Q.3', p: 1, skill: 'Thiết bị bếp', want: 1, out: true, techs: ['NV08'], day: 1, s: 'Chiều', done: true },
+  { code: 'TH-20469', cust: 'Trịnh Kim Ngân', area: 'Tân Bình', p: 25, skill: 'Khóa điện tử', want: 2, out: true, techs: ['NV09'], day: 2, s: 'Sáng', done: true },
+  { code: 'TH-20476', cust: 'Phạm Quốc Huy', area: 'Phú Nhuận', p: 18, skill: 'Cửa kính, phòng tắm kính', want: 2, out: true, techs: ['NV10'], day: 2, s: 'Chiều', done: true },
+  { code: 'TH-20470', cust: 'Cty CP Xây dựng Hưng Thịnh', area: 'Thủ Đức', p: 23, skill: 'Cửa kính, phòng tắm kính', want: 3, out: true, techs: ['NV10'], day: 3, s: 'Sáng', done: true },
+  { code: 'TH-20467', cust: 'Mai Xuân Phúc', area: 'Q.5', p: 26, skill: 'Khóa điện tử', want: 3, out: true, techs: ['NV09'], day: 3, s: 'Chiều', note: 'Không lắp được: cửa chưa hoàn thiện · chờ xếp lại' },
+  { code: 'TH-20474', cust: 'Đoàn Thị Lan', area: 'Q.3', p: 0, skill: 'Thiết bị bếp', want: 4, out: true, techs: ['NV08'], day: 4, s: 'Sáng' },
+  { code: 'TH-20475', cust: 'Vũ Minh Tuấn', area: 'Phú Nhuận', p: 6, skill: 'Thiết bị bếp', want: 4, out: true, techs: ['NV08'], day: 4, s: 'Chiều' },
+  { code: 'TH-20471', cust: 'Đặng Ngọc Hân', area: 'Thủ Đức', p: 27, skill: 'Khóa điện tử', want: 4, out: true, techs: ['NV09'], day: 4, s: 'Chiều' },
+  { code: 'BH-0112', cust: 'Lâm Ngọc Diệp', area: 'Thủ Đức', p: 1, skill: 'Thiết bị bếp', want: 4, out: true, techs: ['NV10'], day: 4, s: 'Sáng', bh: 'Bảo hành tại nhà · bếp báo lỗi E2' },
+  { code: 'TH-20478', cust: 'Võ Thị Mai', area: 'Phú Nhuận', p: 4, skill: 'Thiết bị bếp', want: 5, out: false, techs: ['NV08'], day: 5, s: 'Sáng' },
+  { code: 'TH-20480', cust: 'Cty TNHH Nội thất An Phát', area: 'Thủ Đức', p: 12, qty: 20, skill: 'Phụ kiện tủ bếp Blum, Hafele', want: 5, out: false, techs: ['NV09', 'NV10'], day: 5, s: 'Sáng', note: 'Hai thợ · chia công 50/50' },
+  // chờ xếp lịch
+  { code: 'TH-20481', cust: 'Trần Thu Hà', area: 'Q.10', p: 24, skill: 'Khóa điện tử', want: 5, out: false, techs: [] },
+  { code: 'TH-20482', cust: 'Nguyễn Minh Khoa', area: 'Phú Nhuận', p: 0, skill: 'Thiết bị bếp', want: 6, out: false, techs: [] },
+  { code: 'BH-0115', cust: 'Lương Văn Tú', area: 'Gò Vấp', p: 5, skill: 'Thiết bị bếp', want: 5, out: true, techs: [], bh: 'Bảo hành tại nhà · máy hút mùi kêu to' },
+  { code: 'LD-0091', cust: 'Hồ Thị Thanh (đặt lịch trên web)', area: 'Q.7', p: 13, skill: 'Phụ kiện tủ bếp Blum, Hafele', want: 6, out: true, techs: [], note: 'Khách tự mua hàng, chỉ đặt dịch vụ lắp' },
+];
+const FEES = [
+  ['Lắp bếp từ, bếp gas âm', 'Mỗi chiếc', 'Thiết bị bếp', 300000, 150000],
+  ['Lắp máy hút mùi', 'Mỗi chiếc', 'Thiết bị bếp', 400000, 200000],
+  ['Lắp máy rửa chén, lò âm tủ', 'Mỗi chiếc', 'Thiết bị bếp', 350000, 150000],
+  ['Lắp khóa điện tử (cửa gỗ, cửa kính)', 'Mỗi bộ', 'Khóa điện tử', 300000, 150000],
+  ['Lắp tay nâng, ray hộp, bản lề Blum', 'Mỗi bộ', 'Phụ kiện tủ bếp Blum, Hafele', 150000, 60000],
+  ['Bảo hành tại nhà', 'Mỗi lần', 'Theo thiết bị', 0, 100000],
+  ['Phát sinh: khoét đá', 'Mỗi việc', '—', 250000, 100000],
+  ['Phát sinh: đi ống, đi điện', 'Mỗi mét', '—', 80000, 30000],
+];
+
+let tab = 'Lịch tuần', sel = null;
+const prod = j => PRODUCTS[j.p];
+const load = (t, d) => JOBS.filter(j => j.techs.includes(t) && j.day === d).length;
+function warnings(j) {
+  const w = [];
+  j.techs.forEach(t => {
+    if (!TECH.find(x => x.id === t).skills.includes(j.skill)) w.push(`${staff(t).name} không có kỹ năng "${j.skill}"`);
+    if (JOBS.some(o => o !== j && o.techs.includes(t) && o.day === j.day && o.s === j.s)) w.push(`${staff(t).name} trùng giờ buổi ${j.s} ${DAYS[j.day]}`);
+  });
+  if (!j.out && !j.done) w.push('Hàng chưa xuất kho trước ngày lắp');
+  return w;
+}
+
+function draw() {
+  const q = JOBS.filter(j => !j.techs.length);
+  document.getElementById('stats').innerHTML = [
+    ['Chờ xếp lịch', q.length, 'Gọi khách chốt giờ rồi xếp'],
+    ['Hôm nay 27/11', JOBS.filter(j => j.day === TODAY).length, `${JOBS.filter(j => j.day === TODAY && j.techs.length).length} việc · 3 thợ đang đi`],
+    ['Xong trong tuần', JOBS.filter(j => j.done).length, 'Đã có ảnh nghiệm thu'],
+    ['Cảnh báo', JOBS.filter(j => j.techs.length && warnings(j).length).length, 'Trùng giờ · sai kỹ năng · chưa xuất kho', 'bad'],
+  ].map(([l, v, t, c]) => `<div class="stat-card ${c || ''}"><div class="label">${l}</div><div class="value">${v}</div><div class="kpi-trend">${t}</div></div>`).join('');
+  document.getElementById('tabs').innerHTML = ['Lịch tuần', 'Biểu phí'].map(t => `<button class="${t === tab ? 'active' : ''}" onclick="tab='${t}';draw()">${t}</button>`).join('');
+  document.getElementById('v-lich').style.display = tab === 'Lịch tuần' ? '' : 'none';
+  document.getElementById('v-phi').style.display = tab === 'Biểu phí' ? '' : 'none';
+
+  document.getElementById('qn').textContent = q.length;
+  document.getElementById('queue').innerHTML = q.map(j => `<button class="job ${sel === j.code ? 'sel' : ''}" draggable="true" ondragstart="sel='${j.code}';hint()" onclick="pickJob('${j.code}')">
+      <b class="mono">${j.code}</b> · ${j.cust}<span class="sub-muted">${j.bh || prod(j).name}${j.qty ? ' × ' + j.qty : ''}</span>
+      <span class="sub-muted">${j.area} · khách muốn ${DAYS[j.want]} · ${j.out ? 'đã xuất kho' : '<span style="color:var(--danger)">chưa xuất kho</span>'}</span></button>`).join('') || '<div class="empty-state">Đã xếp hết</div>';
+
+  document.getElementById('cal').innerHTML = `<thead><tr><th style="width:150px">Thợ</th>${DAYS.map((d, i) => `<th class="${i === TODAY ? 'today' : ''}">${d}</th>`).join('')}</tr></thead><tbody>${TECH.map(t => `<tr>
+      <td class="who"><b>${staff(t.id).name}</b> <span class="muted">${staff(t.id).id}</span>${t.skills.map(s => `<span class="skill">· ${s}</span>`).join('')}<span class="skill"><i class="ti ti-map-pin"></i> ${t.area}</span></td>
+      ${DAYS.map((_, d) => `<td>${['Sáng', 'Chiều'].map(s => `<div class="slot ${sel ? 'drop-ok' : ''}" ondragover="event.preventDefault()" ondrop="place('${t.id}',${d},'${s}')" onclick="place('${t.id}',${d},'${s}')"><span class="lbl">${s}</span>${JOBS.filter(j => j.techs.includes(t.id) && j.day === d && j.s === s).map(j => {
+        const cls = j.done ? 'done' : warnings(j).length ? 'warn' : j.bh ? 'bh' : '';
+        return `<button class="blk ${cls}" onclick="event.stopPropagation();openJob('${j.code}')"><b class="mono">${j.code}</b>${j.done ? ' ✓' : ''}<span class="skill">${j.bh ? 'Bảo hành' : prod(j).type} · ${j.area}</span></button>`;
+      }).join('')}</div>`).join('')}</td>`).join('')}</tr>`).join('')}</tbody>`;
+
+  document.getElementById('fees').innerHTML = FEES.map(f => `<tr><td>${f[0]}</td><td>${f[1]}</td><td>${f[2]}</td><td class="right">${f[3] ? fmt(f[3]) : '0đ · miễn phí'}</td><td class="right">${fmt(f[4])}</td></tr>`).join('');
+}
+
+function hint() {
+  const h = document.getElementById('hint'), j = JOBS.find(x => x.code === sel);
+  if (!j) { h.style.display = 'none'; return; }
+  const ok = TECH.filter(t => t.skills.includes(j.skill)).sort((a, b) => load(a.id, j.want) - load(b.id, j.want));
+  h.innerHTML = `<b>Gợi ý cho ${j.code}:</b> ${ok.length ? ok.map(t => `${staff(t.id).name} (${load(t.id, j.want)} việc ${DAYS[j.want]})`).join(', ') : 'không thợ nào có kỹ năng này'} — đúng kỹ năng, ít việc nhất xếp trước.`;
+  h.style.display = '';
+}
+function pickJob(code) { sel = sel === code ? null : code; draw(); hint(); }
+function place(t, d, s) {
+  const j = JOBS.find(x => x.code === sel);
+  if (!j) return;
+  Object.assign(j, { techs: [t], day: d, s });
+  sel = null; draw(); hint();
+  const w = warnings(j);
+  toast(w.length ? `Đã xếp ${j.code} · Cảnh báo: ${w.join('; ')}` : `Đã xếp ${j.code} cho ${staff(t).name}, ${s} ${DAYS[d]}. Bấm Xác nhận lịch để báo khách và thợ.`);
+}
+function unplace(code) { JOBS.find(x => x.code === code).techs = []; closeModal('dlg'); draw(); toast(`Đã đưa ${code} về Chờ xếp lịch`); }
+
+function openJob(code) {
+  const j = JOBS.find(x => x.code === code), p = prod(j), w = warnings(j);
+  openModal('dlg', `
+    <div class="row-flex" style="justify-content:space-between"><h3 class="mono" style="margin:0">${j.code}</h3>${j.done ? '<span class="badge green">Đã lắp xong</span>' : '<span class="badge blue">Đã xếp lịch</span>'}</div>
+    <p class="sub">${j.bh || 'Lắp đặt theo đơn'} · ${j.s} ${DAYS[j.day]} · ${j.techs.map(t => staff(t).name).join(' + ')}</p>
+    <div class="detail-grid">
+      <div class="row-flex" style="flex-wrap:nowrap;align-items:flex-start"><img class="th-img" src="${p.img}" alt=""><div><b>${p.name}</b>${j.qty ? ' × ' + j.qty : ''}<span class="sub-muted">Mã ${sku(p)} · cần kỹ năng: ${j.skill}</span></div></div>
+      <div class="kv"><span class="muted">Khách</span><span>${j.cust}</span><span class="muted">Khu vực</span><span>${j.area}</span><span class="muted">Khách muốn</span><span>${DAYS[j.want]}</span><span class="muted">Xuất kho</span><span>${j.out ? '<span class="badge green">Đã xuất kho</span>' : '<span class="badge red">Chưa xuất kho</span>'}</span>${j.note ? `<span class="muted">Ghi chú</span><span>${j.note}</span>` : ''}</div>
+    </div>
+    ${w.length ? `<div class="box-note" style="background:var(--danger-bg);border-color:var(--danger)"><b>Cảnh báo:</b> ${w.join(' · ')}</div>` : ''}
+    <div class="actions">
+      <button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button>
+      ${j.code.startsWith('TH') ? `<a class="btn btn-outline" href="admin-orders.html">Mở đơn</a>` : j.code.startsWith('BH') ? `<a class="btn btn-outline" href="admin-warranty.html">Mở yêu cầu bảo hành</a>` : ''}
+      ${j.done ? `<a class="btn btn-primary" href="admin-install-tickets.html">Xem phiếu lắp đặt</a>` : `<button class="btn btn-outline" onclick="unplace('${j.code}')">Gỡ khỏi lịch</button><button class="btn btn-primary" onclick="toast('Dời lịch ${j.code}: kéo sang ô khác và ghi lý do. Khách và thợ nhận tin mới');closeModal('dlg')">Dời lịch</button>`}
+    </div>`);
+}
+draw();
+</script>
+</body>
+</html>

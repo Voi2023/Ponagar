@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Đổi trả & hoàn tiền (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" aria-label="Mở menu" onclick="toggleSide()"><i class="ti ti-menu-2"></i></button><h1>Đổi trả &amp; hoàn tiền</h1></div>
+      <div class="row-flex">
+        <button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel danh sách đổi trả')"><i class="ti ti-file-spreadsheet"></i> Xuất Excel</button>
+        <button class="btn btn-primary btn-sm" onclick="toast('Nhập mã đơn đã xuất kho → chọn dòng hàng, lý do, cách xử lý')"><i class="ti ti-plus"></i> Tạo yêu cầu đổi trả</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid">
+        <div class="stat-card" onclick="pick('Chờ duyệt')"><div class="label">Chờ quản lý duyệt</div><div class="value">1</div><div class="kpi-trend">DT-0017 · Q.10</div></div>
+        <div class="stat-card" onclick="pick('Chờ kho nhận')"><div class="label">Chờ kho nhận hàng</div><div class="value">1</div><div class="kpi-trend">Quét serial phải khớp serial đã bán</div></div>
+        <div class="stat-card" onclick="pick('Chờ hoàn tiền')"><div class="label">Chờ kế toán hoàn tiền</div><div class="value">1</div><div class="kpi-trend">Đánh dấu Đã hoàn sau khi chuyển</div></div>
+        <div class="stat-card bad" onclick="pick('MISA lỗi')"><div class="label">Chứng từ trả MISA lỗi</div><div class="value">1</div><div class="kpi-trend">DT-0014 · kỳ kế toán đã khoá sổ</div></div>
+      </div>
+
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+      <div class="toolbar">
+        <input type="search" id="q" placeholder="Tìm mã phiếu, mã đơn gốc, tên khách…" aria-label="Tìm phiếu đổi trả" oninput="draw()">
+        <select id="fType" aria-label="Cách xử lý" onchange="draw()"><option value="">Mọi cách xử lý</option><option>Trả hàng hoàn tiền</option><option>Đổi sản phẩm khác</option></select>
+        <select id="fStore" aria-label="Kho" onchange="draw()"><option value="">Mọi kho</option></select>
+      </div>
+
+      <div class="panel" style="padding:6px 8px">
+        <div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Phiếu</th><th>Khách · đơn gốc</th><th>Hàng trả</th><th>Lý do · xử lý</th><th class="right">Hoàn / chênh lệch</th><th>Trạng thái</th><th>MISA</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table></div>
+      </div>
+      <div class="box-note">Thiết bị đã lắp, đã kích hoạt (bếp, khóa điện tử) bị lỗi: chuyển sang <a href="admin-warranty.html" style="text-decoration:underline">Bảo hành</a>, không làm đổi trả. Đổi sản phẩm khác = một phiếu trả + một đơn mới. Hoa hồng của đơn bị trả trừ lại ở kỳ lương đang mở. Chính sách đổi trả chi tiết (số ngày, điều kiện hộp): <span class="badge amber">chờ Techhomes xác nhận</span></div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')">
+  <div class="modal modal-lg"></div>
+</div>
+
+<script>
+renderAdmin('admin-returns.html');
+document.getElementById('fStore').insertAdjacentHTML('beforeend', STORES.map((s, i) => `<option value="${i}">${s.short}</option>`).join(''));
+
+const ST = { 'Chờ duyệt': 'amber', 'Chờ kho nhận': 'blue', 'Chờ hoàn tiền': 'blue', 'Hoàn tất': 'green', 'Chuyển bảo hành': 'gray', 'Từ chối': 'gray' };
+const MS = { 'Chưa đến lúc': 'gray', 'Chờ gửi': 'gray', 'Đã gửi · chờ MISA': 'amber', 'MISA đã nhận': 'green', 'Lỗi': 'red', 'Không gửi': 'gray' };
+// p = chỉ số PRODUCTS, ex = sản phẩm đổi sang, store = kho xuất gốc, cond = tình trạng kho kiểm
+const RETURNS = [
+  { code: 'DT-0019', order: 'TH-20468', cus: 'Bùi Thanh Tâm', p: 5, n: 1, type: 'Đổi sản phẩm khác', ex: 6, reason: 'Không vừa kích thước tủ', st: 'Chờ kho nhận', store: 0, serial: 'HF2409H0318', by: 'NV02', date: '26/11', misa: 'Chưa đến lúc' },
+  { code: 'DT-0018', order: 'TH-20455', cus: 'Xưởng tủ bếp Hưng Thịnh', p: 17, n: 20, type: 'Trả hàng hoàn tiền', reason: 'Công trình dùng thừa · nguyên hộp', st: 'Chờ hoàn tiền', store: 2, cond: 'Bán lại được', by: 'NV04', date: '25/11', misa: 'Đã gửi · chờ MISA', refund: 'Chuyển khoản' },
+  { code: 'DT-0017', order: 'TH-20477', cus: 'Khách lẻ', p: 29, n: 1, type: 'Trả hàng hoàn tiền', reason: 'Khách đổi ý · còn nguyên hộp', st: 'Chờ duyệt', store: 1, by: 'NV03', date: '27/11', misa: 'Chưa đến lúc', refund: 'Thẻ (hoàn về thẻ)' },
+  { code: 'DT-0016', order: 'TH-20452', cus: 'Lê Thị Thu', p: 3, n: 1, type: 'Đổi sản phẩm khác', ex: 3, reason: 'Móp cửa khi giao', st: 'Hoàn tất', store: 0, serial: 'HF2408D2215', cond: 'Lỗi', by: 'NV02', date: '20/11', misa: 'MISA đã nhận', newOrder: 'TH-20459' },
+  { code: 'DT-0015', order: 'TH-20440', cus: 'Trương Văn Phúc', p: 25, n: 1, type: 'Trả hàng hoàn tiền', reason: 'Lỗi nhận vân tay · đã lắp, đã kích hoạt', st: 'Chuyển bảo hành', store: 1, serial: 'HF2405K0921', by: 'NV03', date: '18/11', misa: 'Không gửi', warranty: 'BH-0084' },
+  { code: 'DT-0014', order: 'TH-20431', cus: 'Đỗ Minh Quân', p: 9, n: 1, type: 'Trả hàng hoàn tiền', reason: 'Sai màu so với đặt', st: 'Hoàn tất', store: 0, cond: 'Bán lại được', by: 'NV01', date: '14/11', misa: 'Lỗi', misaErr: 'Kỳ kế toán đã khoá sổ', refund: 'Tiền mặt', invoice: '0001284' },
+  { code: 'DT-0013', order: 'TH-20428', cus: 'Ngô Gia Hưng', p: 33, n: 1, type: 'Trả hàng hoàn tiền', reason: 'Đã dùng, trầy nắp', st: 'Từ chối', store: 2, by: 'NV04', date: '12/11', misa: 'Không gửi' },
+];
+const amount = r => { const p = PRODUCTS[r.p]; return r.type === 'Đổi sản phẩm khác' ? (p.price - PRODUCTS[r.ex].price) * r.n : p.price * r.n; };
+const money = r => { const a = amount(r); return r.type === 'Trả hàng hoàn tiền' ? 'Hoàn ' + fmt(a) : a > 0 ? 'Hoàn lại ' + fmt(a) : a < 0 ? 'Thu thêm ' + fmt(-a) : 'Không chênh'; };
+
+let filter = 'Tất cả';
+function pick(t) { filter = t; draw(); }
+function draw() {
+  const q = document.getElementById('q').value.toLowerCase(), ty = document.getElementById('fType').value, s = document.getElementById('fStore').value;
+  document.getElementById('tabs').innerHTML = ['Tất cả', ...Object.keys(ST), 'MISA lỗi'].map(t => `<button class="${t === filter ? 'active' : ''}" onclick="pick('${t}')">${t}</button>`).join('');
+  document.getElementById('rows').innerHTML = RETURNS.map((r, i) => [r, i])
+    .filter(([r]) => (filter === 'Tất cả' || r.st === filter || (filter === 'MISA lỗi' && r.misa === 'Lỗi')) && (!ty || r.type === ty) && (s === '' || r.store === +s) && (r.code + r.order + r.cus).toLowerCase().includes(q))
+    .map(([r, i]) => { const p = PRODUCTS[r.p];
+      return `<tr class="row-link" onclick="openRet(${i})">
+        <td><b class="mono">${r.code}</b><span class="sub-muted">${r.date} · ${staff(r.by).name}</span></td>
+        <td>${r.cus}<span class="sub-muted mono">${r.order} · kho ${storeName(r.store)}</span></td>
+        <td><div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${p.img}" alt=""><span>${p.name}${r.n > 1 ? ` × ${r.n}` : ''}${r.cond ? `<span class="sub-muted">${r.cond === 'Lỗi' ? '→ Kho hàng lỗi' : '→ Nhập lại ' + storeName(r.store)}</span>` : ''}</span></div></td>
+        <td>${r.reason}<span class="sub-muted">${r.type}${r.ex != null ? ' → ' + PRODUCTS[r.ex].name : ''}</span></td>
+        <td class="right"><b>${r.st === 'Chuyển bảo hành' || r.st === 'Từ chối' ? '—' : money(r)}</b></td>
+        <td><span class="badge ${ST[r.st]}">${r.st}</span></td>
+        <td><span class="badge ${MS[r.misa]}">${r.misa}</span>${r.misaErr ? `<span class="sub-err">${r.misaErr}</span>` : ''}</td>
+      </tr>`; }).join('') || '<tr><td colspan="7" class="empty-state">Không có phiếu phù hợp</td></tr>';
+}
+
+function openRet(i) {
+  const r = RETURNS[i], p = PRODUCTS[r.p], done = ['Chờ hoàn tiền', 'Hoàn tất'].includes(r.st), step = Object.keys(ST).indexOf(r.st);
+  const act = { 'Chờ duyệt': ['Duyệt yêu cầu', `toast('Quản lý duyệt ${r.code} · báo kho ${storeName(r.store)} chuẩn bị nhận hàng')`],
+    'Chờ kho nhận': ['Kho xác nhận đã nhận', `receive(${i})`],
+    'Chờ hoàn tiền': ['Đánh dấu Đã hoàn', `toast('Kế toán đánh dấu Đã hoàn ${fmt(amount(r))} cho ${r.cus}')`] }[r.st];
+  openModal('dlg', `
+    <div class="row-flex" style="justify-content:space-between"><h3 class="mono" style="margin:0">${r.code}</h3><span class="badge ${ST[r.st]}">${r.st}</span></div>
+    <p class="sub">${r.type} · đơn gốc <a class="mono" href="admin-orders.html" style="text-decoration:underline">${r.order}</a> · ${r.cus} · tạo ${r.date}/2026 bởi ${staff(r.by).name}</p>
+    <div class="detail-grid">
+      <div>
+        <div class="row-flex" style="flex-wrap:nowrap;align-items:flex-start"><img class="th-img" src="${p.img}" alt=""><div><b>${p.name}</b> × ${r.n}<span class="sub-muted mono">${sku(p)} · ${fmt(p.price)}</span>${r.serial ? `<span class="sub-muted mono">Serial đã bán: ${r.serial}</span>` : ''}</div></div>
+        ${r.ex != null ? `<div class="row-flex" style="flex-wrap:nowrap;margin-top:10px"><i class="ti ti-arrow-right"></i><img class="th-img" src="${PRODUCTS[r.ex].img}" alt=""><div>Đổi sang <b>${PRODUCTS[r.ex].name}</b><span class="sub-muted">${r.newOrder ? 'Đơn mới ' + r.newOrder : 'Tạo đơn mới khi kho nhận hàng'}</span></div></div>` : ''}
+        <hr class="divider">
+        <div class="kv"><span class="muted">Lý do</span><span>${r.reason}</span><span class="muted">Tiền</span><b style="color:var(--ink)">${money(r)}</b>${r.refund ? `<span class="muted">Hoàn qua</span><span>${r.refund}</span>` : ''}</div>
+        ${r.warranty ? `<div class="box-note">Khóa đã lắp và kích hoạt: không làm đổi trả, đã chuyển thành yêu cầu bảo hành <a href="admin-warranty.html" class="mono" style="text-decoration:underline">${r.warranty}</a>.</div>` : ''}
+      </div>
+      <div>
+        <h3 style="font-size:14px">Kho kiểm hàng nhận lại</h3>
+        ${r.serial ? `<div class="field"><label for="scan">Quét serial hàng trả</label><input id="scan" class="mono" placeholder="Phải khớp ${r.serial}" value="${done ? r.serial : ''}" oninput="checkSerial('${r.serial}',this.value)" ${done || r.st === 'Chuyển bảo hành' ? 'disabled' : ''}><span id="snote" class="sub-muted">${done ? '✓ Khớp serial đã bán' : ''}</span></div>` : ''}
+        <div class="field"><label for="cond">Tình trạng</label><select id="cond" ${done ? 'disabled' : ''} onchange="document.getElementById('wh').value=this.value==='Lỗi'?'loi':'${r.store}'">
+          <option ${r.cond === 'Bán lại được' ? 'selected' : ''}>Bán lại được</option><option ${r.cond === 'Lỗi' ? 'selected' : ''}>Lỗi</option></select></div>
+        <div class="field"><label for="wh">Nhập hàng về kho</label><select id="wh" ${done ? 'disabled' : ''}>${STORES.map((s, k) => `<option value="${k}" ${k === r.store && r.cond !== 'Lỗi' ? 'selected' : ''}>${s.name}</option>`).join('')}<option value="loi" ${r.cond === 'Lỗi' ? 'selected' : ''}>Kho hàng lỗi · chờ gửi hãng</option></select></div>
+        <div class="kv"><span class="muted">MISA</span><span><span class="badge ${MS[r.misa]}">${r.misa}</span><span class="sub-muted">Chứng từ trả lại hàng bán tham chiếu ${r.order}${r.misa === 'Chưa đến lúc' ? ' · gửi khi đã duyệt và kho đã nhận' : ''}</span></span></div>
+        ${r.misaErr ? `<div class="box-note" style="background:var(--danger-bg);border-color:var(--danger)"><b>MISA từ chối:</b> ${r.misaErr}. Cách sửa: kế toán mở sổ bên MISA hoặc đổi ngày chứng từ, rồi Gửi lại.
+          <div style="margin-top:8px"><button class="btn btn-primary btn-sm" onclick="toast('Đã xếp hàng gửi lại chứng từ trả ${r.code}')">Gửi lại</button></div></div>` : ''}
+        ${r.invoice ? `<p class="muted" style="font-size:12px">Đơn gốc đã xuất hoá đơn số ${r.invoice}: kế toán lập hoá đơn điều chỉnh trong MISA, ghi số mới vào đây.</p>` : ''}
+        ${step <= 3 ? `<p class="muted" style="font-size:12px">Hoa hồng ${staff(r.by).name} của dòng này trừ lại ở kỳ lương 11/2026.</p>` : ''}
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button>
+      ${r.st === 'Chờ duyệt' ? `<button class="btn btn-outline" onclick="toast('Từ chối ${r.code} · báo bán hàng gọi khách');closeModal('dlg')">Từ chối</button>` : ''}
+      ${act ? `<button class="btn btn-primary" onclick="${act[1]}">${act[0]}</button>` : ''}
+    </div>`);
+}
+function checkSerial(sold, v) {
+  const n = document.getElementById('snote'), ok = v.trim().toUpperCase() === sold;
+  n.className = ok ? 'sub-muted' : 'sub-err'; n.textContent = !v ? '' : ok ? '✓ Khớp serial đã bán' : '✗ Không khớp serial đã bán trong ' + sold;
+}
+function receive(i) {
+  const r = RETURNS[i], scan = document.getElementById('scan');
+  if (scan && scan.value.trim().toUpperCase() !== r.serial) return toast('Serial chưa khớp: không nhận được hàng');
+  const wh = document.getElementById('wh'), whName = wh.options[wh.selectedIndex].text;
+  toast(`Đã nhận ${r.code} vào ${whName} · gửi chứng từ trả lại hàng bán sang MISA${r.ex != null ? ' · tạo đơn mới đổi hàng' : ''}`);
+  closeModal('dlg');
+}
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Phiếu lắp đặt (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+table.data b.mono{white-space:nowrap}
+.split{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+.ck{list-style:none;padding:0;margin:0 0 10px}
+.ck li{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px dashed var(--border);font-size:13.2px}
+.ck li i{font-size:18px}
+.ck .ok{color:var(--ok)} .ck .no{color:var(--danger)}
+.photos{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.ph{width:92px;height:70px;border-radius:var(--radius-sm);background:var(--gray-bg);display:grid;place-items:center;color:var(--muted);font-size:11px;text-align:center;border:1px solid var(--border)}
+.ph.empty{border-style:dashed;background:var(--bg)}
+.sign{height:70px;border:1px dashed var(--border);border-radius:var(--radius-sm);display:grid;place-items:center;font-family:cursive;font-size:22px;color:var(--ink);background:var(--bg)}
+.phone{width:320px;border:10px solid var(--ink);border-radius:34px;background:var(--bg);padding:14px 12px 18px;box-shadow:var(--shadow);margin:0 auto}
+.phone .bar{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:10px}
+.phone .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:10px;font-size:12.8px}
+.phone .big{width:100%;margin-top:6px}
+.phone .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+@media (max-width:1100px){.split{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Phiếu lắp đặt</h1></div>
+      <div class="row-flex">
+        <a class="btn btn-outline btn-sm" href="admin-install-calendar.html"><i class="ti ti-calendar-event"></i> Lịch lắp đặt</a>
+        <button class="btn btn-primary btn-sm" onclick="approveAll()"><i class="ti ti-checks"></i> Duyệt các phiếu đủ điều kiện</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid" id="stats"></div>
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+      <div class="toolbar">
+        <input type="search" id="q" placeholder="Tìm mã phiếu, mã đơn, tên khách, serial…" aria-label="Tìm phiếu" oninput="draw()">
+        <select id="who" aria-label="Lọc theo thợ" onchange="draw()"><option value="">Mọi thợ</option><option value="NV08">Văn Hùng</option><option value="NV09">Minh Đức</option><option value="NV10">Công Sơn</option></select>
+      </div>
+
+      <div class="split">
+        <div class="panel" style="padding:6px 8px">
+          <div class="table-scroll"><table class="data wide">
+            <thead><tr><th>Phiếu</th><th>Khách</th><th>Sản phẩm</th><th>Thợ · hẹn</th><th>Phát sinh</th><th>Trạng thái</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table></div>
+        </div>
+        <div>
+          <p class="muted" style="font-size:12px;text-align:center;margin:0 0 8px"><i class="ti ti-device-mobile"></i> Thợ Văn Hùng thấy trên điện thoại (trang nhân viên › Việc lắp đặt)</p>
+          <div class="phone" id="phone"></div>
+        </div>
+      </div>
+
+      <div class="panel" id="bao-cao">
+        <h2><span><i class="ti ti-chart-bar"></i> Báo cáo lắp đặt · 01/11 – 27/11/2026</span><button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel báo cáo lắp đặt theo khoảng ngày đang chọn')"><i class="ti ti-file-spreadsheet"></i> Xuất Excel</button></h2>
+        <div class="table-scroll"><table class="data">
+          <thead><tr><th>Thợ</th><th class="right">Phiếu đã duyệt</th><th>Loại việc</th><th class="right">Đúng hẹn</th><th class="right">Trễ hẹn</th><th class="right">Không lắp được</th><th class="right">Tiền phát sinh</th></tr></thead>
+          <tbody>
+            <tr><td>Văn Hùng</td><td class="right">36</td><td>16 bếp từ · 9 hút mùi · 11 khóa</td><td class="right">34</td><td class="right">2</td><td class="right">0</td><td class="right">1.250.000đ</td></tr>
+            <tr><td>Minh Đức</td><td class="right">27</td><td>18 khóa · 6 Blum · 3 bảo hành</td><td class="right">26</td><td class="right">1</td><td class="right">1</td><td class="right">480.000đ</td></tr>
+            <tr><td>Công Sơn</td><td class="right">24</td><td>11 bếp từ · 8 hút mùi · 5 cửa kính</td><td class="right">21</td><td class="right">3</td><td class="right">0</td><td class="right">1.900.000đ</td></tr>
+          </tbody>
+        </table></div>
+        <p class="muted" style="font-size:12px;margin:10px 0 0">Theo khu vực: Phú Nhuận · Q.3 · Bình Thạnh 38% · Q.10 · Tân Bình 31% · Thủ Đức · Q.9 31%. Bảo hành theo hãng và mã hay lỗi xem ở <a href="admin-warranty.html">Bảo hành</a>.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal modal-lg"></div></div>
+
+<script>
+renderAdmin('admin-install-tickets.html');
+
+const ST = { 'Chờ lắp': 'gray', 'Đang lắp': 'blue', 'Chờ nghiệm thu': 'amber', 'Hoàn tất': 'green', 'Không lắp được': 'red' };
+// p = chỉ số PRODUCTS; photos = số ảnh nghiệm thu; extras = [[việc, tiền]]
+const TK = [
+  { id: 'PL-2611-01', ref: 'TH-20466', cust: 'Lý Thanh Trúc', phone: '0938 ••• 214', addr: '45 Phan Đăng Lưu, Bình Thạnh', p: 5, tech: 'NV08', when: '23/11 · Sáng', st: 'Hoàn tất', serial: 'HF2409-21-08817', start: '08:35', end: '09:50', photos: 3, sign: 'Trúc', extras: [], paid: 0 },
+  { id: 'PL-2611-02', ref: 'TH-20463', cust: 'Ngô Đức Anh', phone: '0907 ••• 563', addr: '12 Trần Quốc Thảo, Q.3', p: 1, tech: 'NV08', when: '24/11 · Chiều', st: 'Hoàn tất', serial: 'HF2410-11-03342', start: '14:10', end: '15:40', photos: 4, sign: 'Đ.Anh', extras: [['Khoét đá mặt bếp', 250000]], paid: 250000 },
+  { id: 'PL-2611-03', ref: 'TH-20469', cust: 'Trịnh Kim Ngân', phone: '0919 ••• 880', addr: '88 Cộng Hòa, Tân Bình', p: 25, tech: 'NV09', when: '25/11 · Sáng', st: 'Hoàn tất', serial: 'HF2408-20-11950', start: '08:50', end: '10:05', photos: 2, sign: 'Ngân', extras: [], paid: 0 },
+  { id: 'PL-2611-04', ref: 'TH-20476', cust: 'Phạm Quốc Huy', phone: '0935 ••• 771', addr: '201 Huỳnh Văn Bánh, Phú Nhuận', p: 18, tech: 'NV10', when: '25/11 · Chiều', st: 'Chờ nghiệm thu', serial: 'GZ2407-55-00418', start: '13:40', end: '16:20', photos: 4, sign: 'Q.Huy', extras: [['Khoan, đục sàn đá đặt hộp bản lề', 300000]], paid: 300000 },
+  { id: 'PL-2611-05', ref: 'TH-20470', cust: 'Cty CP Xây dựng Hưng Thịnh', phone: '028 ••• 6612', addr: 'Dự án Lumière, Thủ Đức', p: 23, tech: 'NV10', when: '26/11 · Sáng', st: 'Chờ nghiệm thu', serial: 'HF2411-35-00072', start: '08:20', end: '11:45', photos: 5, sign: 'Hưng Thịnh', extras: [['Đi điện nguồn cho motor', 160000]], paid: 0 },
+  { id: 'PL-2611-06', ref: 'TH-20467', cust: 'Mai Xuân Phúc', phone: '0976 ••• 045', addr: '30 Trần Hưng Đạo, Q.5', p: 26, tech: 'NV09', when: '26/11 · Chiều', st: 'Không lắp được', serial: '', start: '14:05', photos: 1, sign: '', extras: [], paid: 0, reason: 'Thiếu mặt bằng: cửa gỗ chưa hoàn thiện · việc quay về điều phối xếp lại' },
+  { id: 'PL-2611-07', ref: 'TH-20474', cust: 'Đoàn Thị Lan', phone: '0902 ••• 377', addr: '76 Lý Chính Thắng, Q.3', p: 0, tech: 'NV08', when: '27/11 · Sáng', st: 'Đang lắp', serial: 'HF2411-09-00561', start: '08:42', photos: 1, sign: '', extras: [], paid: 0 },
+  { id: 'PL-2611-08', ref: 'BH-0112', cust: 'Lâm Ngọc Diệp', phone: '0983 ••• 120', addr: 'Chung cư The Sun Avenue, Thủ Đức', p: 1, tech: 'NV10', when: '27/11 · Sáng', st: 'Đang lắp', serial: 'HF2405-11-01208', start: '08:15', photos: 0, sign: '', extras: [], paid: 0, bh: true },
+  { id: 'PL-2611-09', ref: 'TH-20475', cust: 'Vũ Minh Tuấn', phone: '0918 ••• 654', addr: '9 Nguyễn Văn Trỗi, Phú Nhuận', p: 6, tech: 'NV08', when: '27/11 · Chiều', st: 'Chờ lắp', serial: '', photos: 0, sign: '', extras: [], paid: 0 },
+  { id: 'PL-2611-10', ref: 'TH-20471', cust: 'Đặng Ngọc Hân', phone: '0909 ••• 552', addr: '14 Võ Văn Ngân, Thủ Đức', p: 27, tech: 'NV09', when: '27/11 · Chiều', st: 'Chờ lắp', serial: '', photos: 0, sign: '', extras: [], paid: 0 },
+  { id: 'PL-2611-11', ref: 'TH-20478', cust: 'Võ Thị Mai', phone: '0977 ••• 305', addr: '55 Hoàng Văn Thụ, Phú Nhuận', p: 4, tech: 'NV08', when: '28/11 · Sáng', st: 'Chờ lắp', serial: '', photos: 0, sign: '', extras: [], paid: 0, warn: 'Hàng chưa xuất kho' },
+];
+const MISSING = t => [t.photos < 2 && 'ảnh nghiệm thu (tối thiểu 2)', !t.sign && 'chữ ký khách', !t.serial && 'serial khớp đơn'].filter(Boolean);
+
+let filter = 'Tất cả';
+function draw() {
+  const count = s => TK.filter(t => t.st === s).length;
+  document.getElementById('stats').innerHTML = Object.keys(ST).map(s =>
+    `<div class="stat-card ${s === 'Không lắp được' ? 'bad' : ''}" onclick="pick('${s}')"><div class="label">${s}</div><div class="value">${count(s)}</div></div>`).join('');
+  document.getElementById('tabs').innerHTML = ['Tất cả', ...Object.keys(ST), 'Có phát sinh'].map(t =>
+    `<button class="${t === filter ? 'active' : ''}" onclick="pick('${t}')">${t}</button>`).join('');
+  const q = document.getElementById('q').value.toLowerCase(), who = document.getElementById('who').value;
+  document.getElementById('rows').innerHTML = TK.map((t, i) => [t, i])
+    .filter(([t]) => filter === 'Tất cả' || t.st === filter || (filter === 'Có phát sinh' && t.extras.length))
+    .filter(([t]) => (!who || t.tech === who) && (!q || [t.id, t.ref, t.cust, t.serial].join(' ').toLowerCase().includes(q)))
+    .map(([t, i]) => {
+      const p = PRODUCTS[t.p];
+      return `<tr class="row-link" onclick="openTicket(${i})">
+        <td><b class="mono">${t.id}</b><span class="sub-muted">${t.bh ? 'Bảo hành' : 'Đơn'} ${t.ref}</span></td>
+        <td>${t.cust}<span class="sub-muted">${t.addr}</span></td>
+        <td><div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${p.img}" alt=""><span>${p.name}<span class="sub-muted mono">${t.serial || 'chưa quét serial'}</span></span></div></td>
+        <td>${staff(t.tech).name}<span class="sub-muted">${t.when}</span></td>
+        <td>${t.extras.length ? fmt(t.extras.reduce((s, e) => s + e[1], 0)) : '<span class="muted">—</span>'}</td>
+        <td><span class="badge ${ST[t.st]}">${t.st}</span>${t.warn ? `<span class="sub-err">${t.warn}</span>` : ''}</td></tr>`;
+    }).join('') || '<tr><td colspan="6" class="empty-state">Không có phiếu phù hợp</td></tr>';
+  drawPhone();
+}
+function pick(t) { filter = t; draw(); }
+
+function openTicket(i) {
+  const t = TK[i], p = PRODUCTS[t.p], miss = MISSING(t), ext = t.extras.reduce((s, e) => s + e[1], 0);
+  const row = (ok, text) => `<li><i class="ti ${ok ? 'ti-circle-check ok' : 'ti-circle-x no'}"></i><span>${text}</span></li>`;
+  openModal('dlg', `
+    <div class="row-flex" style="justify-content:space-between"><h3 class="mono" style="margin:0">${t.id}</h3><span class="badge ${ST[t.st]}">${t.st}</span></div>
+    <p class="sub">${t.bh ? 'Bảo hành tại nhà' : 'Lắp đặt'} · ${t.ref} · ${staff(t.tech).name} · ${t.when}</p>
+    <div class="detail-grid">
+      <div>
+        <div class="row-flex" style="flex-wrap:nowrap;align-items:flex-start"><img class="th-img" src="${p.img}" alt=""><div><b>${p.name}</b><span class="sub-muted">Mã ${sku(p)}</span></div></div>
+        <div class="kv" style="margin-top:12px"><span class="muted">Khách</span><span>${t.cust} · ${t.phone}</span><span class="muted">Địa chỉ</span><span>${t.addr}</span><span class="muted">Serial</span><span class="mono">${t.serial || '—'}</span><span class="muted">Giờ</span><span>${t.start ? `Bắt đầu ${t.start}` : 'Chưa bắt đầu'}${t.end ? ` · Hoàn tất ${t.end}` : ''}</span><span class="muted">Đã thu tại nhà</span><span>${fmt(t.paid)}</span></div>
+        <b style="font-size:13px">Phát sinh</b>
+        ${t.extras.length ? `<div class="kv">${t.extras.map(e => `<span class="muted">${e[0]}</span><span>${fmt(e[1])}</span>`).join('')}<span class="muted">Cộng</span><b>${fmt(ext)}</b></div>` : '<p class="muted" style="margin:4px 0;font-size:13px">Không có</p>'}
+      </div>
+      <div>
+        <ul class="ck">
+          ${row(!!t.start, 'Thợ bấm Bắt đầu tại nhà khách')}
+          ${row(!!t.serial, 'Quét serial · khớp với đơn')}
+          ${row(t.photos >= 2, `Ảnh trước và sau khi lắp: ${t.photos}/2`)}
+          ${row(!!t.sign, 'Khách ký xác nhận trên điện thoại')}
+          ${row(t.st === 'Hoàn tất', 'Điều phối duyệt phiếu sau khi xem ảnh (rồi mới tính công)')}
+        </ul>
+        <div class="photos">${[0, 1, 2, 3].map(k => k < t.photos ? `<div class="ph"><span><i class="ti ti-photo"></i><br>${k ? 'Sau lắp ' + k : 'Trước lắp'}</span></div>` : k < 2 ? '<div class="ph empty">Chưa có ảnh</div>' : '').join('')}</div>
+        <div class="sign" aria-label="Chữ ký khách">${t.sign || '<span class="muted" style="font-family:var(--font-family);font-size:12px">Chưa ký</span>'}</div>
+        ${t.reason ? `<div class="box-note" style="background:var(--danger-bg);border-color:var(--danger)"><b>Báo không lắp được:</b> ${t.reason}</div>` : ''}
+        ${miss.length && !t.reason ? `<div class="box-note">Chưa bấm Hoàn tất được: thiếu ${miss.join(', ')}.</div>` : ''}
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button>
+      ${t.st === 'Chờ nghiệm thu' ? `<button class="btn btn-outline" onclick="toast('Trả phiếu ${t.id} về thợ: yêu cầu chụp lại ảnh');closeModal('dlg')">Trả lại thợ</button><button class="btn btn-primary" onclick="approve(${i})">Duyệt phiếu</button>` : ''}
+      ${t.st === 'Không lắp được' ? `<a class="btn btn-primary" href="admin-install-calendar.html">Xếp lại lịch</a>` : ''}
+    </div>`);
+}
+function approve(i) {
+  TK[i].st = 'Hoàn tất'; closeModal('dlg'); draw();
+  toast(`Đã duyệt ${TK[i].id}: đơn ${TK[i].ref} Đã lắp đặt, bảo hành kích hoạt từ ngày lắp, công thợ được ghi nhận`);
+}
+
+function approveAll() {
+  const ok = TK.filter(t => t.st === 'Chờ nghiệm thu' && !MISSING(t).length);
+  ok.forEach(t => t.st = 'Hoàn tất'); draw();
+  toast(ok.length ? `Đã duyệt ${ok.map(t => t.id).join(', ')} · công thợ được ghi nhận` : 'Không còn phiếu Chờ nghiệm thu');
+}
+function drawPhone() {
+  const mine = TK.filter(t => t.tech === 'NV08' && t.when.startsWith('27/11'));
+  document.getElementById('phone').innerHTML = `<div class="bar"><span>09:12</span><span>Văn Hùng · NV08</span></div>
+    <b style="font-size:15px">Việc lắp đặt hôm nay</b><p class="muted" style="font-size:12px;margin:2px 0 10px">Thứ Sáu 27/11 · ${mine.length} việc</p>
+    ${mine.map(t => {
+      const p = PRODUCTS[t.p], miss = MISSING(t);
+      return `<div class="card"><div class="row-flex" style="justify-content:space-between"><b>${t.when.split('· ')[1]} · ${t.ref}</b><span class="badge ${ST[t.st]}">${t.st}</span></div>
+        <div style="margin:6px 0">${t.cust}<span class="sub-muted"><i class="ti ti-map-pin"></i> ${t.addr}</span><span class="sub-muted"><i class="ti ti-phone"></i> ${t.phone}</span><span class="sub-muted">${p.name}</span></div>
+        ${t.st === 'Chờ lắp' ? `<button class="btn btn-primary btn-sm big" onclick="toast('Bắt đầu: hệ thống ghi giờ đến nơi')">Bắt đầu</button>` : `
+        <div class="grid">
+          <button class="btn btn-outline btn-sm" onclick="toast('Mở camera quét serial · phải khớp đơn')"><i class="ti ti-barcode"></i> ${t.serial ? 'Serial ✓' : 'Quét serial'}</button>
+          <button class="btn btn-outline btn-sm" onclick="toast('Chụp ảnh nghiệm thu')"><i class="ti ti-camera"></i> Ảnh ${t.photos}/2</button>
+          <button class="btn btn-outline btn-sm" onclick="toast('Chọn từ danh mục phát sinh · khách thấy số tiền')"><i class="ti ti-plus"></i> Phát sinh</button>
+          <button class="btn btn-outline btn-sm" onclick="toast('Đưa điện thoại cho khách ký')"><i class="ti ti-signature"></i> Khách ký</button>
+        </div>
+        <button class="btn btn-primary btn-sm big" ${miss.length ? 'disabled' : ''} onclick="toast('Hoàn tất phiếu')">Hoàn tất</button>
+        ${miss.length ? `<span class="sub-err">Còn thiếu: ${miss.join(', ')}</span>` : ''}
+        <button class="btn btn-sm big" style="color:var(--danger)" onclick="toast('Báo không lắp được: chọn lý do (thiếu mặt bằng, khách vắng…)')">Báo không lắp được</button>`}
+      </div>`;
+    }).join('')}`;
+}
+draw();
+</script>
+</body>
+</html>

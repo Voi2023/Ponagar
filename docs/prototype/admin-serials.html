@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Cổng Kho — Số serial (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<script src="assets/kho-data.js"></script>
+<style>
+table.data .mono{white-space:nowrap}
+.lookup{display:flex;gap:10px;margin-bottom:16px}
+.lookup input{flex:1;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:15px;background:var(--surface)}
+.steps{display:flex;gap:6px;margin:6px 0 16px;flex-wrap:wrap}
+.steps span{flex:1;min-width:90px;text-align:center;padding:8px 6px;border-radius:var(--radius-sm);background:var(--gray-bg);color:var(--muted);font-size:12.5px;font-weight:700}
+.steps span.on{background:var(--brand);color:var(--surface)}
+.timeline li.todo{opacity:.45}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Số serial</h1></div>
+      <div class="row-flex">
+        <select id="store" aria-label="Kho" class="input" style="padding:8px 10px" onchange="draw()">
+          <option value="">Tất cả kho</option><option value="0">Phú Nhuận</option><option value="1">Q.10</option><option value="2">Thủ Đức</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="toast('Mở camera quét serial')"><i class="ti ti-scan"></i> Quét serial</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="lookup">
+        <input type="search" id="q" placeholder="Tra serial, số điện thoại khách hoặc mã đơn (VD: HF-I7326-25011088, 0903 556, TH-20471)" aria-label="Tra serial" oninput="draw()">
+      </div>
+      <div class="stat-grid" id="kpi"></div>
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+      <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+        <thead><tr><th>Serial</th><th>Sản phẩm</th><th>Trạng thái</th><th>Đang ở / khách</th><th>Đơn</th><th>Bảo hành đến</th></tr></thead>
+        <tbody id="rows"></tbody></table></div></div>
+
+      <div class="panel">
+        <h2><span>Mã cần quản lý serial</span><span class="badge amber">Chờ Techhomes xác nhận</span></h2>
+        <p class="muted" style="margin-top:0">Đề xuất: bếp, máy hút mùi, máy rửa chén, lò, tủ lạnh, máy giặt, máy lọc nước, khóa điện tử. Phụ kiện nhỏ (bản lề, ray, tay nắm) không theo serial, chỉ theo số lượng.</p>
+        <div id="types" class="row-flex" style="gap:6px"></div>
+        <div class="box-note">Nhập kho: quét serial từng chiếc. Xuất kho: quét serial, serial gắn vào đơn và khách. Một serial chỉ có một chiếc, quét trùng hệ thống báo ngay. Thời hạn bảo hành từng hãng: chờ Techhomes xác nhận (dữ liệu mẫu dùng 24 tháng).</div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal modal-lg"></div></div>
+
+<script>
+renderAdmin('admin-serials.html');
+const ST = { 'Trong kho': 'blue', 'Đang đi đường': 'blue', 'Đã bán · chờ lắp': 'amber', 'Đang bảo hành': 'green', 'Gửi hãng': 'red', 'Hết bảo hành': 'gray' };
+let filter = 'Tất cả';
+function pick(t) { filter = t; draw(); }
+const digits = s => s.replace(/\D/g, '');
+function match(x, q) {
+  if (!q) return true;
+  const p = byId(x.pid), hay = [x.sn, p.name, p.code, ...(x.sold || [])].join(' ').toLowerCase();
+  if (hay.includes(q.toLowerCase())) return true;
+  // SĐT mẫu đã che giữa (0903 ••• 556): gõ đủ số thì so 4 số đầu + 3 số cuối
+  const d = digits(q), ph = digits(x.sold ? x.sold[2] : '');
+  return d.length >= 3 && !!ph && (ph.includes(d) || (d.length >= 7 && ph === d.slice(0, 4) + d.slice(-3)));
+}
+
+function draw() {
+  const v = document.getElementById('store').value, q = document.getElementById('q').value.trim();
+  const list = SERIALS.filter(x => (v === '' || x.s === +v) && match(x, q));
+  document.getElementById('kpi').innerHTML = ['Trong kho', 'Đã bán · chờ lắp', 'Đang bảo hành', 'Gửi hãng']
+    .map(s => `<div class="stat-card ${s === 'Gửi hãng' ? 'bad' : ''}" onclick="pick('${s}')" style="cursor:pointer"><div class="label">${s}</div><div class="value">${list.filter(x => x.st === s).length}</div><div class="kpi-trend">${{ 'Trong kho': 'Kể cả hàng đang đi đường: ' + list.filter(x => x.st === 'Đang đi đường').length, 'Đã bán · chờ lắp': 'Đã xuất kho, chưa có phiếu lắp', 'Đang bảo hành': 'Tính từ ngày lắp (hoặc ngày bán nếu không lắp)', 'Gửi hãng': 'Chờ hãng trả về' }[s]}</div></div>`).join('');
+  document.getElementById('tabs').innerHTML = ['Tất cả', ...Object.keys(ST)].map(t => `<button class="${t === filter ? 'active' : ''}" onclick="pick('${t}')">${t}</button>`).join('');
+  document.getElementById('rows').innerHTML = list.filter(x => filter === 'Tất cả' || x.st === filter).map(x => {
+    const p = byId(x.pid);
+    return `<tr class="row-link" onclick="openSn('${x.sn}')">
+      <td><b class="mono">${x.sn}</b></td>
+      <td><div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${p.img}" alt=""><span>${p.name}<span class="sub-muted">Mã ${sku(p)}</span></span></div></td>
+      <td><span class="badge ${ST[x.st]}">${x.st}</span>${x.note ? `<span class="sub-muted">${x.note}</span>` : ''}</td>
+      <td>${x.sold ? `${x.sold[1]}<span class="sub-muted">${x.sold[2]}</span>` : `Kho ${storeName(x.s)}`}</td>
+      <td>${x.sold ? `<a class="mono" href="admin-orders.html" onclick="event.stopPropagation()">${x.sold[0]}</a>` : '—'}</td>
+      <td>${x.wEnd || '<span class="muted">Chưa kích hoạt</span>'}</td></tr>`;
+  }).join('') || `<tr><td colspan="6" class="empty-state">Không tìm thấy serial "${q}". Serial chưa nhập kho thì không có trong hệ thống.</td></tr>`;
+}
+
+function openSn(sn) {
+  const x = SERIALS.find(z => z.sn === sn), p = byId(x.pid);
+  const stage = { 'Trong kho': 1, 'Đang đi đường': 1, 'Đã bán · chờ lắp': 2, 'Đang bảo hành': x.inst ? 4 : 3, 'Gửi hãng': 4, 'Hết bảo hành': 4 }[x.st];
+  const steps = [
+    ['Nhập kho', `Phiếu ${x.in[0]} · ${x.in[1]} · ${x.in[2]}`],
+    ['Tồn kho', `Kho ${storeName(x.s)}${x.note && !x.sold ? ' · ' + x.note : ''}`],
+    ['Bán', x.sold ? `Đơn ${x.sold[0]} · ${x.sold[1]} · ${x.sold[2]} · xuất kho ${x.sold[3]}` : 'Gắn vào đơn và khách khi kho bấm Xuất kho'],
+    ['Lắp đặt', x.inst ? `${x.inst[0]} · thợ ${x.inst[1]} · có ảnh nghiệm thu` : x.wEnd ? 'Khách mua mang về, không lắp' : 'Thợ quét serial trên phiếu lắp, phải khớp với đơn'],
+    ['Bảo hành', x.wEnd ? `Đến ${x.wEnd}${x.st === 'Gửi hãng' ? ' · ' + x.note : x.st === 'Hết bảo hành' ? ' · đã hết hạn' : ''}` : 'Kích hoạt từ ngày lắp'],
+  ];
+  openModal('dlg', `<div class="row-flex" style="justify-content:space-between"><h3 class="mono" style="margin:0">${x.sn}</h3><span class="badge ${ST[x.st]}">${x.st}</span></div>
+    <p class="sub">${p.name} · Mã ${sku(p)} · ${p.brand}</p>
+    <div class="steps">${steps.map(([t], i) => `<span class="${i <= stage ? 'on' : ''}">${t}</span>`).join('')}</div>
+    <ul class="timeline">${steps.map(([t, m], i) => `<li class="${i <= stage ? '' : 'todo'}"><div class="t-status">${t}</div><div class="t-meta">${m}</div></li>`).join('')}</ul>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button>
+      ${x.sold ? `<button class="btn btn-primary" onclick="closeModal('dlg');toast('Tạo yêu cầu bảo hành cho ${x.sn}')">Tạo yêu cầu bảo hành</button>` : `<button class="btn btn-primary" onclick="toast('In tem serial ${x.sn}')"><i class="ti ti-printer"></i> In tem serial</button>`}</div>`);
+}
+
+document.getElementById('types').innerHTML = [...SERIAL_TYPES, 'Khóa điện tử (mọi loại)'].map(t => `<span class="chip">${t}</span>`).join('')
+  + `<span class="muted" style="font-size:12.5px">· ${PRODUCTS.filter(hasSerial).length}/${PRODUCTS.length} mã trong danh sách mẫu</span>`;
+const q0 = new URLSearchParams(location.search).get('q');
+if (q0) document.getElementById('q').value = q0;
+draw();
+</script>
+</body>
+</html>

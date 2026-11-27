@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Bảo hành (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+table.data b.mono{white-space:nowrap}
+.lookup{display:flex;gap:10px;flex-wrap:wrap}
+.lookup input{flex:1;min-width:220px;padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg)}
+.wcard{border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-top:12px;display:flex;gap:12px;align-items:flex-start;background:var(--surface)}
+tr.late td{background:var(--danger-bg)}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Bảo hành</h1></div>
+      <div class="row-flex">
+        <button class="btn btn-outline btn-sm" onclick="toast('Tạo phiếu bảo hành tay cho hàng bán trước khi dùng hệ thống · đính kèm ảnh hoá đơn cũ')"><i class="ti ti-file-plus"></i> Phiếu bảo hành tay</button>
+        <button class="btn btn-primary btn-sm" onclick="toast('Tiếp nhận yêu cầu mới: nhập số điện thoại hoặc serial, mô tả lỗi, ảnh khách gửi')"><i class="ti ti-plus"></i> Tiếp nhận yêu cầu</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid" id="stats"></div>
+
+      <div class="panel">
+        <h2><span><i class="ti ti-search"></i> Tra bảo hành</span><span class="muted" style="font-size:12px;font-weight:400">Khách cũng tra được trên web bằng số điện thoại hoặc serial</span></h2>
+        <div class="lookup">
+          <input id="lk" placeholder="Số serial hoặc số điện thoại, ví dụ 0938214214 hoặc HF2409-21-08817" aria-label="Serial hoặc số điện thoại" onkeydown="if(event.key==='Enter')lookup()">
+          <button class="btn btn-primary" onclick="lookup()">Tra cứu</button>
+        </div>
+        <div id="lkOut"></div>
+      </div>
+
+      <div class="toolbar"><div class="tabs" id="tabs"></div><div class="tabs" id="tabs2"></div></div>
+      <div class="panel" style="padding:6px 8px">
+        <div class="table-scroll"><table class="data wide" id="tbl"></table></div>
+      </div>
+      <div class="box-note">Cam kết xử lý <b>7 ngày</b> kể từ khi tiếp nhận <span class="badge amber">số ngày chờ Techhomes xác nhận</span>. Quá hạn chưa xong: hiện đỏ ở Tổng quan và báo Telegram. Techhomes tự sửa hay chuyển trung tâm bảo hành của hãng (Häfele, Bosch…): <span class="badge amber">chờ Techhomes xác nhận theo từng hãng</span></div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal modal-lg"></div></div>
+
+<script>
+renderAdmin('admin-warranty.html');
+
+const TODAY = new Date(2026, 10, 27), SLA = 7;
+const d = s => { const [dd, mm, yy] = s.split('/'); return new Date(+yy, mm - 1, +dd); };
+// Phiếu bảo hành theo serial. p = chỉ số PRODUCTS; from = ngày lắp (có lắp) hoặc ngày xuất kho
+const CARDS = [
+  { serial: 'HF2409-21-08817', p: 5, cust: 'Lý Thanh Trúc', phone: '0938214214', order: 'TH-20466', from: '23/11/2026', months: 24, src: 'Ngày lắp' },
+  { serial: 'HF2410-11-03342', p: 1, cust: 'Ngô Đức Anh', phone: '0907112563', order: 'TH-20463', from: '24/11/2026', months: 24, src: 'Ngày lắp' },
+  { serial: 'HF2405-11-01208', p: 1, cust: 'Lâm Ngọc Diệp', phone: '0983550120', order: 'TH-20198', from: '12/06/2026', months: 24, src: 'Ngày lắp' },
+  { serial: 'HF2401-21-00977', p: 5, cust: 'Lương Văn Tú', phone: '0912870331', order: 'TH-20022', from: '08/02/2026', months: 24, src: 'Ngày lắp' },
+  { serial: 'HF2403-20-04410', p: 24, cust: 'Trương Gia Hân', phone: '0966301447', order: 'TH-20105', from: '21/04/2026', months: 24, src: 'Ngày lắp' },
+  { serial: 'HF2404-29-02286', p: 3, cust: 'Nguyễn Hữu Phước', phone: '0903665019', order: 'TH-20140', from: '15/05/2026', months: 24, src: 'Ngày xuất kho' },
+  { serial: 'HF2402-20-05530', p: 25, cust: 'Phan Thị Yến', phone: '0937402288', order: 'TH-20061', from: '02/03/2026', months: 24, src: 'Ngày lắp' },
+  { serial: 'HF2311-01-07712', p: 4, cust: 'Đỗ Minh Quân', phone: '0988123540', order: 'Hoá đơn cũ 0418/2023', from: '10/11/2023', months: 24, src: 'Tạo tay · hàng bán trước hệ thống' },
+  { serial: 'BL2406-18-00093', p: 12, cust: 'Cty TNHH Nội thất An Phát', phone: '0283915550', order: 'TH-20211', from: '28/06/2026', months: 60, src: 'Ngày lắp' },
+  { serial: 'HF2412-81-01540', p: 6, cust: 'Kiều Anh Thơ', phone: '0975887120', order: 'TH-20271', from: '05/09/2026', months: 24, src: 'Ngày lắp · đổi máy mới từ HF2407-81-00312' },
+];
+const until = c => { const x = d(c.from); x.setMonth(x.getMonth() + c.months); return x; };
+const vn = x => x.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const valid = c => until(c) >= TODAY;
+const card = s => CARDS.find(c => c.serial === s);
+
+const ST = { 'Mới tiếp nhận': 'amber', 'Đã hẹn kiểm tra': 'blue', 'Đang xử lý': 'blue', 'Hoàn tất': 'green', 'Từ chối': 'gray' };
+const REQ = [
+  { id: 'BH-0116', serial: 'HF2403-20-04410', ch: 'Form web', at: '27/11/2026', st: 'Mới tiếp nhận', err: 'Khóa không nhận vân tay, mở bằng mã số vẫn được', who: 'Quốc Bảo' },
+  { id: 'BH-0115', serial: 'HF2401-21-00977', ch: 'Zalo', at: '27/11/2026', st: 'Mới tiếp nhận', err: 'Máy hút mùi kêu to khi bật số 3', who: 'Thanh Vy' },
+  { id: 'BH-0112', serial: 'HF2405-11-01208', ch: 'Hotline', at: '25/11/2026', st: 'Đã hẹn kiểm tra', err: 'Bếp báo lỗi E2 vùng nấu trái', who: 'Quốc Bảo', step: 'Hẹn sáng 27/11 · thợ Công Sơn · phiếu PL-2611-08' },
+  { id: 'BH-0110', serial: 'HF2402-20-05530', ch: 'Hotline', at: '21/11/2026', st: 'Đang xử lý', err: 'Mô-đun vân tay chập chờn', who: 'Thanh Vy', step: 'Sửa tại nhà · chờ linh kiện mô-đun vân tay từ Häfele' },
+  { id: 'BH-0109', serial: 'HF2404-29-02286', ch: 'Form web', at: '18/11/2026', st: 'Đang xử lý', err: 'Máy rửa chén không xả nước', who: 'Hoàng Long', step: 'Gửi hãng · phiếu xuất Gửi hãng bảo hành XG-0031 ngày 20/11', hang: true },
+  { id: 'BH-0105', serial: 'BL2406-18-00093', ch: 'Zalo', at: '12/11/2026', st: 'Hoàn tất', err: 'Tay nâng AVENTOS hạ không êm', who: 'Hoàng Long', step: 'Chỉnh lực tay nâng tại công trình · khách ký 14/11', done: '14/11/2026' },
+  { id: 'BH-0103', serial: 'HF2412-81-01540', ch: 'Hotline', at: '03/11/2026', st: 'Hoàn tất', err: 'Máy hút mùi không lên nguồn', who: 'Quốc Bảo', step: 'Đổi máy mới serial HF2412-81-01540 · máy cũ HF2407-81-00312 vào kho hàng lỗi', done: '07/11/2026' },
+  { id: 'BH-0101', serial: 'HF2311-01-07712', ch: 'Hotline', at: '02/11/2026', st: 'Từ chối', err: 'Lò vi sóng không nóng', who: 'Thanh Vy', step: 'Hết hạn bảo hành từ 10/11/2025 · báo phí sửa 850.000đ, khách đồng ý sửa' },
+];
+const open_ = r => !['Hoàn tất', 'Từ chối'].includes(r.st);
+const age = r => Math.round((TODAY - d(r.at)) / 864e5);
+const sla = r => open_(r) ? SLA - age(r) : null;   // số ngày còn lại tới hạn cam kết
+
+let tab = 'Yêu cầu bảo hành', filter = 'Tất cả';
+function draw() {
+  const late = REQ.filter(r => open_(r) && sla(r) < 0);
+  document.getElementById('stats').innerHTML = [
+    ['Mới tiếp nhận', REQ.filter(r => r.st === 'Mới tiếp nhận').length, 'Hotline, Zalo, form web'],
+    ['Đã hẹn kiểm tra', REQ.filter(r => r.st === 'Đã hẹn kiểm tra').length, 'Đã vào lịch lắp đặt'],
+    ['Đang xử lý', REQ.filter(r => r.st === 'Đang xử lý').length, `${REQ.filter(r => r.hang && open_(r)).length} gửi hãng`],
+    ['Quá hạn cam kết', late.length, late.map(r => r.id).join(', ') || 'Không có', 'bad'],
+  ].map(([l, v, t, c], i) => `<div class="stat-card ${c || ''}" onclick="${i < 3 ? `tab='Yêu cầu bảo hành';filter='${l}';draw()` : `tab='Yêu cầu bảo hành';filter='Tất cả';draw()`}"><div class="label">${l}</div><div class="value">${v}</div><div class="kpi-trend">${t}</div></div>`).join('');
+  const tabs = tab === 'Yêu cầu bảo hành' ? ['Tất cả', ...Object.keys(ST)] : [];
+  document.getElementById('tabs').innerHTML = ['Yêu cầu bảo hành', 'Phiếu bảo hành'].map(t => `<button class="${t === tab ? 'active' : ''}" onclick="tab='${t}';filter='Tất cả';draw()">${t}</button>`).join('')
+    ;
+  const t2 = document.getElementById('tabs2');
+  t2.style.display = tabs.length ? '' : 'none';
+  t2.innerHTML = tabs.map(t => `<button class="${t === filter ? 'active' : ''}" onclick="filter='${t}';draw()">${t}</button>`).join('');
+  const T = document.getElementById('tbl');
+  if (tab === 'Phiếu bảo hành') {
+    T.innerHTML = `<thead><tr><th>Serial</th><th>Sản phẩm</th><th>Khách</th><th>Đơn</th><th>Bắt đầu</th><th>Hết hạn</th><th>Tình trạng</th></tr></thead><tbody>${CARDS.map(c => {
+      const p = PRODUCTS[c.p];
+      return `<tr class="row-link" onclick="showCard('${c.serial}')"><td><b class="mono">${c.serial}</b></td><td><div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${p.img}" alt=""><span>${p.name}<span class="sub-muted">Thời hạn ${c.months} tháng</span></span></div></td>
+        <td>${c.cust}<span class="sub-muted">${c.phone}</span></td><td class="mono">${c.order}</td><td>${c.from}<span class="sub-muted">${c.src}</span></td><td>${vn(until(c))}</td>
+        <td><span class="badge ${valid(c) ? 'green' : 'gray'}">${valid(c) ? 'Còn hạn' : 'Hết hạn'}</span></td></tr>`;
+    }).join('')}</tbody>`;
+    return;
+  }
+  T.innerHTML = `<thead><tr><th>Yêu cầu</th><th>Khách · sản phẩm</th><th>Lỗi khách báo</th><th>Bảo hành</th><th>Trạng thái</th><th>Hạn cam kết</th></tr></thead><tbody>${REQ.map((r, i) => [r, i]).filter(([r]) => filter === 'Tất cả' || r.st === filter).map(([r, i]) => {
+    const c = card(r.serial), p = PRODUCTS[c.p], left = sla(r);
+    return `<tr class="row-link ${left < 0 ? 'late' : ''}" onclick="openReq(${i})"><td><b class="mono">${r.id}</b><span class="sub-muted">${r.ch} · ${r.at.slice(0, 5)}</span></td>
+      <td>${c.cust}<span class="sub-muted">${p.name}</span></td><td>${r.err}</td>
+      <td><span class="badge ${valid(c) ? 'green' : 'gray'}">${valid(c) ? 'Còn hạn' : 'Hết hạn'}</span></td>
+      <td><span class="badge ${ST[r.st]}">${r.st}</span>${r.hang && open_(r) ? '<span class="sub-muted">Gửi hãng</span>' : ''}</td>
+      <td>${left === null ? '<span class="muted">—</span>' : left < 0 ? `<span class="badge red">Quá hạn ${-left} ngày</span>` : left <= 1 ? `<span class="badge amber">Còn ${left} ngày</span>` : `Còn ${left} ngày`}</td></tr>`;
+  }).join('') || '<tr><td colspan="6" class="empty-state">Không có yêu cầu ở trạng thái này</td></tr>'}</tbody>`;
+}
+
+function wcardHTML(c) {
+  const p = PRODUCTS[c.p];
+  return `<div class="wcard"><img class="th-img" src="${p.img}" alt=""><div style="flex:1"><b>${p.name}</b> <span class="badge ${valid(c) ? 'green' : 'gray'}">${valid(c) ? 'Còn hạn' : 'Hết hạn'}</span>
+    <div class="kv" style="margin-top:6px"><span class="muted">Serial</span><span class="mono">${c.serial}</span><span class="muted">Khách</span><span>${c.cust} · ${c.phone}</span><span class="muted">Đơn</span><span>${c.order}</span><span class="muted">Hiệu lực</span><span>${c.from} → ${vn(until(c))} (${c.months} tháng · ${c.src})</span></div>
+    <span class="sub-muted">Xem kèm hoá đơn và ảnh nghiệm thu · thời hạn từng hãng chờ Techhomes xác nhận</span></div></div>`;
+}
+function lookup() {
+  const q = document.getElementById('lk').value.replace(/\s/g, '').toUpperCase();
+  const hits = q ? CARDS.filter(c => c.serial.includes(q) || c.phone.includes(q)) : [];
+  document.getElementById('lkOut').innerHTML = !q ? '' : hits.length ? hits.map(wcardHTML).join('') : '<p class="muted" style="margin:12px 0 0">Không tìm thấy phiếu bảo hành. Hàng mua trước khi dùng hệ thống: tạo phiếu bảo hành tay.</p>';
+}
+function showCard(s) { openModal('dlg', `<h3>Phiếu bảo hành điện tử</h3>${wcardHTML(card(s))}<div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button><button class="btn btn-primary" onclick="toast('Tiếp nhận yêu cầu bảo hành cho serial ${s}')">Tiếp nhận yêu cầu</button></div>`); }
+
+const NEXT = { 'Mới tiếp nhận': ['Hẹn kiểm tra (vào lịch lắp đặt)', 'Đã hẹn kiểm tra'], 'Đã hẹn kiểm tra': ['Bắt đầu xử lý', 'Đang xử lý'], 'Đang xử lý': ['Hoàn tất · khách ký xác nhận', 'Hoàn tất'] };
+function openReq(i) {
+  const r = REQ[i], c = card(r.serial), left = sla(r), nx = NEXT[r.st];
+  openModal('dlg', `
+    <div class="row-flex" style="justify-content:space-between"><h3 class="mono" style="margin:0">${r.id}</h3><span class="badge ${ST[r.st]}">${r.st}</span></div>
+    <p class="sub">Tiếp nhận ${r.at} qua ${r.ch} · người nhận: ${r.who}${left !== null ? ` · ${left < 0 ? `<b style="color:var(--danger)">quá hạn cam kết ${-left} ngày</b>` : `còn ${left} ngày tới hạn cam kết`}` : ''}</p>
+    <div class="detail-grid">
+      <div>${wcardHTML(c)}</div>
+      <div>
+        <div class="kv"><span class="muted">Lỗi khách báo</span><span>${r.err}</span><span class="muted">Ảnh khách gửi</span><span class="row-flex"><span class="chip"><i class="ti ti-photo"></i> 2 ảnh</span></span></div>
+        <ul class="timeline" style="margin-top:12px">
+          <li><div class="t-status">Mới tiếp nhận</div><div class="t-meta">${r.who} ghi mô tả lỗi, ảnh khách gửi</div></li>
+          ${r.step ? `<li><div class="t-status">${r.st}</div><div class="t-meta">${r.step}</div></li>` : ''}
+        </ul>
+        ${!valid(c) && open_(r) ? '<div class="box-note">Hết hạn bảo hành: có thể Từ chối và báo phí sửa nếu khách vẫn muốn sửa.</div>' : ''}
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button>
+      ${r.st === 'Đang xử lý' ? `<button class="btn btn-outline" onclick="toast('Lập phiếu xuất Gửi hãng bảo hành cho ${r.serial}')">Gửi hãng</button><button class="btn btn-outline" onclick="toast('Đổi máy mới: xuất máy serial mới, phiếu bảo hành chuyển sang serial mới, máy cũ vào kho hàng lỗi')">Đổi máy mới</button>` : ''}
+      ${open_(r) ? `<button class="btn btn-outline" onclick="move(${i},'Từ chối')">Từ chối</button>` : ''}
+      ${nx ? `<button class="btn btn-primary" onclick="move(${i},'${nx[1]}')">${nx[0]}</button>` : ''}
+    </div>`);
+}
+function move(i, st) { REQ[i].st = st; closeModal('dlg'); draw(); toast(`${REQ[i].id} → ${st}${st === 'Đã hẹn kiểm tra' ? ' · việc đã sang Chờ xếp lịch ở Lịch lắp đặt' : ''}`); }
+draw();
+</script>
+</body>
+</html>

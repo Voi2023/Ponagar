@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Cổng Kho — Tồn kho 3 showroom (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<script src="assets/kho-data.js"></script>
+<style>
+table.data .mono{white-space:nowrap}
+.tabpane{display:none}.tabpane.on{display:block}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.chip.z{color:var(--danger);background:var(--danger-bg)}
+.cnt{width:80px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm)}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Tồn kho 3 showroom</h1></div>
+      <div class="row-flex">
+        <select id="store" aria-label="Kho" class="input" style="padding:8px 10px" onchange="draw()">
+          <option value="">Tất cả kho</option><option value="0">Phú Nhuận</option><option value="1">Q.10</option><option value="2">Thủ Đức</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="openCreateKK()"><i class="ti ti-clipboard-check"></i> Tạo phiếu kiểm kê</button>
+        <button class="btn btn-primary btn-sm" onclick="toast('Mở phiếu nhập mua từ nhà phân phối')"><i class="ti ti-package-import"></i> Nhập hàng</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid" id="kpi"></div>
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+
+      <section class="tabpane" id="t-ton">
+        <div class="toolbar">
+          <input type="search" id="q" placeholder="Tìm tên, mã hàng…" aria-label="Tìm sản phẩm" oninput="draw()">
+          <select id="cat" aria-label="Ngành hàng" onchange="draw()"><option value="">Mọi ngành hàng</option></select>
+          <label class="row-flex" style="font-size:13px"><input type="checkbox" id="onlySn" onchange="draw()"> Chỉ mã quản lý serial</label>
+        </div>
+        <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Sản phẩm</th><th class="num">Tồn thực</th><th class="num">Đang giữ</th><th class="num">Có thể bán</th><th class="num">Đang về</th><th>Có thể bán theo kho</th><th>Website hiện</th></tr></thead>
+          <tbody id="rows"></tbody></table></div></div>
+        <div class="box-note">Tồn thực = số trong kho, kể cả kệ trưng bày. Đang giữ = đã có đơn, chưa xuất kho. <b>Có thể bán = Tồn thực − Đang giữ</b>, web và showroom bán theo số này. Không sửa tay con số tồn: muốn đổi phải lập phiếu nhập, xuất hoặc kiểm kê. Hệ thống không cho tồn âm.</div>
+        <div class="panel"><h2>Tồn hiện lên website</h2>
+          <table class="data"><thead><tr><th>Có thể bán (cộng các kho bán online)</th><th>Web hiện</th></tr></thead><tbody>
+            <tr><td>Từ 3 trở lên</td><td>Còn hàng · có tại showroom Phú Nhuận, Thủ Đức</td></tr>
+            <tr><td>1–2</td><td>Chỉ còn 2 sản phẩm</td></tr>
+            <tr><td>0, mã cho đặt hàng</td><td>Đặt hàng · giao sau vài ngày <span class="badge amber">thời gian chờ Techhomes xác nhận</span></td></tr>
+            <tr><td>0, mã ngừng kinh doanh</td><td>Tạm hết · nhận tin khi có hàng · gợi ý mã thay thế</td></tr>
+          </tbody></table>
+          <p class="muted" style="font-size:12.5px;margin:10px 0 0">Bán tại showroom chiếc cuối cùng → web đổi trạng thái trong vài giây. Hàng đánh dấu Trưng bày không tính vào số bán online.</p>
+        </div>
+      </section>
+
+      <section class="tabpane" id="t-canh-bao">
+        <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Sản phẩm</th><th>Kho</th><th class="num">Có thể bán</th><th class="num">Tối thiểu</th><th class="num">Đang về</th><th>Gợi ý</th><th></th></tr></thead>
+          <tbody id="low"></tbody></table></div></div>
+        <div class="box-note">Mỗi sáng 8:00 hệ thống gửi Telegram danh sách mã dưới mức tối thiểu. Mã bán chạy: gợi ý số cần đặt nhà phân phối, tính cả đơn đang chờ hàng về. Showroom này thiếu mà showroom khác còn: gợi ý phiếu chuyển kho. Đơn <i>Chờ hàng về</i> quá ngày hẹn với khách: báo bán hàng gọi khách (hiện tại: TH-20479 hẹn 01/12, chưa quá hạn).</div>
+      </section>
+
+      <section class="tabpane" id="t-kiem-ke">
+        <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Phiếu</th><th>Kho</th><th>Phạm vi</th><th>Người tạo</th><th>Dòng lệch</th><th>Trạng thái</th></tr></thead>
+          <tbody id="kk"></tbody></table></div></div>
+        <div class="box-note">Trong lúc kiểm, phạm vi đó tạm khoá nhập xuất. Thủ kho không thấy số hệ thống khi đếm. Quản lý duyệt thì tồn điều chỉnh theo số đếm, phiếu gửi kế toán để điều chỉnh bên MISA. Đề xuất: thiết bị có serial kiểm mỗi tháng, phụ kiện nhỏ (bản lề, ray, tay nắm) mỗi quý.</div>
+      </section>
+
+      <section class="tabpane" id="t-kho">
+        <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Kho</th><th>Địa chỉ</th><th>Phụ trách</th><th>Mã kho MISA</th><th>Bán online</th><th>Bán tại showroom</th></tr></thead>
+          <tbody>
+            <tr><td><b>Phú Nhuận</b><span class="sub-muted">Trụ sở</span></td><td>132 Nguyễn Trọng Tuyển, Phú Nhuận</td><td>Ngọc Trâm</td><td class="mono">KHO-PN</td><td><span class="badge green">Có · ưu tiên 1</span></td><td>Có</td></tr>
+            <tr><td><b>Quận 10</b><span class="sub-muted">CN1</span></td><td>283/57 Cách Mạng Tháng Tám, P.12, Q.10</td><td>Văn Tài</td><td class="mono">KHO-Q10</td><td><span class="badge green">Có · ưu tiên 2</span></td><td>Có</td></tr>
+            <tr><td><b>Thủ Đức</b><span class="sub-muted">CN2</span></td><td>17 B3 Khu Đông Tăng Long, Thủ Đức</td><td>Hoàng Long <span class="sub-muted">kiêm kho</span></td><td class="mono">KHO-TD</td><td><span class="badge green">Có · ưu tiên 3</span></td><td>Có</td></tr>
+            <tr><td><b>Hàng lỗi · chờ gửi hãng</b></td><td class="muted">Kho trên sổ, không phải địa điểm</td><td>Ngọc Trâm</td><td class="mono">KHO-LOI</td><td><span class="badge gray">Không</span></td><td>—</td></tr>
+          </tbody></table></div></div>
+        <div class="box-note">Mỗi showroom là một kho, có kho tổng riêng hay không, thứ tự ưu tiên xuất cho đơn web: <span class="badge amber">chờ Techhomes xác nhận</span>. Kho không bán online thì tồn ở đó không cộng vào số trên web. Thêm kho mới chỉ chủ làm được; kho đã có phiếu không xoá, chỉ ngừng dùng.</div>
+        <div class="panel"><h2>Tồn đầu kỳ <span class="badge green">Đã chốt 01/11/2026 · Minh Thư</span></h2>
+          <p class="muted" style="margin:0">Kiểm đếm từng kho → điền file Excel mẫu (mã hàng · số lượng · kho · serial) → tải lên, hệ thống báo mã không tồn tại, serial trùng → quản lý bấm Chốt. Sau đó mọi thay đổi tồn phải qua phiếu. Kế toán nhập cùng số vào MISA.</p>
+        </div>
+      </section>
+
+      <section class="tabpane" id="t-nxt">
+        <div class="toolbar">
+          <label class="muted" for="d1">Từ</label><input type="date" id="d1" value="2026-11-01">
+          <label class="muted" for="d2">đến</label><input type="date" id="d2" value="2026-11-27">
+          <select id="brand" aria-label="Thương hiệu" onchange="draw()"><option value="">Mọi thương hiệu</option><option>Hafele</option><option>Blum</option><option>GEZE</option></select>
+          <button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel Nhập – Xuất – Tồn để kế toán đối chiếu MISA')"><i class="ti ti-file-spreadsheet"></i> Xuất Excel</button>
+        </div>
+        <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Sản phẩm</th><th class="num">Tồn đầu</th><th class="num">Nhập mua</th><th class="num">Nhập trả</th><th class="num">Xuất bán</th><th class="num">Chuyển kho</th><th class="num">Trưng bày · gửi hãng · huỷ</th><th class="num">Kiểm kê</th><th class="num">Tồn cuối</th><th class="num">Giá trị cuối*</th></tr></thead>
+          <tbody id="nxt"></tbody></table></div></div>
+        <p class="muted" style="font-size:12px">* Theo giá vốn tham khảo (bình quân giá nhập), chỉ chủ và kế toán thấy. Số chính thức là số trong MISA.</p>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal modal-lg"></div></div>
+
+<script>
+renderAdmin('admin-stock.html');
+document.getElementById('cat').innerHTML += CATS.map(c => `<option value="${c.key}">${c.name}</option>`).join('');
+
+const TABS = [['ton', 'Tồn theo mã'], ['canh-bao', 'Cảnh báo tồn thấp'], ['kiem-ke', 'Kiểm kê'], ['kho', 'Danh sách kho'], ['nxt', 'Nhập – Xuất – Tồn']];
+let tab = (TABS.find(t => '#' + t[0] === location.hash) || TABS[0])[0];
+function pick(t) { tab = t; history.replaceState(null, '', '#' + t); draw(); }
+const KST = { 'Đang đếm': 'blue', 'Chờ duyệt': 'amber', 'Đã duyệt': 'green' };
+const thumb = (p, sub) => `<div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${p.img}" alt=""><span><b>${p.name}</b><span class="sub-muted">${sub ?? 'Mã ' + sku(p)}</span></span></div>`;
+const S = () => { const v = document.getElementById('store').value; return v === '' ? [0, 1, 2] : [+v]; };
+const tot = (f, p, ss) => ss.reduce((a, s) => a + f(p, s), 0);
+function web(p) {
+  const n = tot(avail, p, [0, 1, 2]), at = [0, 1, 2].filter(s => avail(p, s) > 0).map(storeName);
+  return n >= 3 ? `<span class="badge green">Còn hàng</span><span class="sub-muted">Có tại ${at.join(', ')}</span>` : n ? `<span class="badge amber">Chỉ còn ${n} sản phẩm</span>` : '<span class="badge gray">Đặt hàng · giao sau vài ngày</span>';
+}
+
+function draw() {
+  const ss = S(), inS = s => ss.includes(s);
+  document.getElementById('tabs').innerHTML = TABS.map(([k, t]) => `<button class="${k === tab ? 'active' : ''}" onclick="pick('${k}')">${t}</button>`).join('');
+  document.querySelectorAll('.tabpane').forEach(el => el.classList.toggle('on', el.id === 't-' + tab));
+  const low = LOW.filter(l => inS(l[1]));
+  document.getElementById('kpi').innerHTML = [
+    ['Tồn thực', PRODUCTS.reduce((a, p) => a + tot(onHand, p, ss), 0), `${PRODUCTS.length} mã trong danh sách mẫu`],
+    ['Đang giữ cho đơn', PRODUCTS.reduce((a, p) => a + tot(held, p, ss), 0), 'Chưa xuất kho'],
+    ['Đang về', PRODUCTS.reduce((a, p) => a + tot(incoming, p, ss), 0), 'Đã đặt nhà phân phối'],
+    ['Dưới mức tối thiểu', low.length, 'Bấm để xem gợi ý', "pick('canh-bao')", 'bad'],
+  ].map(([l, v, t, on, c]) => `<div class="stat-card ${c || ''}" ${on ? `onclick="${on}" style="cursor:pointer"` : ''}><div class="label">${l}</div><div class="value">${v.toLocaleString('vi-VN')}</div><div class="kpi-trend">${t}</div></div>`).join('');
+
+  const q = document.getElementById('q').value.toLowerCase(), cat = document.getElementById('cat').value, sn = document.getElementById('onlySn').checked;
+  document.getElementById('rows').innerHTML = PRODUCTS.filter(p => (!q || (p.name + p.code).toLowerCase().includes(q)) && (!cat || p.cat === cat) && (!sn || hasSerial(p))).map(p => {
+    const a = tot(avail, p, ss);
+    return `<tr class="row-link" onclick="openCard(${p.id})">
+      <td>${thumb(p, `Mã ${sku(p)}${hasSerial(p) ? ' · <i class="ti ti-barcode"></i> serial' : ''}`)}</td>
+      <td class="num">${tot(onHand, p, ss)}</td><td class="num">${tot(held, p, ss) || '—'}</td>
+      <td class="num"><b style="${a ? '' : 'color:var(--danger)'}">${a}</b></td><td class="num">${tot(incoming, p, ss) || '—'}</td>
+      <td>${[0, 1, 2].map(s => `<span class="chip ${avail(p, s) ? '' : 'z'}" style="margin:1px;display:inline-block;white-space:nowrap">${storeName(s)} ${avail(p, s)}</span>`).join('')}</td>
+      <td>${web(p)}</td></tr>`;
+  }).join('') || '<tr><td colspan="7" class="empty-state">Không có mã phù hợp</td></tr>';
+
+  document.getElementById('low').innerHTML = low.map(([id, s, min, g]) => {
+    const p = byId(id), tr = g.includes('Chuyển');
+    return `<tr><td>${thumb(p)}</td><td>${storeName(s)}</td><td class="num"><b style="color:var(--danger)">${avail(p, s)}</b></td><td class="num">${min}</td><td class="num">${incoming(p, s) || '—'}</td><td style="font-size:12.5px">${g}</td>
+      <td>${tr ? '<a class="btn btn-outline btn-sm" href="admin-transfers.html">Phiếu chuyển</a>' : `<button class="btn btn-outline btn-sm" onclick="toast('Tạo đơn đặt ${p.brand} cho ${sku(p)}')">Đặt NPP</button>`}</td></tr>`;
+  }).join('') || '<tr><td colspan="7" class="empty-state">Không có mã dưới mức tối thiểu</td></tr>';
+
+  document.getElementById('kk').innerHTML = STOCKTAKES.filter(k => inS(k.s)).map(k => `<tr class="row-link" onclick="openKK('${k.id}')">
+    <td><b class="mono">${k.id}</b><span class="sub-muted">${k.at}</span></td><td>${storeName(k.s)}</td><td>${k.scope}</td><td>${staff(k.by).name}</td>
+    <td>${k.st === 'Đang đếm' ? '<span class="muted">Đang đếm</span>' : (n => n ? `<b style="color:var(--danger)">${n} dòng</b>` : 'Khớp')(k.lines.filter(l => l[1]).length)}</td>
+    <td><span class="badge ${KST[k.st]}">${k.st}</span>${k.st === 'Đang đếm' ? '<span class="sub-muted">Khoá nhập xuất phạm vi này</span>' : ''}</td></tr>`).join('') || '<tr><td colspan="6" class="empty-state">Không có phiếu</td></tr>';
+
+  drawNXT(ss);
+}
+
+// Nhập – Xuất – Tồn: số phát sinh mẫu, tồn cuối khớp cột Tồn thực
+function drawNXT(ss) {
+  const br = document.getElementById('brand').value, sum = Array(9).fill(0);
+  const rows = PRODUCTS.filter(p => !br || p.brand === br).map(p => {
+    const cuoi = tot(onHand, p, ss), nt = p.id === 8 && ss.includes(1) ? 1 : 0, tb = p.id === 9 && ss.includes(0) ? -1 : 0;
+    const ck = TRANSFERS.filter(t => t.st !== 'Nháp').reduce((a, t) => a + t.lines.filter(l => l[0] === p.id).reduce((b, l) => b - (ss.includes(t.from) ? l[1] : 0) + (ss.includes(t.to) ? l[2] : 0), 0), 0);
+    let dau = p.id % 4 + 1, xb = p.id % 3 + 1, nm = cuoi - dau - nt + xb - ck - tb;
+    if (nm < 0) { xb -= nm; nm = 0; }
+    const val = cuoi * Math.round(p.price / 1.08 * 0.75 / 1000) * 1000, r = [dau, nm, nt, xb, ck, tb, 0, cuoi, val];
+    r.forEach((v, i) => sum[i] += v);
+    const sg = v => v > 0 ? '+' + v : v || '—';
+    return `<tr><td>${thumb(p)}</td><td class="num">${dau}</td><td class="num">${nm || '—'}</td><td class="num">${nt || '—'}</td><td class="num">${xb}</td><td class="num">${sg(ck)}</td><td class="num">${sg(tb)}</td><td class="num">—</td><td class="num"><b>${cuoi}</b></td><td class="num">${fmt(val)}</td></tr>`;
+  });
+  document.getElementById('nxt').innerHTML = rows.join('') + `<tr><td><b>Tổng</b></td>${sum.map((v, i) => `<td class="num"><b>${i === 8 ? fmt(v) : v}</b></td>`).join('')}</tr>`;
+}
+
+function openCard(id) {
+  const p = byId(id), sns = SERIALS.filter(x => x.pid === id && ['Trong kho', 'Đang đi đường'].includes(x.st));
+  const moves = [
+    ...HOLDS.filter(h => h[0] === id).map(h => [`Giữ hàng cho ${h[3]}`, `${storeName(h[1])} · ${h[2]} · tự động khi khách đặt`]),
+    ...INCOMING.filter(r => r[0] === id).map(r => [`Đặt ${r[3]} · ${r[2]}`, `${storeName(r[1])} · ${r[5]} · dự kiến về ${r[4]}`]),
+    ...TRANSFERS.filter(t => t.lines.some(l => l[0] === id)).map(t => [`${t.id} · ${storeName(t.from)} → ${storeName(t.to)}`, `${t.st} · ${staff(t.by).name} · ${t.at}`]),
+    ...[...new Set(SERIALS.filter(x => x.pid === id).map(x => x.in.join(' · ')))].map(t => ['Nhập mua ' + t.split(' · ')[0], t.split(' · ').slice(1).join(' · ')]),
+    ['Tồn đầu kỳ', 'Chốt 01/11/2026 · Minh Thư'],
+  ];
+  openModal('dlg', `<h3>Thẻ kho · ${p.name}</h3><p class="sub">Mã ${sku(p)} · ${p.brand}${hasSerial(p) ? ' · quản lý serial' : ' · theo số lượng'}</p>
+    <table class="data"><thead><tr><th>Kho</th><th class="num">Tồn thực</th><th class="num">Đang giữ</th><th class="num">Có thể bán</th><th class="num">Đang về</th></tr></thead><tbody>
+    ${[0, 1, 2].map(s => `<tr><td>${storeName(s)}</td><td class="num">${onHand(p, s)}</td><td class="num">${held(p, s) || '—'}</td><td class="num"><b>${avail(p, s)}</b></td><td class="num">${incoming(p, s) || '—'}</td></tr>`).join('')}</tbody></table>
+    <div class="grid-2" style="margin-top:16px"><div><b>Phiếu gần đây</b><ul class="timeline" style="margin-top:10px">${moves.map(([a, b]) => `<li><div class="t-status">${a}</div><div class="t-meta">${b}</div></li>`).join('')}</ul></div>
+    <div>${hasSerial(p) ? `<b>Serial đang ở kho</b>${sns.map(x => `<div class="row-flex" style="margin-top:6px"><a class="mono" href="admin-serials.html?q=${x.sn}">${x.sn}</a><span class="chip">${storeName(x.s)} · ${x.st}</span></div>`).join('') || '<p class="muted">Chưa có serial trong dữ liệu mẫu</p>'}` : '<p class="muted">Mã này không theo serial, chỉ theo số lượng.</p>'}</div></div>
+    <div class="box-note">Không sửa tay con số tồn. Muốn đổi phải lập phiếu để còn dấu vết.</div>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button><button class="btn btn-primary" onclick="closeModal('dlg');openCreateKK()">Lập phiếu kiểm kê</button></div>`);
+}
+
+function openKK(id) {
+  const k = STOCKTAKES.find(x => x.id === id), counting = k.st === 'Đang đếm';
+  const rows = k.lines.map(([pid, d, why]) => {
+    const p = byId(pid), sys = onHand(p, k.s);
+    return counting
+      ? `<tr><td>${thumb(p)}</td><td><input class="cnt" type="number" min="0" aria-label="Số đếm ${p.name}" placeholder="Đếm"></td><td class="muted">${hasSerial(p) ? 'Quét serial từng chiếc' : 'Nhập số đếm'}</td></tr>`
+      : `<tr><td>${thumb(p)}</td><td class="num">${sys}</td><td class="num">${sys + d}</td><td class="num"><b style="${d ? 'color:var(--danger)' : ''}">${d > 0 ? '+' + d : d || '0'}</b></td><td style="font-size:12.5px">${why || (d ? '<span class="sub-err">Cần nhập lý do</span>' : '—')}</td></tr>`;
+  }).join('');
+  openModal('dlg', `<h3>${k.id} · ${storeName(k.s)}</h3><p class="sub">${k.scope} · ${staff(k.by).name} tạo ${k.at} · <span class="badge ${KST[k.st]}">${k.st}</span></p>
+    <table class="data"><thead><tr>${counting ? '<th>Sản phẩm</th><th>Số đếm</th><th></th>' : '<th>Sản phẩm</th><th class="num">Hệ thống</th><th class="num">Đếm</th><th class="num">Chênh lệch</th><th>Lý do</th>'}</tr></thead><tbody>${rows}</tbody></table>
+    ${counting ? '<div class="box-note">Thủ kho không thấy số hệ thống trong lúc đếm, tránh điền cho khớp. Phạm vi này đang tạm khoá nhập xuất.</div>' : k.st === 'Đã duyệt' ? '<div class="box-note">Đã duyệt, tồn đã điều chỉnh theo số đếm. Phiếu đã gửi kế toán điều chỉnh bên MISA.</div>' : ''}
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button>
+      ${counting ? `<button class="btn btn-primary" onclick="closeModal('dlg');toast('Đã gửi ${k.id} cho quản lý duyệt')">Gửi duyệt</button>` : k.st === 'Chờ duyệt' ? `<button class="btn btn-primary" onclick="closeModal('dlg');toast('Đã duyệt ${k.id}: điều chỉnh tồn theo số đếm, gửi kế toán')">Duyệt (quản lý)</button>` : ''}</div>`);
+}
+
+function openCreateKK() {
+  openModal('dlg', `<h3>Tạo phiếu kiểm kê</h3><p class="sub">Chọn kho và phạm vi. Trong lúc kiểm, phạm vi đó tạm khoá nhập xuất.</p>
+    <div class="grid-2"><div class="field"><label for="kS">Kho</label><select id="kS">${[0, 1, 2].map(s => `<option>${storeName(s)}</option>`).join('')}</select></div>
+    <div class="field"><label for="kT">Phạm vi</label><select id="kT"><option>Toàn kho</option>${CATS.map(c => `<option>Ngành hàng · ${c.name}</option>`).join('')}<option>Thương hiệu · Hafele</option><option>Thương hiệu · Blum</option></select></div></div>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Huỷ</button><button class="btn btn-primary" onclick="toast('Đã tạo phiếu kiểm kê ' + kS.value + ' · ' + kT.value + ' — khoá nhập xuất phạm vi này');closeModal('dlg')">Tạo phiếu kiểm kê</button></div>`);
+}
+draw();
+</script>
+</body>
+</html>

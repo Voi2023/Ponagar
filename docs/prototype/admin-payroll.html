@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Nhân sự — Bảng lương (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+.steps{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.steps button{border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-full);padding:6px 14px;font:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+.steps button.done{color:var(--brand-dark);border-color:var(--brand)}
+.steps button.on{background:var(--brand);border-color:var(--brand);color:var(--surface)}
+table.pay td,table.pay th{white-space:nowrap;font-size:12.6px;padding:9px 8px}
+table.pay tfoot td{font-weight:800;border-top:2px solid var(--border)}
+table.pay input{width:96px;padding:4px 6px;border:1px solid var(--border);border-radius:var(--radius-sm);text-align:right;font:inherit}
+.neg{color:var(--danger)}
+.slip{display:grid;grid-template-columns:1fr auto;gap:7px 16px;font-size:13.5px}
+.slip .tot{border-top:1px solid var(--border);padding-top:8px;font-weight:800;font-size:15px}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Bảng lương tháng 10/2026</h1></div>
+      <div class="row-flex">
+        <button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel bảng lương tháng 10/2026')"><i class="ti ti-file-spreadsheet"></i> Xuất Excel</button>
+        <button class="btn btn-outline btn-sm" onclick="toast('Tạo file chuyển khoản hàng loạt theo mẫu ngân hàng')"><i class="ti ti-building-bank"></i> File chuyển khoản</button>
+        <button class="btn btn-primary btn-sm" id="next" onclick="advance()"></button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid" id="stats"></div>
+      <div class="panel">
+        <h2><span class="steps" id="steps"></span><span class="muted" style="font-size:12px;font-weight:400" id="lockNote"></span></h2>
+        <div class="table-scroll"><table class="data pay" id="pay"></table></div>
+        <p class="muted" style="font-size:12px;margin:10px 0 0">Lương công = lương cơ bản ÷ 26 × số công. Bấm một dòng để xem phiếu lương. Bản đầu <b>không tự tính BHXH, thuế TNCN</b>: kế toán nhập số khấu trừ từng người (hoặc tải Excel lên). Thợ là nhân viên hay thợ khoán (có đóng BHXH không): <span class="badge amber">chờ Techhomes xác nhận</span></p>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel" id="ung-luong">
+          <h2><span><i class="ti ti-cash-banknote"></i> Ứng lương</span><span class="muted" style="font-size:12px;font-weight:400">Tối đa 50% tiền đã làm ra</span></h2>
+          <div class="table-scroll"><table class="data"><thead><tr><th>Nhân viên</th><th>Ngày</th><th class="right">Số tiền</th><th>Trạng thái</th><th></th></tr></thead><tbody id="adv"></tbody></table></div>
+          <p class="muted" style="font-size:12px;margin:8px 0 0">Nhân viên gửi từ điện thoại → quản lý duyệt → kế toán chi và bấm Đã chi → tự trừ vào bảng lương tháng đó.</p>
+        </div>
+        <div class="panel" id="luong-ke-toan">
+          <h2><span><i class="ti ti-report-money"></i> Chi phí lương sang kế toán</span><button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel chi phí lương theo bộ phận để hạch toán trong MISA')">Xuất theo bộ phận</button></h2>
+          <div class="table-scroll"><table class="data"><thead><tr><th>Bộ phận</th><th class="right">Người</th><th class="right">Tổng thu nhập</th><th class="right">Thực lãnh</th></tr></thead><tbody id="dept"></tbody></table></div>
+          <p class="muted" style="font-size:12px;margin:8px 0 0">Chỉ bảng lương đã duyệt. Bản đầu không đẩy bảng lương sang MISA qua API.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal"></div></div>
+
+<script>
+renderAdmin('admin-payroll.html');
+
+const STEPS = ['Nháp', 'Đã duyệt', 'Đã trả'];
+let step = 1;   // chủ đã duyệt, kế toán chưa chi
+// [id, cách tính, lương cơ bản, số công, hoa hồng / công lắp, phụ cấp ăn trưa, thưởng, phạt, BHXH & thuế (kế toán nhập), đã ứng, ghi chú thưởng/phạt]
+// Hoa hồng và công lắp khớp trang Hoa hồng & công lắp kỳ tháng 10. Văn Hùng = ví dụ trong tài liệu (thực lãnh 10.958.462đ).
+const ROWS = [
+  ['NV01', 'Lương tháng + hoa hồng', 12000000, 26, 920000, 780000, 300000, 0, 1260000, 0, 'Chuyên cần'],
+  ['NV02', 'Lương tháng + hoa hồng', 8000000, 25, 2700000, 750000, 300000, 0, 840000, 0, 'Chuyên cần'],
+  ['NV03', 'Lương tháng + hoa hồng', 8000000, 26, 1810000, 780000, 300000, 0, 840000, 1000000, 'Chuyên cần'],
+  ['NV04', 'Lương tháng + hoa hồng', 8000000, 24, 1860000, 720000, 0, -50000, 840000, 0, 'Trễ 1 lần · nghỉ không lương 1 ngày'],
+  ['NV05', 'Lương tháng', 7500000, 26, 0, 780000, 300000, 0, 787500, 0, 'Chuyên cần'],
+  ['NV06', 'Lương tháng', 7000000, 26, 0, 780000, 300000, 0, 735000, 0, 'Chuyên cần'],
+  ['NV07', 'Lương tháng', 9000000, 26, 0, 780000, 300000, 0, 945000, 0, 'Chuyên cần'],
+  ['NV08', 'Lương công + công lắp đặt', 6000000, 24, 6500000, 720000, 300000, -100000, 0, 2000000, 'Chuyên cần · phạt đi trễ 2 lần'],
+  ['NV09', 'Lương công + công lắp đặt', 6000000, 26, 5000000, 780000, 300000, 0, 0, 0, 'Chuyên cần'],
+  ['NV10', 'Lương công + công lắp đặt', 6000000, 25, 4750000, 750000, 0, -50000, 0, 1500000, 'Phạt đi trễ 1 lần'],
+  ['NV11', 'Lương tháng', 10000000, 26, 0, 780000, 300000, 0, 1050000, 0, 'Chuyên cần'],
+];
+const lc = r => Math.round(r[2] / 26 * r[3]);
+const gross = r => lc(r) + r[4] + r[5] + r[6] + r[7];
+const net = r => gross(r) - r[8] - r[9];
+const ADV = [
+  { id: 'NV09', day: '26/11', amt: 1500000, why: 'Đóng học phí cho con', max: 4640000, st: 'Chờ duyệt' },
+  { id: 'NV02', day: '25/11', amt: 2000000, why: 'Sửa xe', max: 5310000, st: 'Đã duyệt' },
+  { id: 'NV10', day: '20/10', amt: 1500000, why: 'Việc gia đình', st: 'Đã chi' },
+  { id: 'NV08', day: '15/10', amt: 2000000, why: 'Ứng giữa tháng', st: 'Đã chi' },
+  { id: 'NV03', day: '12/10', amt: 1000000, why: 'Ứng giữa tháng', st: 'Đã chi' },
+];
+const DEPT = [['Bán hàng · Phú Nhuận', ['NV01', 'NV02']], ['Bán hàng · Q.10', ['NV03']], ['Bán hàng · Thủ Đức', ['NV04']], ['Lắp đặt', ['NV07', 'NV08', 'NV09', 'NV10']], ['Kho', ['NV05', 'NV06']], ['Văn phòng', ['NV11']]];
+
+const m = v => v ? (v < 0 ? `<span class="neg">−${fmt(-v)}</span>` : fmt(v)) : '<span class="muted">—</span>';
+const sum = f => ROWS.reduce((s, r) => s + f(r), 0);
+function draw() {
+  document.getElementById('stats').innerHTML = [
+    ['Tổng thực lãnh', fmt(sum(net)), `${ROWS.length} người · chuyển khoản`],
+    ['Hoa hồng + công lắp', fmt(sum(r => r[4])), '4 bán hàng · 3 thợ'],
+    ['Khấu trừ BHXH, thuế', fmt(sum(r => r[8])), 'Kế toán nhập tay'],
+    ['Đã ứng trong tháng', fmt(sum(r => r[9])), '3 người'],
+  ].map(([l, v, t]) => `<div class="stat-card"><div class="label">${l}</div><div class="value" style="font-size:22px">${v}</div><div class="kpi-trend">${t}</div></div>`).join('');
+  document.getElementById('steps').innerHTML = STEPS.map((s, i) => `<button class="${i === step ? 'on' : i < step ? 'done' : ''}" onclick="step=${i};draw()" title="Xem trạng thái ${s}">${i < step ? '✓ ' : ''}${s}</button>${i < 2 ? '<i class="ti ti-chevron-right muted"></i>' : ''}`).join('');
+  document.getElementById('lockNote').innerHTML = step ? '<i class="ti ti-lock"></i> Đã duyệt: bảng bị khoá, sai sót sửa bằng khoản điều chỉnh ở tháng sau' : 'Nháp: kế toán kiểm và nhập khấu trừ, rồi gửi chủ duyệt';
+  const nx = ['Gửi chủ duyệt', 'Đã trả lương', ''][step];
+  const b = document.getElementById('next'); b.style.display = nx ? '' : 'none'; b.innerHTML = `<i class="ti ti-${step ? 'cash' : 'send'}"></i> ${nx}`;
+
+  document.getElementById('pay').innerHTML = `<thead><tr><th>Nhân viên</th><th class="right">Lương cơ bản</th><th class="right">Công</th><th class="right">Lương công</th><th class="right">Hoa hồng / công lắp</th><th class="right">Phụ cấp</th><th class="right">Thưởng</th><th class="right">Phạt</th><th class="right">BHXH, thuế</th><th class="right">Tạm ứng</th><th class="right">Thực lãnh</th></tr></thead>
+    <tbody>${ROWS.map((r, i) => `<tr class="row-link" onclick="slip(${i})"><td><b>${staff(r[0]).name}</b><span class="sub-muted">${r[1]}</span></td><td class="right">${fmt(r[2])}</td><td class="right">${r[3]}/26</td><td class="right">${fmt(lc(r))}</td><td class="right">${m(r[4])}</td><td class="right">${m(r[5])}</td><td class="right">${m(r[6])}</td><td class="right">${m(r[7])}</td>
+      <td class="right">${step ? m(-r[8]) : `<input type="number" value="${r[8]}" aria-label="BHXH, thuế ${staff(r[0]).name}" onclick="event.stopPropagation()" onchange="ROWS[${i}][8]=+this.value||0;draw()">`}</td><td class="right">${m(-r[9])}</td><td class="right"><b>${fmt(net(r))}</b></td></tr>`).join('')}</tbody>
+    <tfoot><tr><td>Cộng</td><td></td><td></td><td class="right">${fmt(sum(lc))}</td><td class="right">${fmt(sum(r => r[4]))}</td><td class="right">${fmt(sum(r => r[5]))}</td><td class="right">${fmt(sum(r => r[6]))}</td><td class="right">${m(sum(r => r[7]))}</td><td class="right">${m(-sum(r => r[8]))}</td><td class="right">${m(-sum(r => r[9]))}</td><td class="right">${fmt(sum(net))}</td></tr></tfoot>`;
+
+  document.getElementById('adv').innerHTML = ADV.map((a, i) => `<tr><td>${staff(a.id).name}<span class="sub-muted">${a.why}${a.max ? ` · tối đa ${fmt(a.max)}` : ''}</span></td><td>${a.day}</td><td class="right">${fmt(a.amt)}</td>
+    <td><span class="badge ${{ 'Chờ duyệt': 'amber', 'Đã duyệt': 'blue', 'Đã chi': 'green' }[a.st]}">${a.st}</span></td>
+    <td>${a.st === 'Chờ duyệt' ? `<button class="btn btn-primary btn-sm" onclick="adv(${i},'Đã duyệt')">Duyệt</button>` : a.st === 'Đã duyệt' ? `<button class="btn btn-outline btn-sm" onclick="adv(${i},'Đã chi')">Đã chi</button>` : ''}</td></tr>`).join('');
+  document.getElementById('dept').innerHTML = DEPT.map(([n, ids]) => { const rs = ROWS.filter(r => ids.includes(r[0])); return `<tr><td>${n}</td><td class="right">${rs.length}</td><td class="right">${fmt(rs.reduce((s, r) => s + gross(r), 0))}</td><td class="right">${fmt(rs.reduce((s, r) => s + net(r), 0))}</td></tr>`; }).join('');
+}
+function advance() {
+  if (step === 0) { step = 1; toast('Đã gửi chủ duyệt · bảng lương khoá sau khi duyệt'); }
+  else if (step === 1) { step = 2; toast(`Đã trả lương ${fmt(sum(net))} · phiếu lương tự gửi tới từng người`); }
+  draw();
+}
+function adv(i, st) { ADV[i].st = st; draw(); toast(`Ứng lương ${staff(ADV[i].id).name}: ${st}${st === 'Đã chi' ? ' · tự trừ vào bảng lương tháng 11' : ''}`); }
+function slip(i) {
+  const r = ROWS[i], s = staff(r[0]);
+  const lines = [
+    [`Lương công: ${fmt(r[2]).replace('đ', '')} ÷ 26 × ${r[3]}`, lc(r)],
+    [r[0] >= 'NV08' && r[0] <= 'NV10' ? 'Công lắp đặt (theo phiếu đã duyệt)' : 'Hoa hồng bán hàng', r[4]],
+    [`Phụ cấp ăn trưa: ${r[3]} × 30.000`, r[5]],
+    ['Thưởng chuyên cần', r[6]],
+    [`Phạt đi trễ ${-r[7] / 50000} lần`, r[7]],
+    ['BHXH, thuế TNCN (kế toán nhập)', -r[8]],
+    ['Đã ứng', -r[9]],
+  ].filter(l => l[1]);
+  openModal('dlg', `<h3>Phiếu lương · ${s.name}</h3><p class="sub">${s.id} · ${s.role} · ${storeName(s.store)} · tháng 10/2026 · ${r[1]}</p>
+    <div class="slip">${lines.map(([t, v]) => `<span>${t}</span><span class="right">${v < 0 ? `<span class="neg">−${fmt(-v)}</span>` : fmt(v)}</span>`).join('')}
+      <span class="tot">Thực lãnh</span><span class="tot right">${fmt(net(r))}</span></div>
+    <p class="muted" style="font-size:12px;margin-top:12px">${r[10]}. Nhân viên xem phiếu này ở trang nhân viên › Lương của tôi.</p>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button><button class="btn btn-primary" onclick="toast('Đã gửi lại phiếu lương cho ${s.name}')">Gửi phiếu lương</button></div>`);
+}
+draw();
+</script>
+</body>
+</html>

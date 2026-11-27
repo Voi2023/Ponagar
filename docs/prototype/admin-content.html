@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Banner, bài viết, dự án (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+.th-wide{width:120px;height:56px;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border);flex:none}
+.serp{border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;background:var(--surface)}
+.serp .u{font-size:12px;color:var(--ok)}
+.serp .t{font-size:16px;color:var(--info);margin:2px 0}
+.serp .d{font-size:12.5px;color:var(--muted)}
+.cnt{float:right;font-weight:600;text-transform:none;letter-spacing:0}
+.cnt.over{color:var(--danger)}
+.cover{width:100%;height:140px;object-fit:cover;border-radius:var(--radius);border:1px solid var(--border)}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Banner, bài viết, dự án</h1></div>
+      <div class="row-flex">
+        <button class="btn btn-outline btn-sm" onclick="toast('Mở bảng chuyển hướng 301 từ link techhomes.vn cũ (mục Giữ link cũ & SEO)')"><i class="ti ti-arrow-forward-up"></i> Chuyển hướng 301</button>
+        <button class="btn btn-primary btn-sm" onclick="openEd(-1)"><i class="ti ti-plus"></i> <span id="addLbl">Thêm</span></button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+      <div class="toolbar">
+        <input type="search" id="q" placeholder="Tìm tiêu đề…" aria-label="Tìm nội dung" oninput="draw()">
+        <select id="fSt" aria-label="Trạng thái" onchange="draw()"><option value="">Mọi trạng thái</option><option>Đang hiện</option><option>Hẹn giờ</option><option>Nháp</option><option>Đã gỡ</option></select>
+      </div>
+      <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+        <thead id="head"></thead><tbody id="rows"></tbody></table></div></div>
+      <div class="box-note" id="note"></div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal modal-lg"></div></div>
+
+<script>
+renderAdmin('admin-content.html');
+const SB = { 'Đang hiện': 'green', 'Hẹn giờ': 'blue', 'Nháp': 'gray', 'Đã gỡ': 'gray' };
+const img = id => `assets/img/p/${id}.jpg`;
+// Mỗi tab: nhãn, nút thêm, cột phụ, ghi chú, danh sách. Trạng thái "Đang hiện" = đang đăng trên web.
+const TABS = {
+  banner: { t: 'Banner trang chủ', add: 'Thêm banner', col: ['Thứ tự · liên kết', 'Hẹn đăng – gỡ'], note: 'Banner trang chủ chạy theo thứ tự. Hẹn giờ đăng và gỡ để banner khuyến mãi tự lên, tự xuống đúng hạn chương trình.', items: [
+    { img: 'assets/img/hero-1.jpg', title: 'Bếp chuẩn Đức, giá đã giảm đến 30%', sub: 'Ưu đãi tháng 11 · Häfele', a: '1 · category.html', b: '01/11 – 30/11 23:59', st: 'Đang hiện' },
+    { img: 'assets/img/hero-2.jpg', title: 'Mở nhẹ, đóng êm, dùng hàng chục năm', sub: 'Phụ kiện tủ bếp Blum', a: '2 · category.html', b: 'Từ 01/10 · không hẹn gỡ', st: 'Đang hiện' },
+    { img: 'assets/img/hero-1.jpg', title: 'Black Friday · máy rửa chén Häfele giảm thêm 10%', sub: 'Khớp khuyến mãi Black Friday', a: '1 · category.html', b: '27/11 20:00 – 28/11 23:59', st: 'Hẹn giờ' },
+    { img: 'assets/img/lap-dat.jpg', title: 'Miễn phí lắp đặt khóa điện tử', sub: 'Lắp đặt tận nơi TP.HCM', a: '3 · category.html', b: '29/11 00:00 – 15/12 23:59', st: 'Hẹn giờ' },
+    { img: 'assets/img/hero-2.jpg', title: 'Khai trương chi nhánh Thủ Đức', sub: 'Giảm 7% tại showroom', a: '— · #showroom', b: '01/10 – 31/10 (đã gỡ)', st: 'Đã gỡ' },
+  ] },
+  post: { t: 'Bài viết & cẩm nang', add: 'Viết bài', col: ['Chuyên mục · tác giả', 'Ngày đăng · lượt xem'], note: 'Mỗi bài có tiêu đề SEO, mô tả, ảnh đại diện. Đổi đường dẫn bài đã đăng thì hệ thống tự tạo chuyển hướng 301 từ link cũ.', items: [
+    { img: img(5), title: 'Cách chọn bếp từ Häfele cho căn hộ chung cư', slug: 'cam-nang/chon-bep-tu-hafele-can-ho', a: 'Cẩm nang · Thanh Vy', b: '20/11 · 1.284 lượt', st: 'Đang hiện' },
+    { img: img(6), title: 'So sánh máy rửa chén độc lập Häfele 2026', slug: 'cam-nang/so-sanh-may-rua-chen-hafele', a: 'Cẩm nang · Quốc Bảo', b: '05/11 · 2.310 lượt', st: 'Đang hiện' },
+    { img: img(8), title: 'Khóa Face ID có mở được khi mất điện?', slug: 'cam-nang/khoa-face-id-mat-dien', a: 'Cẩm nang · Minh Thư', b: 'Hẹn 01/12 08:00', st: 'Hẹn giờ' },
+    { img: img(44), title: 'AVENTOS HF hay HL: chọn tay nâng Blum nào cho tủ bếp trên', slug: 'cam-nang/aventos-hf-hay-hl', a: 'Cẩm nang · Quốc Bảo', b: 'Sửa lần cuối 26/11', st: 'Nháp' },
+    { img: 'assets/img/hero-2.jpg', title: 'Techhomes khai trương chi nhánh Thủ Đức', slug: 'tin-tuc/khai-truong-thu-duc', a: 'Tin tức · Minh Thư', b: '01/10 · 846 lượt', st: 'Đang hiện' },
+  ] },
+  project: { t: 'Dự án', add: 'Thêm dự án', col: ['Địa điểm · dạng tủ', 'Sản phẩm đã dùng'], note: 'Dự án đã thi công: ảnh công trình, địa điểm, dạng tủ bếp và danh sách sản phẩm đã dùng — khách bấm vào là tới trang sản phẩm.', items: [
+    { img: 'assets/img/hero-1.jpg', title: 'Căn hộ Catavil — bếp chữ L Häfele', slug: 'du-an/can-ho-catavil-bep-chu-l', a: 'Catavil, Thủ Đức · Chữ L', p: [5, 21, 44, 77], st: 'Đang hiện' },
+    { img: 'assets/img/hero-2.jpg', title: 'Nhà phố Phú Nhuận — tủ bếp chữ U Blum', slug: 'du-an/nha-pho-phu-nhuan-tu-bep-blum', a: 'Phú Nhuận · Chữ U', p: [12, 50, 9, 35], st: 'Đang hiện' },
+    { img: 'assets/img/lap-dat.jpg', title: 'Biệt thự Thảo Điền — khóa Face ID & cửa trượt tự động', slug: 'du-an/biet-thu-thao-dien', a: 'Thảo Điền · phụ kiện cửa', p: [8, 3, 7], st: 'Nháp' },
+  ] },
+  page: { t: 'Trang tĩnh', add: 'Thêm trang', col: ['Đường dẫn', 'Cập nhật'], note: 'Trang 3 showroom, chính sách bảo hành, biểu phí lắp đặt, đổi trả, FAQ. Mục nào còn chờ số liệu từ Techhomes thì để Nháp.', items: [
+    { title: 'Hệ thống 3 showroom', slug: 'showroom', a: '/showroom', b: '15/11 · Minh Thư', st: 'Đang hiện' },
+    { title: 'Chính sách bảo hành', slug: 'chinh-sach-bao-hanh', a: '/chinh-sach-bao-hanh', b: '10/11 · Minh Thư', st: 'Đang hiện', wait: 'Thời hạn bảo hành từng hãng chờ Techhomes xác nhận' },
+    { title: 'Biểu phí lắp đặt', slug: 'bieu-phi-lap-dat', a: '/bieu-phi-lap-dat', b: '—', st: 'Nháp', wait: 'Chờ Techhomes gửi biểu phí hiện hành' },
+    { title: 'Chính sách đổi trả', slug: 'chinh-sach-doi-tra', a: '/chinh-sach-doi-tra', b: '10/11 · Minh Thư', st: 'Đang hiện' },
+    { title: 'Câu hỏi thường gặp', slug: 'hoi-dap', a: '/hoi-dap', b: '22/11 · Thanh Vy', st: 'Đang hiện' },
+  ] },
+  pdf: { t: 'Catalogue PDF', add: 'Tải catalogue', col: ['Hãng · dung lượng', 'Cập nhật'], note: 'Thư viện catalogue PDF theo hãng, khách tải về từ trang thương hiệu.', items: [
+    { title: 'Häfele Kitchen 2026', a: 'Häfele · 48 MB', b: '02/11', st: 'Đang hiện' },
+    { title: 'Häfele Khóa điện tử 2026', a: 'Häfele · 12 MB', b: '02/11', st: 'Đang hiện' },
+    { title: 'Blum Catalogue 2026 (tiếng Việt)', a: 'Blum · 36 MB', b: '20/10', st: 'Đang hiện' },
+    { title: 'GEZE Phụ kiện cửa 2025', a: 'GEZE · 9 MB', b: '12/03', st: 'Đã gỡ' },
+  ] },
+};
+let tab = 'banner';
+function pick(t) { tab = t; draw(); }
+
+function draw() {
+  const T = TABS[tab], q = document.getElementById('q').value.toLowerCase(), st = document.getElementById('fSt').value;
+  document.getElementById('tabs').innerHTML = Object.entries(TABS).map(([k, v]) => `<button class="${k === tab ? 'active' : ''}" onclick="pick('${k}')">${v.t}</button>`).join('');
+  document.getElementById('addLbl').textContent = T.add;
+  document.getElementById('note').textContent = T.note;
+  document.getElementById('head').innerHTML = `<tr><th>${tab === 'banner' ? 'Banner' : 'Tiêu đề'}</th><th>${T.col[0]}</th><th>${T.col[1]}</th><th>Trạng thái</th></tr>`;
+  document.getElementById('rows').innerHTML = T.items.map((x, i) => [x, i]).filter(([x]) => (!q || x.title.toLowerCase().includes(q)) && (!st || x.st === st)).map(([x, i]) => `
+    <tr class="row-link" onclick="openEd(${i})">
+      <td><div class="row-flex" style="flex-wrap:nowrap">${x.img ? `<img class="${tab === 'banner' || tab === 'project' ? 'th-wide' : 'th-img'}" src="${x.img}" alt="">` : `<i class="ti ${tab === 'pdf' ? 'ti-file-type-pdf' : 'ti-file-text'}" style="font-size:26px;color:var(--brand)"></i>`}
+        <span><b>${x.title}</b><span class="sub-muted">${x.sub || (x.slug ? '/' + x.slug : '')}</span>${x.wait ? `<span class="badge amber" style="margin-top:4px">${x.wait}</span>` : ''}</span></div></td>
+      <td>${x.a}</td>
+      <td>${x.p ? x.p.map(id => `<img class="th-img" src="${byId(id).img}" alt="${byId(id).name}" title="${byId(id).name}" style="width:34px;height:34px;margin-right:3px">`).join('') : x.b}</td>
+      <td><span class="badge ${SB[x.st]}">${x.st}</span></td>
+    </tr>`).join('') || '<tr><td colspan="4" class="empty-state">Không có nội dung phù hợp</td></tr>';
+}
+
+const counter = (el, max) => { const c = el.parentNode.querySelector('.cnt'); c.textContent = `${el.value.length}/${max}`; c.classList.toggle('over', el.value.length > max); serp(); };
+function serp() { const s = document.getElementById('serp'); if (s) s.innerHTML = `<div class="u">techhomes.vn › ${sSlug.value.replace(/\//g, ' › ')}</div><div class="t">${sT.value || 'Tiêu đề SEO'}</div><div class="d">${sD.value || 'Mô tả SEO'}</div>`; }
+
+function openEd(i) {
+  const T = TABS[tab], x = T.items[i] || { title: '', slug: '', st: 'Nháp', a: '', b: '' }, isNew = i < 0;
+  const seoT = x.title ? `${x.title} | Techhomes` : '', seoD = x.title ? `${x.title}. Hàng chính hãng Häfele, Blum, giá rõ trên web, lắp đặt tận nơi tại TP.HCM. 3 showroom Phú Nhuận, Q.10, Thủ Đức.` : '';
+  const body = tab === 'banner' ? `
+      <div class="grid-2"><div class="field"><label for="bE">Dòng nhỏ phía trên</label><input id="bE" value="${x.sub || ''}"></div>
+        <div class="field"><label for="bL">Liên kết nút</label><input id="bL" value="${x.a.split(' · ')[1] || ''}"></div>
+        <div class="field"><label for="b1">Hẹn đăng</label><input id="b1" type="datetime-local" value="2026-11-27T20:00"></div>
+        <div class="field"><label for="b2">Hẹn gỡ</label><input id="b2" type="datetime-local" value="2026-11-28T23:59"></div></div>
+      <div class="field"><label for="bA">Mô tả ảnh (alt)</label><input id="bA" value="${x.title}"></div>`
+    : `${tab === 'project' ? `<div class="grid-2"><div class="field"><label for="pL">Địa điểm</label><input id="pL" value="${x.a.split(' · ')[0]}"></div>
+          <div class="field"><label for="pK">Dạng tủ bếp</label><select id="pK">${['Chữ L', 'Chữ U', 'Chữ I', 'Song song', 'Có đảo', 'Không có tủ bếp'].map(k => `<option ${x.a.includes(k) ? 'selected' : ''}>${k}</option>`).join('')}</select></div></div>
+        <div class="field"><label>Sản phẩm đã dùng (bấm để mở trang sản phẩm)</label><div class="row-flex" style="gap:6px">${(x.p || []).map(id => `<a class="chip" href="product.html">${byId(id).name}</a>`).join('')}<button class="btn btn-outline btn-sm" onclick="toast('Tìm và thêm sản phẩm')">+ Thêm</button></div></div>` : ''}
+      ${tab === 'pdf' ? '<div class="drop"><i class="ti ti-file-type-pdf"></i><br>Kéo file PDF vào đây</div>' : `<div class="field"><label for="cB">Nội dung</label><textarea id="cB" rows="5">${x.title ? x.title + '…' : ''}</textarea></div>`}
+      ${tab === 'pdf' ? '' : `<b>SEO</b>
+      <div class="grid-2" style="margin-top:8px"><div>
+        <div class="field"><label for="sT">Tiêu đề SEO <span class="cnt">${seoT.length}/60</span></label><input id="sT" value="${seoT}" oninput="counter(this,60)"></div>
+        <div class="field"><label for="sD">Mô tả SEO <span class="cnt">${seoD.length}/160</span></label><textarea id="sD" rows="3" oninput="counter(this,160)">${seoD}</textarea></div>
+        <div class="field"><label for="sSlug">Đường dẫn</label><input id="sSlug" value="${x.slug || ''}" oninput="serp()"></div>
+      </div><div><span class="muted" style="font-size:12px">Xem trước trên Google</span><div class="serp" id="serp"></div>
+        <div class="field" style="margin-top:12px"><label for="sP">Hẹn giờ đăng</label><input id="sP" type="datetime-local"></div></div></div>`}`;
+  openModal('dlg', `<div class="row-flex" style="justify-content:space-between"><h3 style="margin:0">${isNew ? T.add : 'Sửa · ' + T.t}</h3><span class="badge ${SB[x.st]}">${x.st}</span></div>
+    <p class="sub">${x.wait ? '<span class="badge amber">' + x.wait + '</span>' : 'Mọi thay đổi ghi vào nhật ký thao tác.'}</p>
+    ${x.img || tab === 'banner' || tab === 'project' ? `<img class="cover" src="${x.img || 'assets/img/hero-1.jpg'}" alt=""><div class="row-flex" style="margin:6px 0 12px"><button class="btn btn-outline btn-sm" onclick="toast('Chọn ảnh đại diện · tự nén WebP 3 cỡ')"><i class="ti ti-photo"></i> Đổi ảnh</button></div>` : ''}
+    <div class="field"><label for="eT">${tab === 'banner' ? 'Dòng chữ lớn' : 'Tiêu đề'}</label><input id="eT" value="${x.title}"></div>
+    ${body}
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg');toast('Đã lưu nháp')">Lưu nháp</button><button class="btn btn-primary" onclick="publish(${i})">${tab === 'banner' ? 'Lưu & hẹn giờ' : 'Đăng'}</button></div>`);
+  serp();
+}
+function publish(i) {
+  if (!eT.value.trim()) { toast('Nhập tiêu đề trước khi đăng'); return; }
+  closeModal('dlg');
+  toast(i >= 0 && TABS[tab].items[i].st === 'Đang hiện' && TABS[tab].items[i].slug && typeof sSlug !== 'undefined' && sSlug.value !== TABS[tab].items[i].slug
+    ? 'Đã đăng · đường dẫn đổi nên tự tạo chuyển hướng 301 từ link cũ' : `Đã lưu: ${eT.value}`);
+}
+draw();
+</script>
+</body>
+</html>

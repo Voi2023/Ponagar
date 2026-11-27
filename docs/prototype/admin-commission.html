@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Nhân sự — Hoa hồng & công lắp (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:14px}
+.rule{border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;background:var(--bg);font-size:13px}
+.rule b{display:block;margin-bottom:4px}
+.calc{display:grid;grid-template-columns:1fr auto;gap:6px 16px;font-size:13.5px;margin:10px 0}
+.calc .tot{border-top:1px solid var(--border);padding-top:6px;font-weight:800}
+.neg{color:var(--danger)}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Hoa hồng & công lắp</h1></div>
+      <div class="row-flex">
+        <select id="ky" aria-label="Kỳ lương" onchange="toast('Prototype chỉ có dữ liệu kỳ tháng 10/2026')" style="padding:7px 10px;border:1px solid var(--border);border-radius:9px"><option>Kỳ tháng 10/2026 · đã chốt</option><option>Kỳ tháng 11/2026 · đang mở</option></select>
+        <a class="btn btn-primary btn-sm" href="admin-payroll.html"><i class="ti ti-cash"></i> Sang bảng lương</a>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid" id="stats"></div>
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+
+      <section id="v0" class="panel">
+        <h2><span><i class="ti ti-percentage"></i> Hoa hồng bán hàng · tháng 10/2026</span><span class="badge amber">Mức giả định · chờ Techhomes xác nhận</span></h2>
+        <div class="rules">
+          <div class="rule"><b>Bậc doanh số</b>1% cho 100 triệu đầu · 2% cho phần vượt</div>
+          <div class="rule"><b>Mức riêng nhóm nhà thầu</b>0,5% (chiết khấu cao nên mức thấp hơn) · đặt được theo showroom hoặc từng người</div>
+          <div class="rule"><b>Doanh số tính hoa hồng</b>Tiền hàng chưa thuế, sau giảm giá; không gồm phí giao hàng, phí lắp đặt. Chỉ đơn Hoàn tất trong tháng.</div>
+          <div class="rule"><b>Người chốt</b>Showroom: người thu tiền · Web: người bấm Xác nhận · Báo giá: người lập báo giá. Quản lý sửa được trước khi chốt lương.</div>
+        </div>
+        <div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Nhân viên</th><th class="right">Đơn hoàn tất</th><th class="right">Doanh số bán lẻ</th><th class="right">Doanh số nhà thầu</th><th class="right">Trừ trả hàng</th><th class="right">Hoa hồng</th></tr></thead>
+          <tbody id="sales"></tbody>
+        </table></div>
+      </section>
+
+      <section id="v1" class="panel">
+        <h2><span><i class="ti ti-tool"></i> Công lắp đặt theo phiếu · tháng 10/2026</span><span class="badge amber">Đơn giá giả định · chờ Techhomes xác nhận</span></h2>
+        <div class="rules" id="rates"></div>
+        <div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Thợ</th><th class="right">Bếp từ</th><th class="right">Hút mùi</th><th class="right">Khóa điện tử</th><th class="right">Bảo hành tại nhà</th><th class="right">Phát sinh</th><th class="right">Công lắp đặt</th></tr></thead>
+          <tbody id="inst"></tbody>
+        </table></div>
+        <div class="box-note">Sản lượng lấy tự động từ <a href="admin-install-tickets.html">phiếu lắp đặt</a> đã duyệt (có ảnh nghiệm thu và chữ ký khách). Lắp lại do lỗi của thợ: không tính thêm. Hai thợ một phiếu: chia theo tỉ lệ điều phối nhập. Đổi đơn giá: nhập ngày hiệu lực, phiếu trước ngày đó tính giá cũ.</div>
+      </section>
+
+      <section id="v2" class="panel">
+        <h2><span><i class="ti ti-adjustments"></i> Thưởng, phạt & phụ cấp · kỳ đang mở tháng 11/2026</span><button class="btn btn-primary btn-sm" onclick="addForm()"><i class="ti ti-plus"></i> Thêm khoản</button></h2>
+        <div class="rules">
+          <div class="rule"><b>Phụ cấp ăn trưa · tự động</b>30.000đ × ngày công <span class="badge amber">giả định</span></div>
+          <div class="rule"><b>Chuyên cần · tự động</b>300.000đ nếu không trễ, không nghỉ không phép <span class="badge amber">giả định</span></div>
+          <div class="rule"><b>Phạt đi trễ · tự động</b>50.000đ mỗi lần (trừ đơn đi trễ có lý do đã duyệt) <span class="badge amber">giả định</span></div>
+        </div>
+        <div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Ngày</th><th>Nhân viên</th><th>Khoản</th><th class="right">Số tiền</th><th>Lý do (nhân viên thấy trong phiếu lương)</th><th>Người nhập</th></tr></thead>
+          <tbody id="adj"></tbody>
+        </table></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal"></div></div>
+
+<script>
+renderAdmin('admin-commission.html');
+
+const tier = ds => Math.round(Math.min(ds, 1e8) * 0.01 + Math.max(ds - 1e8, 0) * 0.02);
+// [id, số đơn, doanh số bán lẻ, doanh số nhà thầu, trừ trả hàng, ghi chú trả hàng]
+const SALES = [
+  ['NV01', 14, 92000000, 0, 0],
+  ['NV02', 23, 185000000, 0, 0],
+  ['NV03', 19, 146500000, 0, 120000, 'TH-20288 trả hàng 6.000.000đ (tháng 9) × 2%'],
+  ['NV04', 17, 128000000, 60000000, 0],
+];
+const hh = s => tier(s[2]) + Math.round(s[3] * 0.005) - s[4];
+const RATES = [['Lắp bếp từ âm', 150000], ['Lắp máy hút mùi', 200000], ['Lắp khóa điện tử', 150000], ['Bảo hành tại nhà', 100000]];
+// [id, bếp từ, hút mùi, khóa, bảo hành, tiền phát sinh]
+const INST = [['NV08', 18, 10, 12, 0, 0], ['NV09', 6, 4, 20, 3, 0], ['NV10', 12, 9, 5, 2, 200000]];
+const cl = r => RATES.reduce((s, [, v], k) => s + r[k + 1] * v, 0) + r[5];
+const ADJ = [
+  ['20/11', 'NV08', 'Phụ cấp xăng xe', 500000, 'Đi công trình Bình Dương 4 lần', 'Thu Hằng'],
+  ['22/11', 'NV02', 'Thưởng nóng', 1000000, 'Chốt đơn nhà thầu từ báo giá BG-0312', 'Minh Thư'],
+  ['25/11', 'NV10', 'Phạt làm hỏng hàng khi lắp', -300000, 'Trầy khung ray cửa trượt SL300D, đơn TH-20470', 'Thu Hằng'],
+  ['26/11', 'NV05', 'Thưởng nóng', 300000, 'Kiểm kê kho Phú Nhuận khớp 100%', 'Minh Thư'],
+];
+
+let tab = 0;
+const money = v => `<span class="${v < 0 ? 'neg' : ''}">${v < 0 ? '−' + fmt(-v) : fmt(v)}</span>`;
+function draw() {
+  document.getElementById('stats').innerHTML = [
+    ['Hoa hồng tháng 10', fmt(SALES.reduce((s, r) => s + hh(r), 0)), `${SALES.length} người · doanh số ${fmt(SALES.reduce((s, r) => s + r[2] + r[3], 0))}`, 0],
+    ['Công lắp đặt tháng 10', fmt(INST.reduce((s, r) => s + cl(r), 0)), `${INST.reduce((s, r) => s + r[1] + r[2] + r[3] + r[4], 0)} phiếu đã duyệt`, 1],
+    ['Khoản thêm tay tháng 11', ADJ.length, 'Bắt buộc ghi lý do', 2],
+  ].map(([l, v, t, k]) => `<div class="stat-card" onclick="tab=${k};draw()"><div class="label">${l}</div><div class="value">${v}</div><div class="kpi-trend">${t}</div></div>`).join('');
+  document.getElementById('tabs').innerHTML = ['Hoa hồng bán hàng', 'Công lắp đặt', 'Thưởng · phạt · phụ cấp'].map((t, i) => `<button class="${i === tab ? 'active' : ''}" onclick="tab=${i};draw()">${t}</button>`).join('');
+  [0, 1, 2].forEach(i => document.getElementById('v' + i).style.display = i === tab ? '' : 'none');
+
+  document.getElementById('sales').innerHTML = SALES.map((s, i) => `<tr class="row-link" onclick="showSale(${i})"><td><b>${staff(s[0]).name}</b><span class="sub-muted">${staff(s[0]).role} · ${storeName(staff(s[0]).store)}</span></td>
+    <td class="right">${s[1]}</td><td class="right">${fmt(s[2])}</td><td class="right">${s[3] ? fmt(s[3]) : '—'}</td><td class="right">${s[4] ? money(-s[4]) : '—'}</td><td class="right"><b>${fmt(hh(s))}</b></td></tr>`).join('');
+  document.getElementById('rates').innerHTML = RATES.map(([n, v]) => `<div class="rule"><b>${n}</b>${fmt(v)} / việc</div>`).join('');
+  document.getElementById('inst').innerHTML = INST.map((r, i) => `<tr class="row-link" onclick="showInst(${i})"><td><b>${staff(r[0]).name}</b><span class="sub-muted">${staff(r[0]).id} · ${storeName(staff(r[0]).store)}</span></td>
+    ${[1, 2, 3, 4].map(k => `<td class="right">${r[k]}</td>`).join('')}<td class="right">${r[5] ? fmt(r[5]) : '—'}</td><td class="right"><b>${fmt(cl(r))}</b></td></tr>`).join('');
+  document.getElementById('adj').innerHTML = ADJ.map(a => `<tr><td>${a[0]}</td><td>${staff(a[1]).name}</td><td>${a[2]}</td><td class="right">${money(a[3])}</td><td>${a[4]}</td><td class="muted">${a[5]}</td></tr>`).join('');
+}
+
+function showSale(i) {
+  const s = SALES[i], a = Math.min(s[2], 1e8), b = Math.max(s[2] - 1e8, 0);
+  openModal('dlg', `<h3>Hoa hồng · ${staff(s[0]).name}</h3><p class="sub">Tháng 10/2026 · ${s[1]} đơn hoàn tất · doanh số chưa thuế, sau giảm giá</p>
+    <div class="calc"><span>${fmt(a).replace('đ', '')} × 1%</span><span>${fmt(a * 0.01)}</span>
+    ${b ? `<span>${fmt(b).replace('đ', '')} × 2%</span><span>${fmt(b * 0.02)}</span>` : ''}
+    ${s[3] ? `<span>Nhà thầu ${fmt(s[3]).replace('đ', '')} × 0,5%</span><span>${fmt(s[3] * 0.005)}</span>` : ''}
+    ${s[4] ? `<span>Trừ lại: ${s[5]}</span><span class="neg">−${fmt(s[4])}</span>` : ''}
+    <span class="tot">Hoa hồng tháng</span><span class="tot">${fmt(hh(s))}</span></div>
+    <p class="muted" style="font-size:12px">Mức giả định, chờ Techhomes xác nhận. Đơn trả hàng tháng sau trừ lại vào kỳ lương đang mở.</p>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button><button class="btn btn-primary" onclick="toast('Mở danh sách ${s[1]} đơn của ${staff(s[0]).name}')">Xem đơn</button></div>`);
+}
+function showInst(i) {
+  const r = INST[i];
+  openModal('dlg', `<h3>Công lắp đặt · ${staff(r[0]).name}</h3><p class="sub">Tháng 10/2026 · chỉ phiếu đã duyệt</p>
+    <div class="calc">${RATES.map(([n, v], k) => r[k + 1] ? `<span>${n.replace('Lắp ', '')}: ${r[k + 1]} × ${fmt(v).replace('đ', '')}</span><span>${fmt(r[k + 1] * v)}</span>` : '').join('')}
+    ${r[5] ? `<span>Phát sinh (theo danh mục)</span><span>${fmt(r[5])}</span>` : ''}
+    <span class="tot">Công lắp đặt tháng</span><span class="tot">${fmt(cl(r))}</span></div>
+    <p class="muted" style="font-size:12px">Thợ xem từng phiếu ở trang nhân viên, thấy sai báo trước ngày chốt.</p>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button><a class="btn btn-primary" href="admin-install-tickets.html">Xem phiếu</a></div>`);
+}
+function addForm() {
+  openModal('dlg', `<h3>Thêm khoản thưởng / phạt / phụ cấp</h3><p class="sub">Vào kỳ lương tháng 11/2026 · nhân viên thấy lý do trong phiếu lương</p>
+    <div class="field"><label for="f-who">Nhân viên</label><select id="f-who">${STAFF.filter(s => s.id !== 'NV00').map(s => `<option value="${s.id}">${s.name} · ${s.role}</option>`).join('')}</select></div>
+    <div class="field"><label for="f-kind">Khoản</label><select id="f-kind"><option>Thưởng nóng</option><option>Thưởng lễ</option><option>Phụ cấp xăng xe</option><option value="-">Phạt làm hỏng hàng khi lắp</option></select></div>
+    <div class="field"><label for="f-amt">Số tiền (đ)</label><input id="f-amt" type="number" min="0" step="10000" value="200000"></div>
+    <div class="field"><label for="f-why">Lý do (bắt buộc)</label><input id="f-why"></div>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Huỷ</button><button class="btn btn-primary" onclick="saveAdj()">Lưu</button></div>`);
+}
+function saveAdj() {
+  const g = id => document.getElementById(id), why = g('f-why').value.trim(), amt = +g('f-amt').value, k = g('f-kind');
+  if (!why) return toast('Bắt buộc ghi lý do');
+  if (!(amt > 0)) return toast('Nhập số tiền lớn hơn 0');
+  ADJ.unshift(['27/11', g('f-who').value, k.options[k.selectedIndex].text, k.value === '-' ? -amt : amt, why, 'Kim Oanh']);
+  closeModal('dlg'); draw(); toast('Đã thêm khoản vào kỳ lương tháng 11');
+}
+draw();
+</script>
+</body>
+</html>

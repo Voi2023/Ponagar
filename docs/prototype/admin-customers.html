@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Khách hàng & bảng giá (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" aria-label="Mở menu" onclick="toggleSide()"><i class="ti ti-menu-2"></i></button><h1>Khách hàng &amp; bảng giá</h1></div>
+      <div class="row-flex">
+        <button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel danh sách khách theo bộ lọc')"><i class="ti ti-file-spreadsheet"></i> Xuất Excel</button>
+        <button class="btn btn-primary btn-sm" onclick="toast('Mở form thêm khách: số điện thoại là khoá, không trùng')"><i class="ti ti-user-plus"></i> Thêm khách</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="toolbar"><div class="tabs" id="mainTabs"></div></div>
+
+      <section id="tab-kh">
+        <div class="toolbar">
+          <div class="tabs" id="grpTabs"></div>
+          <input type="search" id="q" placeholder="Tìm tên, số điện thoại, mã số thuế…" aria-label="Tìm khách" oninput="draw()">
+        </div>
+        <div class="panel" style="padding:6px 8px">
+          <div class="table-scroll"><table class="data wide">
+            <thead><tr><th>Khách</th><th>Nhóm</th><th>Phụ trách</th><th class="right">Tổng chi</th><th>Lần mua cuối</th><th>Thanh toán</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table></div>
+        </div>
+        <div class="box-note">Mỗi số điện thoại là một khách. Khách doanh nghiệp (có mã số thuế) được lưu để lần sau chọn lại và khớp sang danh mục khách hàng MISA theo mã số thuế. Cho nhà thầu mua công nợ (trả sau) hay không: <span class="badge amber">chờ Techhomes xác nhận</span> · nếu có, công nợ theo dõi trong MISA, ở đây chỉ là số tham khảo.</div>
+      </section>
+
+      <section id="tab-duyet" hidden>
+        <div class="panel" style="padding:6px 8px">
+          <div class="table-scroll"><table class="data wide">
+            <thead><tr><th>Người đăng ký</th><th>Xin vào nhóm</th><th>Mã số thuế</th><th>Đăng ký lúc</th><th></th></tr></thead>
+            <tbody id="pending"></tbody>
+          </table></div>
+        </div>
+        <p class="muted" style="font-size:12.5px">Nhà thầu, đại lý đăng ký trên web chờ duyệt ở đây. Duyệt xong khách nhận tin và thấy giá nhóm khi đăng nhập.</p>
+      </section>
+
+      <section id="tab-gia" hidden>
+        <div class="box-note" style="margin-top:0"><b>Mức % dưới đây là giả định</b> để minh hoạ, <span class="badge amber">chờ Techhomes xác nhận</span> các nhóm khách và mức chiết khấu từng nhóm. Nhóm khách là đề xuất.</div>
+        <div class="grid-2">
+          <div class="panel" style="padding:14px 8px">
+            <h2 style="padding:0 12px"><span><i class="ti ti-list-details"></i> Quy tắc bảng giá</span><button class="btn btn-outline btn-sm" onclick="toast('Thêm quy tắc: chọn nhóm, thương hiệu/ngành hàng/mã, mức giảm, ngày hiệu lực · chủ duyệt trước khi áp dụng')"><i class="ti ti-plus"></i> Thêm</button></h2>
+            <div class="table-scroll"><table class="data">
+              <thead><tr><th>Nhóm</th><th>Áp cho</th><th>Mức</th><th>Hiệu lực</th><th>Trạng thái</th></tr></thead>
+              <tbody id="rules"></tbody>
+            </table></div>
+          </div>
+          <div class="panel">
+            <h2><span><i class="ti ti-calculator"></i> Giá khách thấy theo nhóm</span></h2>
+            <div class="field"><label for="pp">Sản phẩm</label><select id="pp" onchange="drawCheck()"></select></div>
+            <div class="table-scroll"><table class="data">
+              <thead><tr><th>Nhóm</th><th>Quy tắc</th><th class="right">Giá khách thấy</th></tr></thead>
+              <tbody id="check"></tbody>
+            </table></div>
+          </div>
+        </div>
+        <div class="box-note">Giá riêng cho một mã đè lên mức chung. Mỗi bảng giá có ngày hiệu lực: đơn và báo giá cũ giữ giá cũ. Khuyến mãi và giá nhóm <b>không cộng dồn</b>, khách được giá thấp hơn trong hai giá (đề xuất). Mọi lần sửa bảng giá ghi vào nhật ký; chủ duyệt trước khi áp dụng.</div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')">
+  <div class="modal modal-lg"></div>
+</div>
+
+<script>
+renderAdmin('admin-customers.html');
+
+const GB = { 'Khách lẻ': 'gray', 'Nhà thầu': 'blue', 'Đại lý': 'green' };
+// h: lịch sử [mã, ngày, nội dung, số tiền, trạng thái]
+const CUSTOMERS = [
+  { name: 'Cty TNHH Nội thất An Phát', phone: '0283 ••• 6612', group: 'Nhà thầu', mst: '0315•••', by: 'NV01', pay: 'Công nợ 30 ngày', credit: true, note: 'Thi công nội thất chung cư · xuất hoá đơn công ty mọi đơn',
+    h: [['TH-20480', '26/11', 'Tay nâng AVENTOS HF × 20', 69098400, 'Đã xác nhận'], ['BG-0312', '20/11', 'Báo giá → đã thành đơn TH-20480', 69098400, 'Đã thành đơn'], ['TH-20402', '28/10', 'Bản lề CLIP top × 200, kệ gia vị SPACE TWIN × 30', 161944080, 'Hoàn tất']] },
+  { name: 'Xưởng tủ bếp Hưng Thịnh', phone: '0919 ••• 207', group: 'Nhà thầu', mst: '0316845210', by: 'NV04', pay: 'Trả ngay', note: 'Đơn vị làm tủ bếp · Thủ Đức',
+    h: [['BG-0313', '27/11', 'Bản lề CLIP top × 120, AVENTOS HL × 15…', 0, 'Chờ báo giá'], ['DT-0018', '25/11', 'Trả 20 bản lề CLIP top dùng thừa', -2062500, 'Chờ hoàn tiền'], ['TH-20455', '19/11', 'Bản lề CLIP top × 140', 14437500, 'Hoàn tất'], ['BG-0303', '05/11', 'Kệ gia vị SPACE TWIN × 10', 0, 'Từ chối']] },
+  { name: 'KTS Ngô Phương Thảo', phone: '0938 ••• 415', group: 'Nhà thầu', by: 'NV02', pay: 'Trả ngay', note: 'Kiến trúc sư · giới thiệu chủ nhà, thường đặt bộ bếp trọn gói',
+    h: [['BG-0315', '25/11', 'Bộ bếp × 2 · biệt thự Thảo Điền', 0, 'Chờ báo giá'], ['BG-0308', '21/11', 'Bộ bếp nhà phố Bình Thạnh', 0, 'Đã gửi'], ['TH-20398', '24/10', 'Bếp từ HC-I7326B, hút mùi HH-SG70A', 25456198, 'Hoàn tất']] },
+  { name: 'Cửa hàng Kim Phát Biên Hoà', phone: '0251 ••• 880', group: 'Đại lý', mst: '3603•••', by: 'NV01', pay: 'Công nợ 15 ngày', credit: true, note: 'Mua về bán lại · khóa điện tử',
+    h: [['BG-0311', '24/11', 'Khóa PP9100 × 3, PP8100 × 5, DL6100 × 5', 0, 'Khách đồng ý'], ['TH-20389', '15/10', 'Khóa PP8100 × 10', 84600000, 'Hoàn tất']] },
+  { name: 'Cty CP Xây dựng Đông Á', phone: 'MST 0312•••', group: 'Nhà thầu', mst: '0312•••', by: 'NV02', pay: 'Trả ngay', note: '', h: [['BG-0310', '23/11', 'Bản lề sàn GEZE × 4, cửa kính', 0, 'Đã gửi']] },
+  { name: 'Nguyễn Minh Khoa', phone: '0903 ••• 218', group: 'Khách lẻ', by: 'NV02', pay: 'COD', note: '', h: [['TH-20482', '26/11', 'Bếp từ HC-I7326B · kèm lắp đặt', 18472999, 'Chờ xác nhận']] },
+  { name: 'Trần Thu Hà', phone: '0912 ••• 640', group: 'Khách lẻ', by: 'NV03', pay: 'VietQR', note: '', h: [['TH-20481', '26/11', 'Khóa PP9100 3D Face ID · kèm lắp', 15799699, 'Chờ xác nhận']] },
+  { name: 'Phạm Quốc Huy', phone: '0935 ••• 771', group: 'Khách lẻ', mst: '0314098765', by: 'NV01', pay: 'Chuyển khoản', note: 'Lấy hoá đơn công ty', h: [['TH-20476', '25/11', 'Bản lề sàn GEZE TS 550NV · kèm lắp', 16927400, 'Đã lắp đặt']] },
+  { name: 'Bùi Thanh Tâm', phone: '0918 ••• 437', group: 'Khách lẻ', by: 'NV02', pay: 'Tiền mặt', note: '', h: [['DT-0019', '26/11', 'Đổi hút mùi HH-SG70A → HH-TG60E', -1635199, 'Chờ kho nhận'], ['TH-20468', '22/11', 'Máy hút mùi HH-SG70A', 8322999, 'Hoàn tất']] },
+  { name: 'Võ Thị Mai', phone: '0977 ••• 305', group: 'Khách lẻ', by: 'NV02', pay: 'COD', note: '', h: [['TH-20478', '26/11', 'Lò vi sóng âm tủ HM-B38C · kèm lắp', 12123999, 'Đang chuẩn bị']] },
+];
+const spent = c => c.h.filter(x => x[0].startsWith('TH')).reduce((a, x) => a + x[3], 0);
+const PENDING = [
+  ['Lâm Quốc Việt', 'Cty TNHH Nội thất Việt Mộc · 0909 ••• 731', 'Nhà thầu', '0317459023', '26/11 21:14'],
+  ['Huỳnh Thị Hoa', 'Cửa hàng Hoa Phát Long An · 0272 ••• 118', 'Đại lý', '1101•••', '27/11 08:02'],
+];
+// [nhóm, áp cho, mức, hiệu lực, trạng thái]
+const RULES = [
+  ['Khách lẻ', 'Mọi hàng', 'Giá bán trên web', '—', 'Đang áp dụng'],
+  ['Nhà thầu', 'Thương hiệu Hafele', '−5%', '01/11/2026', 'Đang áp dụng'],
+  ['Nhà thầu', 'Thương hiệu Blum', 'Chưa đặt mức (giá bán)', '—', 'Chờ Techhomes xác nhận'],
+  ['Đại lý', 'Thương hiệu Hafele', '−10%', '01/11/2026', 'Đang áp dụng'],
+  ['Đại lý', 'Thương hiệu Blum', '−5%', '01/11/2026', 'Đang áp dụng'],
+  ['Đại lý', 'Mã 22F1809 · AVENTOS HF', 'Giá riêng 3.100.000đ', '01/12/2026', 'Chờ chủ duyệt'],
+];
+const DISC = { 'Khách lẻ': {}, 'Nhà thầu': { Hafele: 5 }, 'Đại lý': { Hafele: 10, Blum: 5 } };
+
+let tab = location.hash === '#bang-gia' ? 'gia' : 'kh', grp = 'Tất cả';
+function setTab(t) { tab = t; history.replaceState(null, '', t === 'gia' ? '#bang-gia' : t === 'duyet' ? '#cho-duyet' : '#'); draw(); }
+function draw() {
+  document.getElementById('mainTabs').innerHTML = [['kh', 'Khách hàng'], ['duyet', `Chờ duyệt (${PENDING.length})`], ['gia', 'Bảng giá nhóm']]
+    .map(([k, t]) => `<button class="${k === tab ? 'active' : ''}" onclick="setTab('${k}')">${t}</button>`).join('');
+  ['kh', 'duyet', 'gia'].forEach(k => document.getElementById('tab-' + k).hidden = k !== tab);
+  document.getElementById('grpTabs').innerHTML = ['Tất cả', ...Object.keys(GB)].map(g => `<button class="${g === grp ? 'active' : ''}" onclick="grp='${g}';draw()">${g}</button>`).join('');
+
+  const q = document.getElementById('q').value.toLowerCase().replace(/\s/g, '');
+  document.getElementById('rows').innerHTML = CUSTOMERS.map((c, i) => [c, i])
+    .filter(([c]) => (grp === 'Tất cả' || c.group === grp) && (c.name + c.phone + (c.mst || '')).toLowerCase().replace(/\s/g, '').includes(q))
+    .map(([c, i]) => `<tr class="row-link" onclick="openCus(${i})">
+      <td><b>${c.name}</b><span class="sub-muted">${c.phone}${c.mst ? ' · MST ' + c.mst : ''}</span></td>
+      <td><span class="badge ${GB[c.group]}">${c.group}</span></td>
+      <td>${staff(c.by).name}</td>
+      <td class="right"><b>${fmt(spent(c))}</b><span class="sub-muted">${c.h.filter(x => x[0].startsWith('TH')).length} đơn · ${c.h.filter(x => x[0].startsWith('BG')).length} báo giá</span></td>
+      <td>${c.h[0][1]}/2026<span class="sub-muted mono">${c.h[0][0]}</span></td>
+      <td>${c.pay}${c.credit ? '<span class="sub-muted">giả định · chờ Techhomes xác nhận</span>' : ''}</td>
+    </tr>`).join('') || '<tr><td colspan="6" class="empty-state">Không có khách phù hợp</td></tr>';
+
+  document.getElementById('pending').innerHTML = PENDING.map(([n, co, g, mst, t]) => `<tr>
+    <td><b>${n}</b><span class="sub-muted">${co}</span></td><td><span class="badge ${GB[g]}">${g}</span></td><td class="mono">${mst}</td><td>${t}</td>
+    <td class="right"><div class="row-flex" style="justify-content:flex-end"><button class="btn btn-outline btn-sm" onclick="toast('Từ chối ${n} · gửi tin báo lý do')">Từ chối</button><button class="btn btn-primary btn-sm" onclick="toast('Duyệt ${n} vào nhóm ${g} · khách nhận tin, thấy giá nhóm khi đăng nhập')">Duyệt</button></div></td></tr>`).join('');
+
+  document.getElementById('rules').innerHTML = RULES.map(([g, s, m, d, st]) => `<tr>
+    <td><span class="badge ${GB[g]}">${g}</span></td><td>${s}</td><td><b>${m}</b></td><td>${d}</td>
+    <td><span class="badge ${st === 'Đang áp dụng' ? 'green' : 'amber'}">${st}</span>${g !== 'Khách lẻ' ? '<span class="sub-muted">Mức giả định</span>' : ''}</td></tr>`).join('');
+}
+function drawCheck() {
+  const p = PRODUCTS[+document.getElementById('pp').value];
+  document.getElementById('check').innerHTML = Object.keys(DISC).map(g => { const d = DISC[g][p.brand] || 0;
+    return `<tr><td><span class="badge ${GB[g]}">${g}</span></td><td>${d ? `Giá bán − ${d}% với ${p.brand}` : 'Giá bán'}</td><td class="right"><b>${fmt(Math.round(p.price * (1 - d / 100)))}</b></td></tr>`; }).join('');
+}
+document.getElementById('pp').innerHTML = PRODUCTS.map((p, i) => `<option value="${i}">${p.name} · ${sku(p)}</option>`).join('');
+
+function openCus(i) {
+  const c = CUSTOMERS[i];
+  const ST = { 'Hoàn tất': 'green', 'Đã thành đơn': 'green', 'Khách đồng ý': 'green', 'Đã lắp đặt': 'green', 'Chờ xác nhận': 'amber', 'Chờ báo giá': 'amber', 'Đã gửi': 'blue', 'Đã xác nhận': 'blue', 'Đang chuẩn bị': 'blue', 'Chờ kho nhận': 'blue', 'Chờ hoàn tiền': 'blue', 'Từ chối': 'gray' };
+  const page = code => ({ TH: 'admin-orders.html', BG: 'admin-quotes.html', DT: 'admin-returns.html' })[code.slice(0, 2)];
+  openModal('dlg', `
+    <div class="row-flex" style="justify-content:space-between"><h3 style="margin:0">${c.name}</h3><span class="badge ${GB[c.group]}">${c.group}</span></div>
+    <p class="sub">${c.phone} · phụ trách ${staff(c.by).name} · tổng chi ${fmt(spent(c))}</p>
+    <div class="grid-2">
+      <div class="kv"><span class="muted">Mã số thuế</span><span>${c.mst || '—'}</span><span class="muted">Hoá đơn</span><span>${c.mst ? 'Đã lưu thông tin công ty · tự điền lần sau' : 'Không lấy hoá đơn công ty'}</span></div>
+      <div class="kv"><span class="muted">Thanh toán</span><span>${c.pay}${c.credit ? ' <span class="badge amber">chờ Techhomes xác nhận</span><span class="sub-muted">Công nợ theo dõi trong MISA · số ở đây chỉ tham khảo</span>' : ''}</span><span class="muted">Ghi chú</span><span>${c.note || '—'}</span></div>
+    </div>
+    <h3 style="font-size:14px;margin-top:14px">Lịch sử mua, báo giá, đổi trả</h3>
+    <div class="table-scroll"><table class="data">
+      <thead><tr><th>Mã</th><th>Ngày</th><th>Nội dung</th><th class="right">Số tiền</th><th>Trạng thái</th></tr></thead>
+      <tbody>${c.h.map(([code, d, t, a, st]) => `<tr><td><a class="mono" href="${page(code)}" style="text-decoration:underline">${code}</a></td><td>${d}</td><td>${t}</td><td class="right">${a ? fmt(a) : '<span class="muted">—</span>'}</td><td><span class="badge ${ST[st] || 'gray'}">${st}</span></td></tr>`).join('')}</tbody>
+    </table></div>
+    <div class="actions">
+      <button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button>
+      <button class="btn btn-outline" onclick="toast('Đổi nhóm khách ${c.name} · ghi nhật ký')">Đổi nhóm</button>
+      <a class="btn btn-primary" href="admin-quotes.html">Lập báo giá</a>
+    </div>`);
+}
+draw(); drawCheck();
+</script>
+</body>
+</html>

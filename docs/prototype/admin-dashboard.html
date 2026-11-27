@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Tổng quan (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+.cols{display:flex;align-items:flex-end;gap:10px;height:170px;padding-top:10px}
+.cols .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;font-size:11.5px;color:var(--muted)}
+.cols .c i{display:block;width:100%;max-width:46px;background:var(--brand-tint);border:1px solid var(--brand);border-radius:var(--radius-sm) var(--radius-sm) 0 0}
+.cols .c.today i{background:var(--brand)}
+.hbar{display:grid;grid-template-columns:110px 1fr 120px;gap:10px;align-items:center;font-size:13.2px;margin-bottom:10px}
+.todo{list-style:none;margin:0;padding:0}
+.todo li a{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border);font-size:13.4px}
+.todo li:last-child a{border-bottom:none}
+.todo li a:hover{background:var(--bg)}
+.todo .n{min-width:30px;text-align:center}
+.todo .go{margin-left:auto;color:var(--muted)}
+.links{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.links a{display:flex;align-items:center;gap:8px;padding:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);font-weight:600;font-size:13.2px}
+.links a:hover{border-color:var(--brand);color:var(--brand-dark)}
+.links i{font-size:18px;color:var(--brand)}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" aria-label="Mở menu" onclick="toggleSide()"><i class="ti ti-menu-2"></i></button><h1>Tổng quan · 27/11/2026</h1></div>
+      <div class="row-flex">
+        <select id="fStore" aria-label="Chọn showroom" onchange="draw()"><option value="">Cả ba showroom</option></select>
+        <button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel báo cáo bán hàng theo showroom đang chọn')"><i class="ti ti-file-spreadsheet"></i> Xuất Excel</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid" id="kpi"></div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h2><span><i class="ti ti-alert-triangle"></i> Việc cần làm ngay</span><span class="muted" style="font-size:12px;font-weight:500">Bấm để mở đúng màn hình</span></h2>
+          <ul class="todo" id="todo"></ul>
+        </div>
+        <div class="panel">
+          <h2><span><i class="ti ti-chart-bar"></i> Doanh thu 7 ngày</span><span class="muted" style="font-size:12px;font-weight:500">Theo đơn Đã xuất kho, trừ hàng trả</span></h2>
+          <div class="cols" id="week"></div>
+          <div class="box-note" style="margin-bottom:0">Cùng cách tính với số đẩy sang MISA nên hai bên khớp nhau. Doanh thu lắp đặt tách riêng, không cộng vào đây.</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h2><span><i class="ti ti-building-store"></i> Doanh thu hôm nay theo showroom</span></h2>
+          <div id="byStore"></div>
+          <h2 style="margin-top:18px"><span><i class="ti ti-route"></i> Theo kênh bán · tháng 11</span></h2>
+          <div id="byChannel"></div>
+        </div>
+        <div class="panel" style="padding:14px 8px">
+          <h2 style="padding:0 12px"><span><i class="ti ti-trophy"></i> Mã bán chạy · tháng 11</span></h2>
+          <div class="table-scroll"><table class="data">
+            <thead><tr><th>Sản phẩm</th><th class="right">SL</th><th class="right">Doanh thu</th></tr></thead>
+            <tbody id="top"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel" style="padding:14px 8px">
+          <h2 style="padding:0 12px"><span><i class="ti ti-packages"></i> Tồn dưới mức tối thiểu</span><a class="btn btn-outline btn-sm" href="admin-stock.html">Tồn kho</a></h2>
+          <div class="table-scroll"><table class="data">
+            <thead><tr><th>Mã</th><th>Kho thiếu</th><th class="right">Tồn / tối thiểu</th><th>Gợi ý</th></tr></thead>
+            <tbody id="low"></tbody>
+          </table></div>
+        </div>
+        <div class="panel" style="padding:14px 8px">
+          <h2 style="padding:0 12px"><span><i class="ti ti-shield-x"></i> Bảo hành quá hạn cam kết</span><a class="btn btn-outline btn-sm" href="admin-warranty.html">Bảo hành</a></h2>
+          <div class="table-scroll"><table class="data">
+            <thead><tr><th>Yêu cầu</th><th>Khách · thiết bị</th><th>Trạng thái</th><th class="right">Quá hạn</th></tr></thead>
+            <tbody>
+              <tr class="row-link" onclick="location.href='admin-warranty.html'"><td class="mono">BH-0087</td><td>Lâm Thuỳ Dung<span class="sub-muted">Bếp từ HC-I7326B · serial HF2405K1187</span></td><td><span class="badge blue">Đã hẹn kiểm tra</span></td><td class="right" style="color:var(--danger)"><b>2 ngày</b></td></tr>
+              <tr class="row-link" onclick="location.href='admin-warranty.html'"><td class="mono">BH-0084</td><td>Trương Văn Phúc<span class="sub-muted">Khóa PP8100 · gửi hãng Hafele</span></td><td><span class="badge amber">Đang xử lý</span></td><td class="right" style="color:var(--danger)"><b>4 ngày</b></td></tr>
+            </tbody>
+          </table></div>
+          <p class="muted" style="font-size:12px;padding:0 12px;margin:6px 0 0">Số ngày cam kết và việc tự sửa hay chuyển trung tâm bảo hành của hãng: <span class="badge amber">chờ Techhomes xác nhận</span></p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2><span><i class="ti ti-apps"></i> Đi nhanh</span></h2>
+        <div class="links" id="links"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+renderAdmin('admin-dashboard.html');
+document.getElementById('fStore').insertAdjacentHTML('beforeend', STORES.map((s, i) => `<option value="${i}">${s.name}</option>`).join(''));
+
+// Số theo từng showroom [Phú Nhuận, Q.10, Thủ Đức] — cộng lại khi chọn "Cả ba"
+const D = {
+  revenue: [52480000, 27910000, 18250000],          // hôm nay, đơn Đã xuất kho (đã gồm VAT)
+  exported: [5, 4, 2], ordersToday: [8, 5, 4], pending: [3, 2, 1], quotes: [2, 0, 1], installs: [2, 1, 1],
+  week: [[41.2, 38.5, 55.1, 29.8, 47.6, 61.3, 52.5], [22.4, 30.1, 18.9, 25.6, 33.0, 28.4, 27.9], [15.7, 12.2, 20.4, 9.8, 17.1, 22.6, 18.3]],
+};
+const DAYS = ['21/11', '22/11', '23/11', '24/11', '25/11', '26/11', 'Hôm nay'];
+const sum = (arr, s) => s === '' ? arr.reduce((a, b) => a + b, 0) : arr[s];
+
+// [số, việc, màn hình, showroom (-1 = chung), mức]
+const TODO = [
+  [1, 'Đơn lỗi MISA: TH-20471 · mã hàng chưa có bên MISA', 'admin-orders.html#misa', 2, 'red'],
+  [2, 'Yêu cầu bảo hành quá số ngày cam kết', 'admin-warranty.html', -1, 'red'],
+  [2, 'Đơn chờ xác nhận quá 2 giờ (TH-20482, TH-20481)', 'admin-orders.html', -1, 'amber'],
+  [1, 'Báo giá chưa gửi quá 1 ngày (BG-0315)', 'admin-quotes.html', 0, 'amber'],
+  [3, 'Mã dưới mức tối thiểu', 'admin-stock.html', -1, 'amber'],
+  [2, 'Việc lắp đặt chưa xếp thợ', 'admin-install-calendar.html', 0, 'amber'],
+  [1, 'Yêu cầu đổi trả chờ quản lý duyệt (DT-0017)', 'admin-returns.html', 1, 'blue'],
+  [2, 'Đơn từ chờ duyệt (nghỉ phép, đổi ca)', 'admin-attendance.html', -1, 'blue'],
+];
+// [chỉ số PRODUCTS, kho thiếu, tồn, tối thiểu, gợi ý]
+const LOW = [[0, 0, 1, 3, 'Chuyển 2 từ Q.10'], [12, 2, 4, 10, 'Đặt NPP Blum 20 bộ'], [24, 1, 0, 2, 'Đặt Häfele 4 · có 1 đơn chờ hàng']];
+// [chỉ số PRODUCTS, số lượng tháng 11]
+const TOP = [[0, 14], [24, 11], [12, 96], [5, 17], [4, 6]];
+
+function bar(label, v, max, txt) {
+  return `<div class="hbar"><span>${label}</span><div class="progress-bar" style="height:12px"><div style="width:${Math.round(v / max * 100)}%"></div></div><b class="right">${txt}</b></div>`;
+}
+function draw() {
+  const s = document.getElementById('fStore').value, n = s === '' ? '' : +s;
+  const rev = sum(D.revenue, n);
+  document.getElementById('kpi').innerHTML = [
+    ['Doanh thu hôm nay', fmt(rev), `${sum(D.exported, n)} đơn đã xuất kho · chưa gồm lắp đặt`, 'admin-orders.html'],
+    ['Đơn hôm nay', sum(D.ordersToday, n), `${sum(D.pending, n)} chờ xác nhận`, 'admin-orders.html'],
+    ['Báo giá đang chờ', sum(D.quotes, n), 'Chờ báo giá · chưa gửi khách', 'admin-quotes.html'],
+    ['Lịch lắp hôm nay', sum(D.installs, n), '2 việc chưa xếp thợ', 'admin-install-calendar.html'],
+    ['MISA lỗi', n === '' || n === 2 ? 1 : 0, 'TH-20471 · cần sửa rồi Gửi lại', 'admin-orders.html#misa', n === '' || n === 2],
+  ].map(([l, v, t, href, bad]) => `<a class="stat-card ${bad ? 'bad' : ''}" href="${href}"><div class="label">${l}</div><div class="value">${v}</div><div class="kpi-trend">${t}</div></a>`).join('');
+
+  document.getElementById('todo').innerHTML = TODO.filter(t => n === '' || t[3] === -1 || t[3] === n).map(([c, t, href, , lv]) =>
+    `<li><a href="${href}"><span class="badge ${lv} n">${c}</span><span>${t}</span><i class="ti ti-chevron-right go"></i></a></li>`).join('');
+
+  const week = DAYS.map((_, d) => n === '' ? D.week.reduce((a, w) => a + w[d], 0) : D.week[n][d]);
+  const wmax = Math.max(...week);
+  document.getElementById('week').innerHTML = week.map((v, d) =>
+    `<div class="c ${d === 6 ? 'today' : ''}" title="${DAYS[d]}: ${v.toFixed(1)} triệu"><b style="color:var(--ink)">${v.toFixed(0)}tr</b><i style="height:${Math.round(v / wmax * 120)}px"></i>${DAYS[d]}</div>`).join('');
+
+  const rmax = Math.max(...D.revenue);
+  document.getElementById('byStore').innerHTML = STORES.map((st, i) => bar(st.short, D.revenue[i], rmax, fmt(D.revenue[i]))).join('');
+  const CH = [['Showroom', 612], ['Website', 384], ['Từ báo giá', 296], ['Zalo · điện thoại', 141]];
+  document.getElementById('byChannel').innerHTML = CH.map(([k, v]) => bar(k, v, 612, v + ' triệu')).join('');
+
+  document.getElementById('top').innerHTML = TOP.map(([i, q]) => { const p = PRODUCTS[i];
+    return `<tr><td><div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${p.img}" alt=""><span>${p.name}<span class="sub-muted mono">${sku(p)}</span></span></div></td><td class="right">${q}</td><td class="right"><b>${fmt(p.price * q)}</b></td></tr>`; }).join('');
+
+  document.getElementById('low').innerHTML = LOW.filter(l => n === '' || l[1] === n).map(([i, k, have, min, tip]) => { const p = PRODUCTS[i];
+    return `<tr class="row-link" onclick="location.href='admin-stock.html'"><td><b class="mono">${sku(p)}</b><span class="sub-muted">${p.name}</span></td><td>${storeName(k)}</td><td class="right"><b style="color:var(--danger)">${have}</b> / ${min}</td><td><span class="chip">${tip}</span></td></tr>`; }).join('')
+    || '<tr><td colspan="4" class="empty-state">Showroom này không có mã dưới mức</td></tr>';
+}
+document.getElementById('links').innerHTML = ADMIN_NAV.flatMap(([, items]) => items).filter(x => x[2] !== 'admin-dashboard.html' && !x[2].includes('#'))
+  .map(([ic, t, href]) => `<a href="${href}"><i class="ti ${ic}"></i>${t}</a>`).join('');
+draw();
+</script>
+</body>
+</html>

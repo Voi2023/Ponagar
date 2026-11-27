@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Nhật ký thao tác (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+  .was{color:var(--danger);text-decoration:line-through}
+  .now{color:var(--ok);font-weight:700}
+  .diff td{vertical-align:top}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Nhật ký thao tác</h1></div>
+      <div class="row-flex"><button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel nhật ký theo bộ lọc đang chọn')"><i class="ti ti-file-spreadsheet"></i> Xuất Excel</button></div>
+    </header>
+    <main class="app-content">
+      <div class="box-note" style="margin-top:0"><i class="ti ti-lock"></i> Ghi mọi thao tác chạm tới <b>tiền, tồn kho, lương, quyền</b>: ai · làm gì · lúc nào · giá trị trước và sau. <b>Không ai sửa hay xoá được nhật ký, kể cả chủ.</b></div>
+      <div class="toolbar">
+        <input type="search" id="q" placeholder="Tìm mã đơn, mã hàng, tên…" aria-label="Tìm trong nhật ký" oninput="draw()">
+        <select id="fWho" aria-label="Người thao tác" onchange="draw()"><option value="">Mọi người</option></select>
+        <select id="fMod" aria-label="Loại việc" onchange="draw()"><option value="">Mọi loại việc</option></select>
+        <label class="row-flex" style="font-size:13px">Từ <input type="date" id="fFrom" value="2026-11-20" onchange="draw()" aria-label="Từ ngày"></label>
+        <label class="row-flex" style="font-size:13px">Đến <input type="date" id="fTo" value="2026-11-27" onchange="draw()" aria-label="Đến ngày"></label>
+      </div>
+      <div class="panel" style="padding:6px 8px">
+        <div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Lúc</th><th>Ai</th><th>Loại việc</th><th>Làm gì</th><th>Trước → sau</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table></div>
+        <p class="muted" style="font-size:12.5px;margin:8px 12px" id="count"></p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')">
+  <div class="modal modal-lg" style="max-height:90vh;overflow:auto"></div>
+</div>
+
+<script>
+renderAdmin('admin-audit.html');
+
+const MOD = { 'Giá & bảng giá': 'ti-tag', 'Đơn hàng': 'ti-receipt', 'Kho': 'ti-packages', 'Lương & công': 'ti-cash', 'Lắp đặt': 'ti-tool', 'MISA': 'ti-refresh', 'Tài khoản & quyền': 'ti-shield-lock' };
+// [lúc, người, loại việc, làm gì, đối tượng, [[trường, trước, sau]], lý do]
+const LOG = [
+  ['2026-11-27 10:02', 'NV11', 'Đơn hàng', 'Xác nhận đã nhận tiền', 'TH-20476', [['Thanh toán', 'Chờ chuyển khoản', 'Đã nhận 16.927.400đ'], ['Đối chiếu', '—', 'Nội dung CK “TH20476 Pham Quoc Huy”']], 'Tiền về tài khoản VCB 09:58'],
+  ['2026-11-27 09:47', 'NV01', 'Giá & bảng giá', 'Sửa giá bán', `${PRODUCTS[0].name} · ${sku(PRODUCTS[0])}`, [['Giá bán', '19.444.999đ', fmt(PRODUCTS[0].price)], ['Giá niêm yết', fmt(PRODUCTS[0].old), fmt(PRODUCTS[0].old)]], 'Theo bảng giá Häfele tháng 12'],
+  ['2026-11-27 09:15', 'NV01', 'Giá & bảng giá', 'Sửa bảng giá nhóm', 'Nhóm Nhà thầu · thương hiệu Blum', [['Chiết khấu', '8%', '10%'], ['Hiệu lực', '—', 'Từ 27/11/2026']], 'Chủ đồng ý qua Zalo 26/11'],
+  ['2026-11-26 17:30', 'NV01', 'Kho', 'Duyệt kiểm kê', `KK-1126 · Phú Nhuận · ${sku(PRODUCTS[32])}`, [[`Tồn ${PRODUCTS[32].name}`, '7', '6'], ['Chênh lệch', '—', '−1 · giá vốn 1.740.480đ']], 'Thiếu 1, chưa tìm thấy'],
+  ['2026-11-26 16:40', 'NV01', 'Đơn hàng', 'Huỷ đơn', 'TH-20465 · Hồ Gia Bảo', [['Trạng thái', 'Chờ xác nhận', 'Đã huỷ'], [`Giữ hàng ${PRODUCTS[34].name}`, '1 · Thủ Đức', '0 (đã nhả)'], ['MISA', 'Chưa đến lúc', 'Không gửi']], 'Khách đổi ý trước khi xuất'],
+  ['2026-11-26 15:05', 'NV05', 'Kho', 'Sửa serial', `TH-20476 · ${PRODUCTS[18].name}`, [['Số serial', 'GZ550-24A118', 'GZ550-24A181']], 'Gõ nhầm khi xuất kho, đã đối chiếu tem trên hộp'],
+  ['2026-11-26 14:12', 'NV01', 'Đơn hàng', 'Duyệt giảm giá vượt mức', 'TH-20473 · Lương Gia Hưng', [['Giảm giá', '5% (mức nhóm Khách lẻ)', '8%'], ['Khách trả', '25.456.198đ', '24.652.318đ']], 'Quốc Bảo xin: khách mua 2 thiết bị bếp'],
+  ['2026-11-26 11:20', 'NV06', 'Kho', 'Xuất huỷ · điều chỉnh tồn', `Q.10 · ${sku(PRODUCTS[37])}`, [[`Tồn ${PRODUCTS[37].name}`, '3', '2']], 'Vỡ khi vận chuyển · chờ quản lý duyệt'],
+  ['2026-11-25 18:10', 'NV07', 'Lắp đặt', 'Sửa đơn giá công lắp đặt', 'Biểu phí · Lắp khóa điện tử', [['Công thợ', '350.000đ', '400.000đ'], ['Áp dụng', '—', 'Phiếu tạo từ 26/11']], 'Đồng bộ với mức công Thủ Đức'],
+  ['2026-11-25 17:00', 'NV01', 'Lương & công', 'Sửa công', `${staff('NV08').name} · ngày 24/11`, [['Giờ vào', 'Không chấm', '08:00'], ['Công ngày', '0', '1']], 'Quên chấm, có phiếu lắp đặt LD-1179 lúc 08:30'],
+  ['2026-11-25 16:00', 'NV00', 'Lương & công', 'Duyệt bảng lương', 'Bảng lương tháng 10/2026', [['Trạng thái', 'Chờ duyệt', 'Đã duyệt · đã chốt kỳ'], ['Tổng thực lĩnh', '—', '187.450.000đ · 12 người']], ''],
+  ['2026-11-24 10:30', 'NV00', 'Tài khoản & quyền', 'Đổi quyền lẻ', `${staff('NV11').name} · Kế toán`, [['Xem giá nhập', 'Tắt', 'Bật'], ['Mở lại kỳ đã chốt', 'Tắt', 'Bật']], 'Để đối chiếu giá vốn cuối tháng'],
+  ['2026-11-20 14:30', 'NV11', 'MISA', 'Đổi mã truy cập MISA', 'Kết nối MISA AMIS Kế toán', [['Mã truy cập', '••••a91c', '••••7e20'], ['Thử kết nối', '—', 'OK']], 'Mã cũ hết hạn'],
+  ['2026-10-31 18:00', 'NV00', 'Tài khoản & quyền', 'Khoá tài khoản', 'Thanh Phong · Bán hàng · Q.10', [['Trạng thái', 'Đang dùng', 'Đã khoá'], ['Phiên đăng nhập', '2 thiết bị', 'Đã đăng xuất hết']], 'Nghỉ việc 31/10/2026'],
+];
+const viDate = s => `${s.slice(8, 10)}/${s.slice(5, 7)} ${s.slice(11)}`;
+
+function draw() {
+  const q = document.getElementById('q').value.toLowerCase(), w = document.getElementById('fWho').value, m = document.getElementById('fMod').value;
+  const from = document.getElementById('fFrom').value, to = document.getElementById('fTo').value;
+  const list = LOG.map((e, i) => [e, i]).filter(([e]) => (!w || e[1] === w) && (!m || e[2] === m) && (!from || e[0].slice(0, 10) >= from) && (!to || e[0].slice(0, 10) <= to)
+    && (!q || (e[3] + e[4] + staff(e[1]).name + e[5].flat().join(' ')).toLowerCase().includes(q)));
+  document.getElementById('rows').innerHTML = list.map(([e, i]) => `<tr class="row-link" onclick="openLog(${i})">
+    <td class="mono">${viDate(e[0])}</td>
+    <td>${staff(e[1]).name}<span class="sub-muted">${staff(e[1]).role}</span></td>
+    <td><span class="chip"><i class="ti ${MOD[e[2]]}"></i> ${e[2]}</span></td>
+    <td><b>${e[3]}</b><span class="sub-muted">${e[4]}</span></td>
+    <td>${e[5][0][0]}: <span class="was">${e[5][0][1]}</span> → <span class="now">${e[5][0][2]}</span>${e[5].length > 1 ? `<span class="sub-muted">+ ${e[5].length - 1} thay đổi</span>` : ''}</td>
+  </tr>`).join('') || '<tr><td colspan="5" class="empty-state">Không có thao tác khớp bộ lọc</td></tr>';
+  document.getElementById('count').textContent = `${list.length} / ${LOG.length} thao tác · bấm một dòng để xem chi tiết`;
+}
+
+function openLog(i) {
+  const [t, who, mod, act, obj, diff, why] = LOG[i], s = staff(who);
+  openModal('dlg', `
+    <div class="row-flex" style="justify-content:space-between"><h3 style="margin:0">${act}</h3><span class="chip"><i class="ti ${MOD[mod]}"></i> ${mod}</span></div>
+    <p class="sub">${obj}</p>
+    <div class="kv"><span class="muted">Ai</span><span>${s.name} · ${s.role} · ${STORES[s.store].name}</span><span class="muted">Lúc</span><span class="mono">${t.slice(8, 10)}/${t.slice(5, 7)}/${t.slice(0, 4)} ${t.slice(11)}</span>
+      <span class="muted">Thiết bị</span><span>${who === 'NV05' || who === 'NV06' ? 'Máy quét kho · ' + storeName(s.store) : 'Chrome · Windows'} · IP 113.161.•••.${40 + i}</span><span class="muted">Lý do</span><span>${why || '—'}</span></div>
+    <div class="table-scroll" style="margin:14px 0"><table class="data diff"><thead><tr><th>Trường</th><th>Trước</th><th>Sau</th></tr></thead><tbody>
+      ${diff.map(([f, a, b]) => `<tr><td>${f}</td><td>${a === b ? a : `<span class="was">${a}</span>`}</td><td>${a === b ? '<span class="muted">không đổi</span>' : `<span class="now">${b}</span>`}</td></tr>`).join('')}
+    </tbody></table></div>
+    <p class="muted" style="font-size:12.5px"><i class="ti ti-lock"></i> Bản ghi chỉ đọc · không sửa, không xoá được.</p>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button></div>`);
+}
+
+document.getElementById('fWho').innerHTML += [...new Set(LOG.map(e => e[1]))].map(id => `<option value="${id}">${staff(id).name} · ${staff(id).role}</option>`).join('');
+document.getElementById('fMod').innerHTML += Object.keys(MOD).map(m => `<option>${m}</option>`).join('');
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Bán tại showroom (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+.pos{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;align-items:start}
+@media (max-width:1100px){.pos{grid-template-columns:1fr}}
+.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.results button{display:flex;gap:10px;align-items:flex-start;text-align:left;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);cursor:pointer;font-size:12.8px;color:var(--ink)}
+.results button:hover{border-color:var(--brand)}
+.results button:disabled{opacity:.5;cursor:not-allowed}
+.line{border-bottom:1px solid var(--border);padding:10px 0}
+.line .qty{display:inline-flex;align-items:center;gap:6px}
+.line .qty button{width:28px;height:28px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm);cursor:pointer}
+.serial{margin-top:6px;display:grid;gap:4px}
+.serial input{font-family:var(--font-mono);font-size:12.5px;padding:6px 10px}
+.lbl{font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin:0 0 6px}
+.pay{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.pay label{border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 6px;text-align:center;cursor:pointer;font-weight:600;font-size:13px;background:var(--surface)}
+.pay input{position:absolute;opacity:0}
+.pay label:has(input:checked){border-color:var(--brand);background:var(--brand-tint);color:var(--brand-dark)}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" aria-label="Mở menu" onclick="toggleSide()"><i class="ti ti-menu-2"></i></button><h1>Bán tại showroom</h1></div>
+      <div class="row-flex">
+        <label class="muted" for="store" style="font-size:12.5px">Showroom · kho</label>
+        <select id="store" onchange="cart=[];draw()"></select>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="pos">
+        <div>
+          <div class="toolbar">
+            <input type="search" id="q" placeholder="Quét mã vạch hoặc gõ mã Hafele / Blum (533.09.989, 53309989, 22F1809)…" aria-label="Tìm hoặc quét mã hàng" oninput="draw()" autofocus>
+            <button class="btn btn-outline btn-sm" onclick="toast('Mở camera máy tính bảng để quét mã vạch')"><i class="ti ti-scan"></i> Quét</button>
+          </div>
+          <div class="results" id="results"></div>
+          <div class="box-note">Tồn hiện là tồn của kho showroom đang chọn. Hết hàng ở đây vẫn bán được nếu chọn <b>Giao sau / lắp đặt</b>: đơn chuyển sang chuẩn bị và có thể xuất từ kho khác.</div>
+        </div>
+
+        <div class="panel">
+          <h2><span><i class="ti ti-user"></i> Khách</span></h2>
+          <div class="row-flex" style="flex-wrap:nowrap">
+            <input id="phone" type="tel" placeholder="Số điện thoại khách" aria-label="Số điện thoại khách" style="flex:1" onkeydown="if(event.key==='Enter')findCus()">
+            <button class="btn btn-outline btn-sm" onclick="findCus()">Tìm</button>
+            <button class="btn btn-outline btn-sm" onclick="cus=null;document.getElementById('phone').value='';draw()">Khách lẻ</button>
+          </div>
+          <div id="cusBox" style="margin:8px 0 4px"></div>
+          <p class="muted" style="font-size:12px;margin:0">Thử: 0919 845 207 (nhà thầu), 0935 420 771 (khách lẻ, có MST)</p>
+
+          <h2 style="margin-top:18px"><span><i class="ti ti-shopping-cart"></i> Giỏ hàng</span><span class="muted" id="cnt" style="font-size:12px"></span></h2>
+          <div id="cart"></div>
+
+          <div class="kv" style="margin-top:12px" id="sum"></div>
+          <div class="field" style="margin-top:12px"><label for="extra">Giảm thêm (đ)</label><input id="extra" type="number" min="0" step="10000" value="0" oninput="draw()"></div>
+          <div class="field" id="pinBox" style="display:none"><label for="pin">PIN quản lý duyệt giảm thêm</label><input id="pin" type="password" inputmode="numeric" maxlength="4" placeholder="4 số"></div>
+
+          <div class="field"><p class="lbl" id="lShip">Giao nhận</p>
+            <div class="pay" role="radiogroup" aria-labelledby="lShip" style="grid-template-columns:1fr 1fr">
+              <label><input type="radio" name="ship" value="take" checked> Khách cầm về</label>
+              <label><input type="radio" name="ship" value="later"> Giao sau / lắp đặt</label>
+            </div></div>
+          <div class="field"><p class="lbl" id="lPay">Thu tiền</p>
+            <div class="pay" role="radiogroup" aria-labelledby="lPay">
+              <label><input type="radio" name="pay" value="Tiền mặt" checked> <i class="ti ti-cash"></i> Tiền mặt</label>
+              <label><input type="radio" name="pay" value="Chuyển khoản"> <i class="ti ti-qrcode"></i> Chuyển khoản</label>
+              <label><input type="radio" name="pay" value="Quẹt thẻ"> <i class="ti ti-credit-card"></i> Quẹt thẻ</label>
+            </div></div>
+          <details style="margin-bottom:14px"><summary style="cursor:pointer;font-weight:600;font-size:13.3px">Thêm thông tin hoá đơn công ty</summary>
+            <div class="field" style="margin-top:8px"><label for="mst">Mã số thuế</label><input id="mst" inputmode="numeric" placeholder="10 hoặc 13 số"></div>
+            <div class="field"><label for="cname">Tên công ty</label><input id="cname"></div>
+          </details>
+          <button class="btn btn-primary" style="width:100%" onclick="checkout()"><i class="ti ti-printer"></i> Thu tiền &amp; in phiếu</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')">
+  <div class="modal"></div>
+</div>
+
+<script>
+renderAdmin('admin-pos.html');
+document.getElementById('store').innerHTML = STORES.map((s, i) => `<option value="${i}">${s.name}</option>`).join('');
+
+const stock = (p, s) => [(p.id * 3) % 5, (p.id * 7) % 9, p.id % 3][s];   // cùng số với trang Sản phẩm
+const needSerial = p => p.cat === 'khoa' || (p.cat === 'bep' && p.type !== 'Chậu & vòi rửa');
+const DISC = { 'Khách lẻ': {}, 'Nhà thầu': { Hafele: 5 }, 'Đại lý': { Hafele: 10, Blum: 5 } };   // giả định, chờ Techhomes xác nhận
+const DISPLAY = [{ i: 1, store: 0, price: 11500000 }];   // máy trưng bày, giá do quản lý đặt
+const CUS = [
+  { phone: '0919845207', name: 'Xưởng tủ bếp Hưng Thịnh', group: 'Nhà thầu', mst: '0316845210' },
+  { phone: '0918605437', name: 'Bùi Thanh Tâm', group: 'Khách lẻ' },
+  { phone: '0935420771', name: 'Phạm Quốc Huy', group: 'Khách lẻ', mst: '0314098765' },
+];
+const EXTRA_LIMIT = 500000;   // giảm thêm không cần PIN — giả định
+let cart = [], cus = null;
+
+const unit = (p, disp) => disp ? disp.price : Math.round(p.price * (1 - ((cus && DISC[cus.group][p.brand]) || 0) / 100));
+function draw() {
+  const s = +document.getElementById('store').value, q = document.getElementById('q').value.toLowerCase().replace(/[.\s]/g, '');
+  const hits = PRODUCTS.map((p, i) => [p, i]).filter(([p]) => !q || p.code.toLowerCase().replace(/\./g, '').includes(q) || p.name.toLowerCase().replace(/\s/g, '').includes(q)).slice(0, 12);
+  const disp = DISPLAY.filter(d => d.store === s);
+  document.getElementById('results').innerHTML = [...disp.map(d => [PRODUCTS[d.i], d.i, d]), ...hits.map(([p, i]) => [p, i, null])].map(([p, i, d]) => {
+    const n = d ? 1 : stock(p, s);
+    return `<button onclick="add(${i},${d ? 1 : 0})"><img class="th-img" src="${p.img}" alt=""><span><b>${p.name}</b><span class="sub-muted mono">${sku(p)}</span>
+      <span class="sub-muted">${d ? '<span class="badge amber">Trưng bày</span> ' + fmt(d.price) : fmt(p.price) + ' · ' + (n ? `còn ${n}` : '<span style="color:var(--danger)">hết ở kho này</span>')}</span></span></button>`;
+  }).join('') || '<div class="empty-state">Không tìm thấy mã này</div>';
+
+  document.getElementById('cusBox').innerHTML = cus
+    ? `<span class="chip">${cus.name}</span> <span class="badge ${cus.group === 'Khách lẻ' ? 'gray' : 'blue'}">${cus.group}</span>${cus.group !== 'Khách lẻ' ? '<span class="sub-muted">Đã áp giá nhóm</span>' : ''}`
+    : '<span class="chip">Khách lẻ</span>';
+
+  document.getElementById('cnt').textContent = cart.reduce((a, l) => a + l.n, 0) + ' món';
+  document.getElementById('cart').innerHTML = cart.map((l, k) => {
+    const p = PRODUCTS[l.i], u = unit(p, l.disp);
+    return `<div class="line"><div class="row-flex" style="flex-wrap:nowrap;align-items:flex-start"><img class="th-img" src="${p.img}" alt="">
+      <div style="flex:1"><b>${p.name}</b>${l.disp ? ' <span class="badge amber">Trưng bày</span>' : ''}<span class="sub-muted mono">${sku(p)} · ${fmt(u)}${u < p.price && !l.disp ? ` <s>${fmt(p.price)}</s>` : ''}</span></div>
+      <span class="qty"><button aria-label="Bớt" onclick="qty(${k},-1)">−</button><b>${l.n}</b><button aria-label="Thêm" onclick="qty(${k},1)" ${l.disp ? 'disabled' : ''}>+</button></span></div>
+      ${needSerial(p) ? `<div class="serial">${l.serials.map((v, j) => `<input aria-label="Serial ${p.name} chiếc ${j + 1}" placeholder="Quét serial chiếc ${j + 1}" value="${v}" oninput="cart[${k}].serials[${j}]=this.value">`).join('')}</div>` : ''}</div>`;
+  }).join('') || '<div class="empty-state" style="padding:20px">Chưa có hàng · quét hoặc bấm vào sản phẩm</div>';
+
+  const list = cart.reduce((a, l) => a + (l.disp ? l.disp.price : PRODUCTS[l.i].price) * l.n, 0);
+  const sub = cart.reduce((a, l) => a + unit(PRODUCTS[l.i], l.disp) * l.n, 0);
+  const extra = Math.min(+document.getElementById('extra').value || 0, sub), pay = sub - extra;
+  document.getElementById('pinBox').style.display = extra > EXTRA_LIMIT ? '' : 'none';
+  document.getElementById('sum').innerHTML = `<span class="muted">Tạm tính</span><span>${fmt(list)}</span><span class="muted">Giá nhóm</span><span>−${fmt(list - sub)}</span>
+    <span class="muted">Giảm thêm</span><span>−${fmt(extra)}${extra > EXTRA_LIMIT ? '<span class="sub-err">Quá ' + fmt(EXTRA_LIMIT) + ': cần PIN quản lý</span>' : ''}</span>
+    <span class="muted">Khách trả</span><b style="color:var(--ink);font-size:17px">${fmt(pay)}</b><span class="muted">Trong đó VAT 8%</span><span>${fmt(Math.round(pay - pay / 1.08))}</span>`;
+  return pay;
+}
+function add(i, isDisp) {
+  const s = +document.getElementById('store').value, disp = isDisp ? DISPLAY.find(d => d.i === i && d.store === s) : null;
+  const l = cart.find(l => l.i === i && !!l.disp === !!disp);
+  if (l && disp) return toast('Máy trưng bày chỉ có 1 chiếc');
+  if (l) qty(cart.indexOf(l), 1); else { cart.push({ i, n: 1, disp, serials: [disp ? 'HF2311TB0042' : ''] }); draw(); }
+}
+function qty(k, d) {
+  const l = cart[k]; l.n += d;
+  if (l.n <= 0) cart.splice(k, 1); else { l.serials.length = l.n; l.serials = Array.from(l.serials, v => v || ''); }
+  draw();
+}
+function findCus() {
+  const v = document.getElementById('phone').value.replace(/\D/g, '');
+  cus = CUS.find(c => c.phone === v) || null;
+  if (!cus) toast(v ? 'Chưa có khách này · sẽ tạo mới khi thu tiền (Khách lẻ)' : 'Nhập số điện thoại');
+  else if (cus.mst) { document.getElementById('mst').value = cus.mst; document.getElementById('cname').value = cus.name; }
+  draw();
+}
+function checkout() {
+  const pay = draw(), mst = document.getElementById('mst').value.trim();
+  if (!cart.length) return toast('Giỏ hàng trống');
+  const take = document.querySelector('[name=ship]:checked').value === 'take';
+  if (take && cart.some(l => needSerial(PRODUCTS[l.i]) && l.serials.some(v => !v.trim()))) return toast('Khách cầm về: quét đủ serial cho thiết bị trước khi thu tiền');
+  if (document.getElementById('pinBox').style.display !== 'none' && !/^\d{4}$/.test(document.getElementById('pin').value)) return toast('Giảm thêm quá mức: cần quản lý nhập PIN 4 số');
+  if (mst && !/^(\d{10}|\d{13})$/.test(mst.replace(/-/g, ''))) return toast('Mã số thuế phải 10 hoặc 13 số');
+  const s = +document.getElementById('store').value, method = document.querySelector('[name=pay]:checked').value;
+  openModal('dlg', `<h3>Phiếu bán hàng TH-20483</h3><p class="sub">${STORES[s].name} · 27/11/2026 · NV ${staff(['NV02', 'NV03', 'NV04'][s]).name}</p>
+    ${cart.map(l => `<div class="kv" style="grid-template-columns:1fr auto"><span>${PRODUCTS[l.i].name} × ${l.n}${l.serials.filter(Boolean).length ? `<span class="sub-muted mono">SN ${l.serials.filter(Boolean).join(', ')}</span>` : ''}</span><b>${fmt(unit(PRODUCTS[l.i], l.disp) * l.n)}</b></div>`).join('')}
+    <hr class="divider"><div class="kv"><span class="muted">Khách</span><span>${cus ? cus.name : 'Khách lẻ'}${mst ? ' · MST ' + mst : ''}</span><span class="muted">Thu</span><b style="color:var(--ink)">${fmt(pay)} · ${method}</b></div>
+    <div class="box-note">${take ? 'Khách cầm về: đơn <b>xuất kho ngay</b>, trừ tồn ' + STORES[s].short + ' và gửi chứng từ sang MISA.' : 'Giao sau / lắp đặt: đơn chuyển sang Chuẩn bị & xuất kho và Lịch lắp đặt như đơn web.'}</div>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button>
+      <button class="btn btn-primary" onclick="toast('Đã gửi lệnh in phiếu TH-20483 (khổ 80mm)');closeModal('dlg');cart=[];cus=null;draw()"><i class="ti ti-printer"></i> In phiếu</button></div>`);
+}
+draw();
+</script>
+</body>
+</html>

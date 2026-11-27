@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Cổng Kho — Xuất kho cho đơn (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<script src="assets/kho-data.js"></script>
+<style>
+table.data .mono{white-space:nowrap}
+.tabpane{display:none}.tabpane.on{display:block}
+.line{border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:10px}
+.scan{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.scan input{flex:1;min-width:200px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-mono)}
+.scan input.ok{border-color:var(--ok)!important;background:var(--ok-bg)!important}
+.scan input.err{border-color:var(--danger)!important;background:var(--danger-bg)!important}
+.msg{font-size:12px;min-width:160px}.msg.ok{color:var(--ok)}.msg.err{color:var(--danger)}
+.label-prev{border:1px dashed var(--border);border-radius:var(--radius-sm);padding:12px;width:260px;background:var(--surface)}
+.bars{height:46px;margin:6px 0;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 3px,var(--ink) 3px 4px,transparent 4px 7px,var(--ink) 7px 10px,transparent 10px 12px)}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Xuất kho cho đơn</h1></div>
+      <div class="row-flex">
+        <select id="store" aria-label="Kho đang làm việc" class="input" style="padding:8px 10px" onchange="draw()">
+          <option value="">Tất cả kho</option><option value="0" selected>Phú Nhuận</option><option value="1">Q.10</option><option value="2">Thủ Đức</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="toast('In phiếu lấy hàng cho các đơn đã nhận, xếp theo vị trí kệ')"><i class="ti ti-printer"></i> In phiếu lấy hàng</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="stat-grid" id="kpi"></div>
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+
+      <section class="tabpane" id="t-queue">
+        <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Mã đơn</th><th>Hẹn giao</th><th>Khách</th><th>Hàng · vị trí kệ</th><th>Cách giao</th><th>Lịch lắp</th><th>Serial</th><th>Trạng thái</th></tr></thead>
+          <tbody id="rows"></tbody></table></div></div>
+        <div class="box-note">Bấm <b>Xuất kho</b> là lúc: tồn thực giảm, hết giữ hàng, serial gắn với đơn và khách, <b>đơn sang MISA</b>, khách nhận tin. Thiết bị có serial: chưa quét đủ serial thì không xuất được. Thiếu hàng thực tế: bấm <b>Báo thiếu</b>, đơn quay về bán hàng để đổi kho hoặc báo khách.</div>
+      </section>
+
+      <section class="tabpane" id="t-done">
+        <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Mã đơn</th><th>Kho</th><th>Hàng</th><th>Serial</th><th>Người xuất</th><th>MISA</th></tr></thead>
+          <tbody id="done"></tbody></table></div></div>
+      </section>
+
+      <section class="tabpane" id="t-xuat-huy">
+        <div class="toolbar"><button class="btn btn-primary btn-sm" onclick="openOut()"><i class="ti ti-plus"></i> Tạo phiếu xuất khác</button></div>
+        <div class="panel" style="padding:6px 8px"><div class="table-scroll"><table class="data wide">
+          <thead><tr><th>Phiếu</th><th>Kho</th><th>Lý do</th><th>Hàng</th><th>Ngày về / trả</th><th>Trạng thái</th></tr></thead>
+          <tbody id="outs"></tbody></table></div></div>
+        <div class="box-note">Phiếu xuất không gắn với đơn bán: bắt buộc chọn lý do và có quản lý duyệt. Hàng trưng bày vẫn thuộc kho, chỉ đổi trạng thái nên không bán online; bán xả máy trưng bày làm ở Bán tại showroom. Hàng gửi hãng hoặc mượn quá hạn chưa về: nhắc qua Telegram.</div>
+      </section>
+
+      <section class="tabpane" id="t-tem">
+        <div class="panel"><h2>In tem mã vạch</h2>
+          <div class="grid-2">
+            <div>
+              <div class="field"><label for="tP">Mã hàng</label><select id="tP" onchange="drawLabel()"></select></div>
+              <div class="grid-2"><div class="field"><label for="tN">Số lượng tem</label><input id="tN" type="number" min="1" value="10"></div>
+              <div class="field"><label for="tK">Loại tem</label><select id="tK" onchange="drawLabel()"><option>Tem mã hàng</option><option>Tem serial (thiết bị thiếu tem)</option></select></div></div>
+              <button class="btn btn-primary" onclick="toast('Gửi ' + tN.value + ' tem ' + tP.selectedOptions[0].text + ' tới máy in tem')"><i class="ti ti-printer"></i> In tem</button>
+            </div>
+            <div><div class="label-prev" id="lbl"></div>
+              <p class="muted" style="font-size:12.5px">Hộp hàng của hãng đã có mã vạch thì hệ thống đọc luôn mã đó, không cần dán tem mới. In tem cho phụ kiện lẻ không có mã vạch và tem serial cho thiết bị thiếu tem. <span class="badge amber">Cần thử với hàng thật Hafele, Blum</span></p></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')"><div class="modal modal-lg"></div></div>
+
+<script>
+renderAdmin('admin-picking.html');
+const TABS = [['queue', 'Hàng đợi'], ['done', 'Đã xuất hôm nay'], ['xuat-huy', 'Xuất khác: trưng bày, hỏng, gửi hãng'], ['tem', 'In tem']];
+let tab = (TABS.find(t => '#' + t[0] === location.hash) || TABS[0])[0];
+function pick(t) { tab = t; history.replaceState(null, '', '#' + t); draw(); }
+const PST = { 'Chờ nhận': 'amber', 'Đang lấy hàng': 'blue', 'Đủ hàng · chờ xuất': 'green' };
+const MS = { 'Chờ gửi': 'gray', 'Đã gửi · chờ MISA': 'amber', 'MISA đã nhận': 'green', 'Lỗi': 'red' };
+const SHIPS = ['Xe Techhomes', 'Hãng vận chuyển', 'Giao cùng thợ lắp đặt', 'Khách nhận tại showroom'];
+// Đã xuất gần đây — khớp admin-orders.html
+const DONE = [
+  { o: 'TH-20476', s: 0, lines: [[7, 1]], sns: [], by: 'NV05', at: '08:40', misa: 'MISA đã nhận' },
+  { o: 'TH-20477', s: 1, lines: [[77, 1]], sns: [], by: 'NV06', at: '09:15', misa: 'Đã gửi · chờ MISA' },
+  { o: 'TH-20471', s: 2, lines: [[83, 1]], sns: ['HF-PP2501-25090077'], by: 'NV04', at: '09:52', misa: 'Lỗi' },
+];
+// Phiếu xuất khác: [mã, kho, lý do, id, SL, ngày về/trả, trạng thái, ghi chú]
+const OUTS = [
+  ['XK-2711-02', 2, 'Hỏng', 72, 1, '', 'Chờ duyệt', 'Móp thân khi dỡ hàng'],
+  ['XK-2611-01', 0, 'Đưa lên trưng bày', 11, 1, '', 'Đã duyệt', 'Minh Thư duyệt · không bán online'],
+  ['XK-2511-02', 0, 'Gửi hãng bảo hành', 26, 1, '04/12', 'Đã duyệt', 'Serial HF-TG60E-24060215 · khách TH-20188'],
+  ['XK-2011-03', 1, 'Mượn cho công trình', 42, 10, '25/11', 'Quá hạn', 'Cty Mộc Gia Huy mượn lắp mẫu · đã nhắc Telegram'],
+  ['XK-2411-01', 0, 'Tặng khách', 71, 1, '', 'Đã duyệt', 'Quà kèm đơn TH-20476'],
+];
+const OST = { 'Chờ duyệt': 'amber', 'Đã duyệt': 'green', 'Quá hạn': 'red' };
+const thumb = (p, sub) => `<div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${p.img}" alt=""><span>${p.name}<span class="sub-muted">${sub ?? 'Mã ' + sku(p)}</span></span></div>`;
+const need = o => o.lines.reduce((a, [id, q]) => a + (hasSerial(byId(id)) ? q : 0), 0);
+const got = o => Object.values(o.sn || {}).filter(Boolean).length;
+const inS = s => { const v = document.getElementById('store').value; return v === '' || +v === s; };
+
+function draw() {
+  document.getElementById('tabs').innerHTML = TABS.map(([k, t]) => `<button class="${k === tab ? 'active' : ''}" onclick="pick('${k}')">${t}</button>`).join('');
+  document.querySelectorAll('.tabpane').forEach(el => el.classList.toggle('on', el.id === 't-' + tab));
+  const q = PICKS.filter(o => inS(o.s)), d = DONE.filter(o => inS(o.s));
+  document.getElementById('kpi').innerHTML = [['Chờ nhận', 'amber'], ['Đang lấy hàng', 'blue'], ['Đủ hàng · chờ xuất', 'green']]
+    .map(([st]) => `<div class="stat-card"><div class="label">${st}</div><div class="value">${q.filter(o => o.st === st).length}</div><div class="kpi-trend">Xếp theo ngày hẹn giao</div></div>`).join('')
+    + `<div class="stat-card" onclick="pick('done')" style="cursor:pointer"><div class="label">Đã xuất hôm nay</div><div class="value">${d.length}</div><div class="kpi-trend">${d.filter(o => o.misa === 'Lỗi').length} đơn MISA báo lỗi</div></div>`;
+  document.getElementById('rows').innerHTML = q.map(o => {
+    const n = need(o), g = got(o);
+    return `<tr class="row-link" onclick="openPick('${o.o}')">
+      <td><b class="mono">${o.o}</b><span class="sub-muted">${storeName(o.s)}</span></td><td>${o.due === '27/11' ? '<b>Hôm nay</b>' : o.due}</td><td>${o.cus}</td>
+      <td>${o.lines.map(([id, qty, shelf]) => `${byId(id).name} × ${qty}<span class="sub-muted">Kệ ${shelf}</span>`).join('')}</td>
+      <td>${o.ship}</td><td>${o.inst || '<span class="muted">—</span>'}</td>
+      <td>${n ? `<span class="badge ${g >= n ? 'green' : 'amber'}">${g}/${n}</span>` : '<span class="muted">Không cần</span>'}</td>
+      <td><span class="badge ${PST[o.st]}">${o.st}</span>${o.by ? `<span class="sub-muted">${staff(o.by).name}</span>` : ''}</td></tr>`;
+  }).join('') || '<tr><td colspan="8" class="empty-state">Không còn đơn chờ xuất ở kho này</td></tr>';
+  document.getElementById('done').innerHTML = d.map(o => `<tr><td><a class="mono" href="admin-orders.html"><b>${o.o}</b></a><span class="sub-muted">${o.at}</span></td><td>${storeName(o.s)}</td>
+    <td>${o.lines.map(([id, q]) => `${byId(id).name} × ${q}`).join('<br>')}</td><td class="mono">${o.sns.join('<br>') || '—'}</td><td>${staff(o.by).name}</td>
+    <td><span class="badge ${MS[o.misa]}">${o.misa}</span>${o.misa === 'Lỗi' ? '<a class="sub-err" href="admin-misa.html">Mã hàng chưa có bên MISA · xem</a>' : ''}</td></tr>`).join('') || '<tr><td colspan="6" class="empty-state">Chưa xuất đơn nào</td></tr>';
+  document.getElementById('outs').innerHTML = OUTS.filter(x => inS(x[1])).map(([id, s, why, pid, n, back, st, note]) => `<tr class="row-link" onclick="toast('${st === 'Chờ duyệt' ? 'Quản lý duyệt ' + id : 'Mở phiếu ' + id}')">
+    <td><b class="mono">${id}</b></td><td>${storeName(s)}</td><td>${why}</td><td>${thumb(byId(pid), `× ${n} · ${note}`)}</td><td>${back || '—'}</td><td><span class="badge ${OST[st]}">${st}</span></td></tr>`).join('') || '<tr><td colspan="6" class="empty-state">Không có phiếu</td></tr>';
+}
+
+// Kiểm tra serial: phải đang Trong kho, đúng mã hàng, đúng kho của đơn, không quét trùng
+function checkSerial(o, pid, v) {
+  const x = SERIALS.find(z => z.sn === v.trim().toUpperCase());
+  if (!x) return 'Serial không có trong hệ thống';
+  if (x.pid !== pid) return `Serial của ${byId(x.pid).name}, sai mã hàng`;
+  if (x.st !== 'Trong kho') return `Serial đang ở trạng thái "${x.st}"${x.sold ? ' · đơn ' + x.sold[0] : ''}`;
+  if (x.s !== o.s) return `Serial đang ở kho ${storeName(x.s)}`;
+  if (Object.values(o.sn || {}).includes(x.sn)) return 'Quét trùng serial trong đơn này';
+  return '';
+}
+function scan(oid, key, pid, el) {
+  const o = PICKS.find(z => z.o === oid), msg = el.parentNode.querySelector('.msg');
+  o.sn = o.sn || {}; delete o.sn[key];
+  const err = el.value ? checkSerial(o, pid, el.value) : 'Chưa quét';
+  if (!err) o.sn[key] = el.value.trim().toUpperCase();
+  el.className = err ? 'err' : 'ok'; msg.className = 'msg ' + (err ? 'err' : 'ok'); msg.textContent = err || 'Khớp · đang ở kho ' + storeName(o.s);
+  syncBtn(o);
+}
+function scanBar(oid, i, el) {
+  const o = PICKS.find(z => z.o === oid), p = byId(o.lines[i][0]), msg = el.parentNode.querySelector('.msg');
+  o.bar = o.bar || {}; o.bar[i] = el.value.replace(/\./g, '') === p.code.replace(/\./g, '');
+  el.className = o.bar[i] ? 'ok' : 'err'; msg.className = 'msg ' + (o.bar[i] ? 'ok' : 'err'); msg.textContent = o.bar[i] ? 'Đúng mã' : 'Sai mã hàng / sai màu';
+  syncBtn(o);
+}
+const ready = o => o.lines.every((l, i) => (o.bar || {})[i]) && got(o) >= need(o);
+function syncBtn(o) {
+  const b = document.getElementById('goBtn'); if (b) b.disabled = !ready(o);
+  if (o.st !== 'Chờ nhận') o.st = ready(o) ? 'Đủ hàng · chờ xuất' : 'Đang lấy hàng';
+  draw();
+}
+function take(oid) { const o = PICKS.find(z => z.o === oid); o.st = 'Đang lấy hàng'; o.by = 'NV05'; toast(`Đã nhận đơn ${o.o} · in phiếu lấy hàng`); draw(); openPick(oid); }
+// Đơn đã lấy đủ thì coi như đã quét mã vạch
+PICKS.forEach(o => { if (o.st === 'Đủ hàng · chờ xuất') o.bar = Object.fromEntries(o.lines.map((l, i) => [i, true])); });
+
+function openPick(oid) {
+  const o = PICKS.find(z => z.o === oid);
+  const lines = o.lines.map(([pid, q, shelf], i) => {
+    const p = byId(pid), inStock = SERIALS.filter(x => x.pid === pid && x.st === 'Trong kho' && x.s === o.s).map(x => x.sn);
+    return `<div class="line">${thumb(p, `Mã ${sku(p)} · Kệ <b>${shelf}</b> · SL ${q}${hasSerial(p) ? ' · <b>quét serial từng chiếc</b>' : ''}`)}
+      <div class="scan"><input aria-label="Quét mã vạch ${p.name}" placeholder="Quét mã vạch hộp (${p.code})" value="${(o.bar || {})[i] ? p.code : ''}" class="${(o.bar || {})[i] ? 'ok' : ''}" onchange="scanBar('${o.o}',${i},this)"><span class="msg"></span></div>
+      ${hasSerial(p) ? Array.from({ length: q }, (_, k) => `<div class="scan"><input aria-label="Serial ${k + 1}" placeholder="Serial chiếc ${k + 1}" value="${(o.sn || {})[i + '-' + k] || ''}" onchange="scan('${o.o}','${i}-${k}',${pid},this)"><span class="msg"></span></div>`).join('')
+        + `<p class="muted" style="font-size:12px;margin:6px 0 0">Serial đang ở kho ${storeName(o.s)}: ${inStock.map(s => `<span class="mono">${s}</span>`).join(', ') || 'không có'}</p>` : ''}</div>`;
+  }).join('');
+  openModal('dlg', `<div class="row-flex" style="justify-content:space-between"><h3 class="mono" style="margin:0">${o.o}</h3><span class="badge ${PST[o.st]}">${o.st}</span></div>
+    <p class="sub">${o.cus} · Kho ${storeName(o.s)} · Hẹn giao ${o.due}${o.inst ? ' · Lắp ' + o.inst : ''} · <a href="admin-orders.html">Xem đơn</a></p>
+    ${lines}
+    <div class="grid-2"><div class="field"><label for="ship">Cách giao</label><select id="ship">${SHIPS.map(s => `<option ${s === o.ship ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+      <div class="field"><label for="awb">Mã vận đơn (nếu có)</label><input id="awb" placeholder="VD: GHN 8A4K2…"></div></div>
+    <div class="actions">
+      <button class="btn btn-outline" onclick="closeModal('dlg');toast('Báo thiếu ${o.o}: đơn quay về bán hàng để đổi kho hoặc báo khách')">Báo thiếu</button>
+      <button class="btn btn-outline" onclick="toast('In tem cho ${o.o}')"><i class="ti ti-printer"></i> In tem</button>
+      ${o.st === 'Chờ nhận' ? `<button class="btn btn-primary" onclick="take('${o.o}')">Nhận đơn</button>` : `<button class="btn btn-primary" id="goBtn" ${ready(o) ? '' : 'disabled'} onclick="ship('${o.o}')">Xuất kho</button>`}
+    </div>`);
+}
+function ship(oid) {
+  const i = PICKS.findIndex(z => z.o === oid), o = PICKS[i], sns = Object.values(o.sn || {});
+  sns.forEach(sn => Object.assign(SERIALS.find(x => x.sn === sn), { st: 'Đã bán · chờ lắp', sold: [o.o, o.cus.split(' · ')[0], o.cus.split(' · ')[1] || '', '27/11/2026'] }));
+  DONE.unshift({ o: o.o, s: o.s, lines: o.lines, sns, by: o.by || 'NV05', at: 'vừa xong', misa: 'Chờ gửi' });
+  PICKS.splice(i, 1); closeModal('dlg'); draw();
+  toast(`Đã xuất kho ${o.o}: trừ tồn, gắn serial ${sns.join(', ') || '—'}, xếp chứng từ bán hàng gửi MISA, nhắn khách`);
+}
+
+function openOut() {
+  openModal('dlg', `<h3>Phiếu xuất khác</h3><p class="sub">Không gắn với đơn bán. Bắt buộc chọn lý do, quản lý duyệt mới trừ tồn.</p>
+    <div class="grid-2"><div class="field"><label for="oR">Lý do</label><select id="oR" onchange="oD.disabled=!/Gửi hãng|Mượn/.test(this.value)"><option value="">— Chọn lý do —</option><option>Đưa lên trưng bày</option><option>Hỏng</option><option>Tặng khách</option><option>Gửi hãng bảo hành</option><option>Mượn cho công trình</option></select></div>
+    <div class="field"><label for="oD">Ngày nhận về / ngày trả</label><input id="oD" type="date" disabled></div></div>
+    <div class="grid-2"><div class="field"><label for="oP">Sản phẩm</label><select id="oP">${PRODUCTS.map(p => `<option>${p.name}</option>`).join('')}</select></div>
+    <div class="field"><label for="oN">Số lượng</label><input id="oN" type="number" min="1" value="1"></div></div>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Huỷ</button><button class="btn btn-primary" onclick="if(!oR.value){toast('Chọn lý do xuất');return}closeModal('dlg');toast('Đã gửi phiếu xuất (' + oR.value + ') cho quản lý duyệt')">Gửi duyệt</button></div>`);
+}
+
+function drawLabel() {
+  const p = byId(+tP.value), serial = tK.selectedIndex === 1;
+  document.getElementById('lbl').innerHTML = `<b style="font-size:12px">TECHHOMES</b><div class="bars" aria-hidden="true"></div>
+    <div class="mono" style="font-size:12px">${serial ? 'HF-' + p.code.replace(/\./g, '') + '-2611xxxx' : p.code}</div><div style="font-size:12.5px">${p.name}</div>${serial ? '' : `<b>${fmt(p.price)}</b>`}`;
+}
+tP.innerHTML = PRODUCTS.map(p => `<option value="${p.id}">${p.code} · ${p.name}</option>`).join('');
+tP.value = 42;
+drawLabel(); draw();
+</script>
+</body>
+</html>

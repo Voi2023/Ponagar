@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="../gate.js"></script>
+<title>Quản trị — Đồng bộ MISA (prototype)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/techhomes.css">
+<link rel="stylesheet" href="assets/admin.css">
+<script src="assets/proto.js"></script>
+<script src="assets/admin.js"></script>
+<style>
+  .stat-card[onclick]{cursor:pointer}
+  .stat-card.sel{border-color:var(--brand)}
+  .warn-badge{margin-left:6px}
+  .ok-dot{color:var(--ok)}
+  [hidden]{display:none !important}
+  td .mono,td.mono{white-space:nowrap}
+</style>
+</head>
+<body class="admin">
+<div class="app-shell">
+  <aside class="app-sidebar" id="side"></aside>
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="row-flex"><button class="menu-btn" onclick="toggleSide()" aria-label="Mở menu"><i class="ti ti-menu-2"></i></button><h1>Đồng bộ MISA</h1></div>
+      <div class="row-flex">
+        <span class="badge green"><i class="ti ti-plug-connected"></i> MISA AMIS Kế toán · đã kết nối</span>
+        <button class="btn btn-outline btn-sm" onclick="toast('Thử kết nối MISA: OK · phản hồi 420 ms')"><i class="ti ti-plug"></i> Thử kết nối</button>
+      </div>
+    </header>
+    <main class="app-content">
+      <div class="toolbar"><div class="tabs" id="tabs"></div></div>
+
+      <!-- Hàng đợi chứng từ -->
+      <section data-tab="queue">
+        <div class="stat-grid" id="stats"></div>
+        <div class="toolbar">
+          <input type="search" id="q" placeholder="Tìm mã đơn, mã chứng từ, tên khách…" aria-label="Tìm chứng từ" oninput="drawQueue()">
+          <select id="fType" aria-label="Loại chứng từ" onchange="drawQueue()"><option value="">Mọi loại chứng từ</option><option>Bán hàng</option><option>Bán dịch vụ</option><option>Trả lại hàng bán</option><option>Mua hàng</option></select>
+          <select id="fDate" aria-label="Ngày" onchange="drawQueue()"><option value="27/11">Hôm nay 27/11/2026</option><option value="">7 ngày gần nhất</option></select>
+          <button class="btn btn-outline btn-sm" onclick="toast('Tải file Excel số hoá đơn + mã tra cứu: khớp theo mã đơn, cập nhật hàng loạt')"><i class="ti ti-upload"></i> Tải lên số hoá đơn</button>
+          <button class="btn btn-primary btn-sm" id="resendAll" hidden onclick="toast('Gửi lại tất cả đơn lỗi cùng lý do “Mã hàng chưa có bên MISA”')"><i class="ti ti-send"></i> Gửi lại tất cả</button>
+        </div>
+        <div class="panel" style="padding:6px 8px">
+          <div class="table-scroll"><table class="data wide">
+            <thead><tr><th>Chứng từ</th><th>Loại</th><th>Khách / NCC</th><th>Hàng</th><th class="right">Khách trả</th><th class="right">Chưa thuế · Thuế 8%</th><th>Showroom</th><th>Trạng thái</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table></div>
+        </div>
+        <div class="box-note">Đơn chỉ sang MISA <b>khi kho bấm Xuất kho</b> (kế toán đổi được mốc ở tab Kết nối). Gửi trong khoảng 1 phút, không cần ai bấm. Mỗi đơn một chứng từ mang mã đơn làm khoá chống trùng. Bên MISA dữ liệu nằm ở <b>Đề nghị lập chứng từ kế toán</b>: kế toán vào Tiện ích › Sinh chứng từ từ đề nghị lập CT kế toán mỗi ngày một lần, sau khi xem đối soát. MISA không phản hồi: tự thử lại 5 lần trong 1 giờ, vẫn lỗi thì báo Telegram nhóm Kế toán.</div>
+      </section>
+
+      <!-- Khớp mã hàng -->
+      <section data-tab="khop" id="khop" hidden>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="label">Mã hàng</div><div class="value">10.281 / 10.284</div><div class="kpi-trend">Đã gửi theo lô lần đầu 20/11</div></div>
+          <div class="stat-card bad"><div class="label">Chưa khớp</div><div class="value">3</div><div class="kpi-trend">Chặn đơn sang MISA · TH-20471 đang lỗi</div></div>
+          <div class="stat-card"><div class="label">Kho</div><div class="value">3 / 3</div><div class="kpi-trend">Mỗi kho một mã kho MISA</div></div>
+          <div class="stat-card"><div class="label">Mã dịch vụ</div><div class="value">3 / 3</div><div class="kpi-trend">Phí giao, phí lắp đặt, phí phát sinh</div></div>
+        </div>
+        <div class="toolbar">
+          <div class="tabs" id="kTabs"></div>
+          <label class="row-flex" style="font-size:13px"><input type="checkbox" id="kBad" onchange="drawKhop()"> Chỉ hiện chưa khớp</label>
+          <button class="btn btn-outline btn-sm" onclick="toast('Xuất Excel đúng mẫu nhập danh mục của MISA')"><i class="ti ti-file-spreadsheet"></i> Xuất Excel mẫu MISA</button>
+          <button class="btn btn-primary btn-sm" onclick="toast('Đã gửi 3 mã hàng sang MISA · đơn đang lỗi sẽ tự gửi lại khi MISA xác nhận')"><i class="ti ti-send"></i> Gửi mã chưa khớp sang MISA</button>
+        </div>
+        <div class="panel" style="padding:6px 8px">
+          <div class="table-scroll"><table class="data wide">
+            <thead><tr><th>Bên Techhomes</th><th>Bên MISA</th><th>Mã MISA</th><th>Cách khớp</th><th>Trạng thái</th></tr></thead>
+            <tbody id="kRows"></tbody>
+          </table></div>
+        </div>
+        <div class="box-note">Mã hàng MISA = mã hàng (mã hãng, ví dụ <span class="mono">533.09.989</span>); mã mới tự gửi sang khi tạo. Mã chưa khớp cũng hiện đỏ ở cột Mã hàng MISA trong <a href="admin-products.html" style="color:var(--brand);font-weight:700">Sản phẩm</a>.
+          <span class="badge amber warn-badge">chờ Techhomes xác nhận</span> API danh mục của MISA cho đẩy hàng hoá mới sang hay chỉ lấy về. Nếu chỉ lấy về: kế toán nhập vào MISA bằng file Excel mẫu ở trên.</div>
+      </section>
+
+      <!-- Đối soát ngày -->
+      <section data-tab="doisoat" hidden>
+        <div class="toolbar">
+          <select id="dDay" aria-label="Ngày đối soát" onchange="drawDoiSoat()"><option value="27">Hôm nay 27/11/2026 (đến 10:30)</option><option value="26">26/11/2026</option></select>
+          <select id="dStore" aria-label="Showroom" onchange="drawDoiSoat()"><option value="">Cả ba showroom</option></select>
+          <button class="btn btn-outline btn-sm" onclick="toast('Tải file đối soát COD của hãng vận chuyển: tự khớp theo mã vận đơn, dòng lệch hiện riêng')"><i class="ti ti-truck-delivery"></i> Tải file đối soát COD</button>
+        </div>
+        <div class="panel"><h2><span><i class="ti ti-scale"></i> Xuất kho · sang MISA · thu tiền</span><span class="muted" style="font-size:12.5px">Mỗi sáng 8:00 gửi Telegram nhóm Kế toán tóm tắt ngày hôm trước</span></h2>
+          <div class="table-scroll"><table class="data"><thead><tr><th></th><th class="right">Số đơn</th><th class="right">Tiền chưa thuế</th><th class="right">Thuế</th></tr></thead><tbody id="dRows"></tbody></table></div>
+          <div id="dDiff"></div>
+        </div>
+        <div class="panel"><h2><span><i class="ti ti-packages"></i> Đối chiếu tồn kho với MISA · cuối tháng</span><button class="btn btn-outline btn-sm" onclick="toast('Đang lấy tồn từ MISA theo từng mã, từng kho…')">Lấy tồn từ MISA</button></h2>
+          <p class="muted" style="font-size:13px;margin-top:0">Lần lấy gần nhất 31/10/2026 · chỉ hiện các mã lệch. Hệ thống không tự sửa tồn bên nào, màn hình này chỉ để tìm chỗ lệch.</p>
+          <div class="table-scroll"><table class="data"><thead><tr><th>Mã hàng</th><th>Kho</th><th class="right">Tồn Techhomes</th><th class="right">Tồn MISA</th><th class="right">Lệch</th><th>Lý do thường gặp</th></tr></thead><tbody id="tRows"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- Kết nối -->
+      <section data-tab="ketnoi" hidden>
+        <div class="grid-2">
+          <div class="panel"><h2><span><i class="ti ti-key"></i> Thông tin kết nối</span><span class="badge green">Đã kết nối</span></h2>
+            <div class="field"><label for="cId">ClientID (MISA cấp)</label><input id="cId" value="th-amis-7f3c21e9" readonly><span class="sub-muted"><i class="ti ti-circle-check ok-dot"></i> MISA đã duyệt ứng dụng 18/11/2026</span></div>
+            <div class="field"><label for="cCode">Mã truy cập (access code)</label><input id="cCode" type="password" value="••••••••••••••••" readonly><span class="sub-muted">Lưu mã hoá · đổi lần cuối 20/11 bởi Kim Oanh · đổi mã được ghi nhật ký</span></div>
+            <div class="field"><label for="cTen">Mã công ty</label><input id="cTen" value="techhomes" readonly></div>
+            <div class="field"><label for="cCb">Địa chỉ nhận kết quả (callback)</label><input id="cCb" class="mono" value="https://admin.techhomes.vn/api/misa/callback" readonly></div>
+            <div class="field"><label for="cData">Dữ liệu kế toán</label><select id="cData"><option>Dữ liệu thật · Techhomes 2026</option><option>Dữ liệu thử (chạy trước khi đổi sang thật)</option></select></div>
+            <div class="row-flex">
+              <button class="btn btn-primary btn-sm" onclick="toast('Thử kết nối MISA: OK')">Thử kết nối</button>
+              <button class="btn btn-outline btn-sm" onclick="toast('Đã gửi 1 đơn mẫu sang dữ liệu đang chọn · kiểm bên MISA ở Đề nghị lập chứng từ')">Gửi 1 đơn mẫu</button>
+              <button class="btn btn-outline btn-sm" onclick="toast('Nhập mã truy cập mới lấy trong AMIS · các đơn chờ tự gửi tiếp')">Đổi mã truy cập</button>
+            </div>
+            <p class="muted" style="font-size:12.5px">Chỉ chủ và kế toán thấy màn hình này (quyền “Kết nối MISA”).</p>
+          </div>
+          <div>
+            <div class="panel"><h2><span><i class="ti ti-settings"></i> Cài đặt gửi</span></h2>
+              <div class="field"><label for="sMoc">Gửi chứng từ bán hàng khi</label><select id="sMoc"><option>Đơn chuyển Đã xuất kho (mặc định)</option><option>Đơn Hoàn tất</option></select></div>
+              <div class="kv"><span class="muted">Thử lại</span><span>5 lần, giãn dần trong 1 giờ</span><span class="muted">Báo chậm</span><span>Đã gửi quá 15 phút chưa có kết quả</span><span class="muted">Tách chứng từ</span><span>Quá 500 dòng chi tiết</span><span class="muted">Phí lắp đặt phát sinh</span><span>Chứng từ bán dịch vụ riêng, tham chiếu đơn gốc <span class="badge gray">đề xuất</span></span></div>
+            </div>
+            <div class="panel"><h2><span><i class="ti ti-percentage"></i> Thuế suất GTGT</span><span class="badge amber">chờ Techhomes xác nhận</span></h2>
+              <table class="data"><thead><tr><th>Nhóm</th><th class="right">Thuế suất</th><th>Hiệu lực</th></tr></thead><tbody id="taxRows"></tbody></table>
+              <p class="muted" style="font-size:12.5px">Giá bán đã gồm thuế. Chưa thuế = khách trả ÷ (1 + thuế suất), làm tròn đồng; thuế = khách trả − chưa thuế. Giảm giá chia theo tỉ lệ giá từng dòng rồi mới tách thuế. Đơn cũ giữ thuế suất cũ.</p>
+            </div>
+          </div>
+        </div>
+        <div class="panel"><h2><span><i class="ti ti-help-circle"></i> Cần kiểm lại với MISA</span></h2>
+          <ul style="margin:0;padding-left:18px;font-size:13.3px;line-height:1.8">
+            <li>Gói AMIS Kế toán của Techhomes có mở API kết nối không, API có phí riêng không <span class="badge amber">chờ Techhomes xác nhận</span></li>
+            <li>Truyền tiền thuế từng dòng theo số hệ thống gửi, hay để MISA tự tính lại <span class="badge amber">chờ Techhomes xác nhận</span></li>
+            <li>MISA có trả số hoá đơn về qua API không (nếu có, bỏ bước dán tay) <span class="badge amber">chờ Techhomes xác nhận</span></li>
+            <li>Phí giao hàng là doanh thu công ty hay thu hộ hãng vận chuyển <span class="badge amber">chờ Techhomes xác nhận</span></li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dlg" style="display:none" onclick="if(event.target===this)closeModal('dlg')">
+  <div class="modal modal-lg" style="max-height:90vh;overflow:auto"></div>
+</div>
+
+<script>
+renderAdmin('admin-misa.html');
+
+const MS = { 'Chờ gửi': 'gray', 'Đã gửi · chờ MISA': 'amber', 'MISA đã nhận': 'green', 'Lỗi': 'red', 'Đã rút lại': 'gray' };
+const KHO = ['KHO-PN', 'KHO-Q10', 'KHO-TD'];
+const VAT = 0.08;
+// Chứng từ: c mã, t loại, who khách/NCC, mst, ch kênh, pay thanh toán, paid đã thu, s showroom, by người bán, l dòng [idx PRODUCTS | mã phí, sl, đơn giá (mặc định giá bán), tên phí], time, st, err, date
+const DOCS = [
+  { c: 'TH-20477', t: 'Bán hàng', who: 'Khách lẻ', ch: 'Showroom Q.10', pay: 'Thẻ · đã thu', paid: 1, s: 1, by: 'NV03', l: [[29, 1]], time: '10:12', st: 'Đã gửi · chờ MISA', date: '27/11' },
+  { c: 'PN-0091', t: 'Mua hàng', who: 'Häfele Việt Nam', mst: '0302•••418', ch: 'Nhập mua', pay: 'Công nợ NCC', s: 0, by: 'NV05', l: [[0, 4, 11200000], [27, 6, 9850000]], time: '10:05', st: 'Đã gửi · chờ MISA', date: '27/11' },
+  { c: 'TH-20476', t: 'Bán hàng', who: 'Phạm Quốc Huy', mst: '0316•••205 (hoá đơn công ty)', ch: 'Website', pay: 'Chuyển khoản · đã nhận', paid: 1, s: 0, by: 'NV01', l: [[18, 1]], time: '09:41', st: 'MISA đã nhận', date: '27/11' },
+  { c: 'TH-20471', t: 'Bán hàng', who: 'Đặng Ngọc Hân', ch: 'Website', pay: 'COD · chờ hãng vận chuyển', paid: 0, s: 2, by: 'NV04', l: [[27, 1]], time: '09:58', st: 'Lỗi', err: 'Mã hàng 499.21.224 chưa có bên MISA', date: '27/11' },
+  { c: 'TH-20470', t: 'Bán hàng', who: 'Lý Thanh Trúc', ch: 'Showroom Q.10', pay: 'VietQR · đã nhận', paid: 1, s: 1, by: 'NV03', l: [[24, 1]], time: '09:30', st: 'MISA đã nhận', date: '27/11' },
+  { c: 'TH-20469', t: 'Bán hàng', who: 'Trương Văn Lộc', ch: 'Website', pay: 'COD · đã đối soát', paid: 1, s: 0, by: 'NV02', l: [[0, 1], [5, 1]], time: '09:12', st: 'MISA đã nhận', date: '27/11' },
+  { c: 'TH-20468', t: 'Bán hàng', who: 'Bùi Thanh Tâm', ch: 'Showroom Phú Nhuận', pay: 'Tiền mặt · đã thu', paid: 1, s: 0, by: 'NV02', l: [[5, 1]], time: '08:55', st: 'MISA đã nhận', date: '27/11' },
+  { c: 'TH-20466', t: 'Bán hàng', who: 'Cty TNHH Nội thất An Phát', mst: '0315•••872', ch: 'Báo giá nhà thầu BG-0309', pay: 'Công nợ 30 ngày', paid: 0, s: 2, by: 'NV04', l: [[12, 8, 3109428], [17, 40, 92813]], time: '08:40', st: 'MISA đã nhận', date: '27/11' },
+  { c: 'TH-20464', t: 'Bán hàng', who: 'Ngô Bảo Ngọc', ch: 'Website', pay: 'VietQR · đã nhận', paid: 1, s: 2, by: 'NV04', l: [[8, 1]], time: '08:31', st: 'MISA đã nhận', date: '27/11' },
+  { c: 'DV-20458', t: 'Bán dịch vụ', who: 'Lâm Hữu Phước', ch: 'Phiếu lắp đặt LD-1187 · đơn gốc TH-20458', pay: 'Thợ thu tại nhà', paid: 1, s: 0, by: 'NV08', l: [['PHI-PHATSINH', 1, 450000, 'Phí phát sinh: đi lại ống thoát nước']], time: '08:20', st: 'MISA đã nhận', date: '27/11' },
+  { c: 'TL-20452', t: 'Trả lại hàng bán', who: 'Phan Mỹ Linh', ch: 'Đổi trả · đơn gốc TH-20452', pay: 'Hoàn tiền chuyển khoản', s: 1, by: 'NV03', l: [[32, 1]], time: '08:05', st: 'MISA đã nhận', date: '27/11' },
+  { c: 'TH-20460', t: 'Bán hàng', who: 'Đỗ Quang Vinh', ch: 'Website', pay: 'VietQR · đã nhận', paid: 1, s: 0, by: 'NV02', l: [[21, 1]], time: '16:02', st: 'Đã rút lại', err: 'Kế toán rút lại: khách đổi sang hoá đơn công ty, chờ sửa MST rồi gửi lại', date: '26/11' },
+];
+const line = ([k, q, price, label]) => {
+  const p = typeof k === 'number' ? PRODUCTS[k] : null, gross = (price ?? p.price) * q, net = Math.round(gross / (1 + VAT));
+  return { code: p ? sku(p) : k, name: p ? p.name : label, img: p && p.img, unit: p ? 'Cái' : 'Lần', q, gross, net, tax: gross - net };
+};
+const sum = (d, f) => d.l.map(line).reduce((a, x) => a + x[f], 0);
+
+let tab = location.hash === '#khop' ? 'khop' : 'queue', fSt = '';
+const TABS = [['queue', 'Hàng đợi chứng từ'], ['khop', 'Khớp mã hàng'], ['doisoat', 'Đối soát ngày'], ['ketnoi', 'Kết nối']];
+function showTab(t) {
+  tab = t;
+  document.getElementById('tabs').innerHTML = TABS.map(([k, n]) => `<button class="${k === t ? 'active' : ''}" onclick="showTab('${k}')">${n}</button>`).join('');
+  document.querySelectorAll('section[data-tab]').forEach(s => s.hidden = s.dataset.tab !== t);
+  history.replaceState(null, '', t === 'khop' ? '#khop' : location.pathname);
+}
+window.addEventListener('hashchange', () => location.hash === '#khop' && showTab('khop'));
+
+function pickSt(s) { fSt = fSt === s ? '' : s; drawQueue(); }
+function drawQueue() {
+  const today = DOCS.filter(d => d.date === '27/11');
+  document.getElementById('stats').innerHTML = [['Chờ gửi', 'Bình thường dưới 1 phút'], ['Đã gửi · chờ MISA', 'Quá 15 phút sẽ báo kế toán'], ['MISA đã nhận', 'Nằm ở Đề nghị lập chứng từ'], ['Lỗi', 'Sửa theo lý do rồi Gửi lại']].map(([s, h]) => {
+    const n = today.filter(d => d.st === s).length;
+    return `<div class="stat-card ${s === 'Lỗi' && n ? 'bad' : ''} ${fSt === s ? 'sel' : ''}" onclick="pickSt('${s}')"><div class="label">${s}</div><div class="value">${n}</div><div class="kpi-trend">${s === 'Lỗi' && n ? 'TH-20471 · mã hàng chưa có bên MISA' : h}</div></div>`;
+  }).join('');
+  const q = document.getElementById('q').value.toLowerCase(), ty = document.getElementById('fType').value, dt = document.getElementById('fDate').value;
+  const list = DOCS.map((d, i) => [d, i]).filter(([d]) => (!fSt || d.st === fSt) && (!ty || d.t === ty) && (!dt || d.date === dt) && (!q || (d.c + d.who + d.ch).toLowerCase().includes(q)));
+  document.getElementById('resendAll').hidden = fSt !== 'Lỗi';
+  document.getElementById('rows').innerHTML = list.map(([d, i]) => {
+    const L = d.l.map(line);
+    return `<tr class="row-link" onclick="openDoc(${i})">
+      <td><b class="mono">${d.c}</b><span class="sub-muted">${d.date} · ${d.time}</span></td>
+      <td>${d.t}<span class="sub-muted">${d.ch}</span></td>
+      <td>${d.who}${d.mst ? `<span class="sub-muted">MST ${d.mst}</span>` : ''}</td>
+      <td><div class="row-flex" style="flex-wrap:nowrap">${L[0].img ? `<img class="th-img" src="${L[0].img}" alt="">` : '<i class="ti ti-tool" style="font-size:22px;color:var(--muted)"></i>'}<span>${L[0].name}${L[0].q > 1 ? ` × ${L[0].q}` : ''}${L.length > 1 ? `<span class="sub-muted">+ ${L.length - 1} dòng khác</span>` : ''}</span></div></td>
+      <td class="right"><b>${d.t === 'Trả lại hàng bán' ? '−' : ''}${fmt(sum(d, 'gross'))}</b></td>
+      <td class="right">${fmt(sum(d, 'net'))}<span class="sub-muted">${fmt(sum(d, 'tax'))}</span></td>
+      <td>${storeName(d.s)}<span class="sub-muted mono">${KHO[d.s]}</span></td>
+      <td><span class="badge ${MS[d.st]}">${d.st}</span>${d.st === 'Lỗi' ? `<span class="sub-err">${d.err}</span>` : ''}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="8" class="empty-state">${fSt === 'Chờ gửi' ? 'Không có chứng từ đang xếp hàng · bình thường dưới 1 phút' : 'Không có chứng từ khớp bộ lọc'}</td></tr>`;
+}
+
+function openDoc(i) {
+  const d = DOCS[i], L = d.l.map(line), err = d.st === 'Lỗi';
+  const action = err
+    ? `<div class="box-note" style="background:var(--danger-bg);border-color:var(--danger)"><b>MISA từ chối:</b> ${d.err}.<br>Cách sửa: tab <b>Khớp mã hàng</b>, gửi mã sang MISA (hoặc nhập bên MISA) rồi bấm Gửi lại. Lỗi dữ liệu không tự thử lại.
+        <div class="row-flex" style="margin-top:8px"><button class="btn btn-outline btn-sm" onclick="closeModal('dlg');showTab('khop')">Mở Khớp mã hàng</button><button class="btn btn-primary btn-sm" onclick="toast('Đã xếp hàng gửi lại ${d.c}')">Gửi lại</button></div></div>`
+    : d.st === 'MISA đã nhận' ? `<div class="box-note">Đang ở <b>Đề nghị lập chứng từ</b> bên MISA. Sai thì <b>Rút lại</b> (xoá đề nghị) → sửa → gửi lại. Nếu MISA đã lập chứng từ: kế toán sửa/xoá trong MISA trước.</div>
+        ${d.t === 'Bán hàng' ? `<div class="grid-2"><div class="field"><label for="hdSo">Số hoá đơn</label><input id="hdSo" placeholder="00001234"></div><div class="field"><label for="hdMa">Mã tra cứu</label><input id="hdMa" placeholder="Mã tra cứu meInvoice"></div></div>
+        <p class="muted" style="font-size:12px;margin-top:-8px">Khách thấy nút Tải hoá đơn ở trang theo dõi đơn. <span class="badge amber">chờ Techhomes xác nhận</span> MISA có trả số hoá đơn qua API không.</p>` : ''}`
+    : d.err ? `<div class="box-note">${d.err}</div>` : '';
+  openModal('dlg', `
+    <div class="row-flex" style="justify-content:space-between"><h3 class="mono" style="margin:0">${d.c}</h3><span class="badge ${MS[d.st]}">${d.st}</span></div>
+    <p class="sub">Chứng từ ${d.t.toLowerCase()} · ${d.ch} · ${d.date}/2026 ${d.time}</p>
+    <div class="kv"><span class="muted">Khách / NCC</span><span>${d.who}${d.mst ? ` · MST ${d.mst}` : ''}${d.who === 'Khách lẻ' ? ' · mã MISA KHACHLE' : ''}</span>
+      <span class="muted">Thanh toán</span><span>${d.pay}</span><span class="muted">Showroom</span><span>${STORES[d.s].name} · kho <span class="mono">${KHO[d.s]}</span></span><span class="muted">Người lập</span><span>${staff(d.by).name}</span></div>
+    <div class="table-scroll" style="margin:12px 0"><table class="data"><thead><tr><th>Mã hàng</th><th>Tên</th><th>ĐVT</th><th class="right">SL</th><th class="right">Đơn giá chưa thuế</th><th class="right">Thành tiền chưa thuế</th><th class="right">Thuế 8%</th><th>Kho</th></tr></thead><tbody>
+      ${L.map(x => `<tr><td class="mono" ${err && d.err.includes(x.code) ? 'style="color:var(--danger)"' : ''}>${x.code}</td><td>${x.name}</td><td>${x.unit}</td><td class="right">${x.q}</td><td class="right">${fmt(Math.round(x.net / x.q))}</td><td class="right">${fmt(x.net)}</td><td class="right">${fmt(x.tax)}</td><td class="mono">${KHO[d.s]}</td></tr>`).join('')}
+      <tr><td colspan="5" class="right"><b>Tổng · khách trả ${fmt(sum(d, 'gross'))}</b></td><td class="right"><b>${fmt(sum(d, 'net'))}</b></td><td class="right"><b>${fmt(sum(d, 'tax'))}</b></td><td></td></tr>
+    </tbody></table></div>
+    ${action}
+    <ul class="timeline">
+      <li><div class="t-status">${d.t === 'Mua hàng' ? 'Nhập kho' : d.t === 'Trả lại hàng bán' ? 'Kho nhận hàng trả' : d.t === 'Bán dịch vụ' ? 'Duyệt phiếu lắp đặt' : 'Xuất kho'} · ${d.time}</div><div class="t-meta">${staff(d.by).name} · tạo chứng từ, xếp hàng gửi</div></li>
+      <li><div class="t-status">Đã gửi sang MISA</div><div class="t-meta">Sau 20 giây · khoá chống trùng = ${d.c}</div></li>
+      ${d.st !== 'Đã gửi · chờ MISA' ? `<li><div class="t-status">${err ? 'MISA trả lỗi' : 'MISA đã nhận'}</div><div class="t-meta">Kết quả về qua địa chỉ nhận kết quả${err ? ' · đã báo Telegram nhóm Kế toán' : ''}</div></li>` : ''}
+      ${d.st === 'Đã rút lại' ? '<li><div class="t-status">Đã rút lại</div><div class="t-meta">Kim Oanh · xoá đề nghị bên MISA</div></li>' : ''}
+    </ul>
+    <div class="actions"><button class="btn btn-outline" onclick="closeModal('dlg')">Đóng</button>
+      ${d.st === 'MISA đã nhận' ? `<button class="btn btn-outline" onclick="toast('Rút lại ${d.c}: xoá đề nghị bên MISA')">Rút lại</button><button class="btn btn-primary" onclick="toast('Đã lưu số hoá đơn cho ${d.c}');closeModal('dlg')">Lưu</button>` : ''}
+      ${err ? `<button class="btn btn-primary" onclick="toast('Đã xếp hàng gửi lại ${d.c}');closeModal('dlg')">Gửi lại</button>` : ''}</div>`);
+}
+
+// Khớp mã: [nhóm, bên Techhomes, bên MISA, mã MISA, cách khớp, đã khớp]
+const KHOP = [
+  ...[27, 23, 34].map(i => ['Mã hàng', PRODUCTS[i], 'Vật tư hàng hoá', sku(PRODUCTS[i]), 'Mã mới tạo · chưa gửi được', 0]),
+  ...[0, 5, 18, 24, 29, 12].map(i => ['Mã hàng', PRODUCTS[i], 'Vật tư hàng hoá', sku(PRODUCTS[i]), 'Mã hàng = mã hãng', 1]),
+  ...STORES.map((s, i) => ['Kho', s.name, 'Kho', KHO[i], 'Nhập mã kho MISA cho từng kho', 1]),
+  ['Khách hàng', 'Khách lẻ (mọi đơn không lấy hoá đơn)', 'Khách hàng', 'KHACHLE', 'Dùng chung một mã', 1],
+  ['Khách hàng', 'Cty TNHH Nội thất An Phát', 'Khách hàng', '0315•••872', 'Theo mã số thuế', 1],
+  ['Khách hàng', 'Phạm Quốc Huy (hoá đơn công ty)', 'Khách hàng', '0316•••205', 'Theo mã số thuế · tạo mới 27/11', 1],
+  ['Nhà cung cấp', 'Häfele Việt Nam', 'Nhà cung cấp', '0302•••418', 'Theo mã số thuế', 1],
+  ['Nhà cung cấp', 'Blum Việt Nam', 'Nhà cung cấp', '0313•••660', 'Theo mã số thuế', 1],
+  ['Mã dịch vụ', 'Phí giao hàng', 'Mã dịch vụ', 'PHI-GIAO', 'Mã cố định', 1],
+  ['Mã dịch vụ', 'Phí lắp đặt', 'Mã dịch vụ', 'PHI-LAPDAT', 'Mã cố định', 1],
+  ['Mã dịch vụ', 'Phí phát sinh lắp đặt', 'Mã dịch vụ', 'PHI-PHATSINH', 'Mã cố định', 1],
+];
+let kGroup = 'Mã hàng';
+function drawKhop(g) {
+  if (g) kGroup = g;
+  const bad = document.getElementById('kBad').checked;
+  document.getElementById('kTabs').innerHTML = ['Mã hàng', 'Kho', 'Khách hàng', 'Nhà cung cấp', 'Mã dịch vụ'].map(k => `<button class="${k === kGroup ? 'active' : ''}" onclick="drawKhop('${k}')">${k}</button>`).join('');
+  document.getElementById('kRows').innerHTML = KHOP.filter(r => r[0] === kGroup && (!bad || !r[5])).map(([, a, b, code, how, ok]) => `<tr>
+    <td>${typeof a === 'object' ? `<div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${a.img}" alt=""><span>${a.name}<span class="sub-muted">${a.brand} · ${a.type}</span></span></div>` : a}</td>
+    <td>${b}</td><td class="mono" ${ok ? '' : 'style="color:var(--danger)"'}>${code}</td><td>${how}</td>
+    <td>${ok ? '<span class="badge green">Đã khớp</span>' : `<span class="badge red">Chưa có bên MISA</span>${code === '499.21.224' ? '<span class="sub-err">Chặn TH-20471</span>' : ''}`}</td></tr>`).join('')
+    || '<tr><td colspan="5" class="empty-state">Mọi mã nhóm này đã khớp</td></tr>';
+}
+
+function drawDoiSoat() {
+  const day = document.getElementById('dDay').value, st = document.getElementById('dStore');
+  st.disabled = day === '26';
+  if (day === '26') st.value = '';
+  let rows, diff;
+  if (day === '26') {   // số ví dụ trong tài liệu chức năng (#doi-soat-ngay)
+    rows = [['Đơn đã xuất kho', 18, 131250000, 10500000], ['MISA đã nhận', 17, 115000603, 9200048], ['Đã thu tiền', 16, 116850000, 9348000]];
+    diff = [['TH-20459', 'Bếp từ Hafele HC-I7326B · mã giảm 5%', 'Cuối ngày còn Đã gửi · chờ MISA; MISA đã nhận lúc 07:42 27/11']];
+  } else {
+    const s = st.value, out = DOCS.filter(d => d.date === '27/11' && d.t === 'Bán hàng' && (s === '' || d.s === +s));
+    const agg = (lbl, l) => [lbl, l.length, l.reduce((a, d) => a + sum(d, 'net'), 0), l.reduce((a, d) => a + sum(d, 'tax'), 0)];
+    rows = [agg('Đơn đã xuất kho', out), agg('MISA đã nhận', out.filter(d => d.st === 'MISA đã nhận')), agg('Đã thu tiền', out.filter(d => d.paid))];
+    diff = out.filter(d => d.st !== 'MISA đã nhận').map(d => [d.c, d.l.map(line)[0].name, d.st + (d.err ? ' · ' + d.err : '')]);
+  }
+  const gap = [rows[0][1] - rows[1][1], rows[0][2] - rows[1][2], rows[0][3] - rows[1][3]];
+  document.getElementById('dRows').innerHTML = rows.map(r => `<tr><td>${r[0]}</td><td class="right">${r[1]}</td><td class="right">${fmt(r[2])}</td><td class="right">${fmt(r[3])}</td></tr>`).join('')
+    + `<tr><td><b>Chênh lệch xuất kho − MISA</b></td><td class="right"><b style="color:${gap[0] ? 'var(--danger)' : 'var(--ok)'}">${gap[0]}</b></td><td class="right"><b>${fmt(gap[1])}</b></td><td class="right"><b>${fmt(gap[2])}</b></td></tr>`;
+  document.getElementById('dDiff').innerHTML = diff.length ? `<div class="box-note"><b>${diff.length} đơn chênh lệch:</b><br>${diff.map(([c, n, why]) => {
+    const i = DOCS.findIndex(d => d.c === c);
+    return `<span class="mono"><b>${c}</b></span> · ${n} · ${why}${i >= 0 ? ` · <a href="#" style="color:var(--brand);font-weight:700" onclick="event.preventDefault();openDoc(${i})">Xem</a>` : ''}`;
+  }).join('<br>')}</div>` : '<div class="box-note">Khớp: mọi đơn đã xuất kho đều đã sang MISA.</div>';
+}
+
+document.getElementById('dStore').innerHTML += STORES.map((s, i) => `<option value="${i}">${s.name}</option>`).join('');
+document.getElementById('tRows').innerHTML = [[0, 1, 4, 5, 'Chứng từ còn nằm ở Đề nghị, chưa lập'], [22, 0, 12, 10, 'Phiếu kiểm kê 28/10 chưa điều chỉnh bên MISA'], [12, 2, 40, 48, 'Phiếu chuyển kho chưa lập chứng từ bên MISA']]
+  .map(([i, k, a, b, why]) => `<tr><td><span class="mono">${sku(PRODUCTS[i])}</span><span class="sub-muted">${PRODUCTS[i].name}</span></td><td>${storeName(k)}</td><td class="right">${a}</td><td class="right">${b}</td><td class="right" style="color:var(--danger)">${a - b > 0 ? '+' : ''}${a - b}</td><td>${why}</td></tr>`).join('');
+document.getElementById('taxRows').innerHTML = [['Thiết bị gia dụng', '8%', '01/07/2025 – 31/12/2026'], ['Phụ kiện tủ bếp, cửa', '8%', '01/07/2025 – 31/12/2026'], ['Khóa điện tử', '8%', '01/07/2025 – 31/12/2026'], ['Thiết bị vệ sinh', '8%', '01/07/2025 – 31/12/2026'], ['Dịch vụ lắp đặt', '8%', '01/07/2025 – 31/12/2026'], ['Mọi nhóm (từ 2027)', '?', 'Từ 01/01/2027 · đặt theo quy định lúc đó']]
+  .map(r => `<tr><td>${r[0]}</td><td class="right">${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+
+showTab(tab); drawQueue(); drawKhop(); drawDoiSoat();
+</script>
+</body>
+</html>
