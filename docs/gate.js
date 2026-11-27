@@ -3,7 +3,7 @@
    ponytail: khoá chạy ở trình duyệt nên chỉ chặn người xem thông thường; mã nguồn vẫn đọc được
    nếu repo công khai. Cần bảo mật thật thì để repo private hoặc chặn bằng máy chủ. */
 (function () {
-  var HASH = 'e632dc5029979dfbf45886e3ebd6aa3242b79ead156eea4c96dcc855ee9d57b2';
+  var HASH = 'ae063d508138f5d0697df710f0101c093db622ed9be0aaa38acf1d3dee208e56';
   var KEY = 'techhomes-gate';
   try { if (localStorage.getItem(KEY) === HASH) return; } catch (e) {}
 
