@@ -3,14 +3,13 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="../gate.js"></script>
-<title>Ponagar — Prototype</title>
+<title>Techhomes — Prototype</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="assets/ponagar.css">
+<link rel="stylesheet" href="assets/techhomes.css">
 <style>
   .hub{max-width:980px;margin:0 auto;padding:40px 20px}
-  body{--font-family:var(--font-display)}
   .hub-head{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:10px}
-  .hub-head img{height:30px;width:auto}
+  .hub-head img{height:48px;width:auto}
   .hub h1{margin:0;font-size:26px;font-family:var(--font-display)}
   .hub .stat-card{display:block}
   .hub .stat-card i{font-size:28px;color:var(--brand)}
@@ -24,31 +23,31 @@
 <body>
 <div class="hub">
   <div class="hub-head">
-    <img src="assets/logo.png" alt="Ponagar">
-    <div><span class="badge red">Prototype v0.3 · 26/11/2026</span><h1>Ponagar — Túi da vẽ tay</h1></div>
+    <img src="assets/logo.svg" alt="Techhomes — Home Solutions">
+    <div><span class="badge red">Prototype · 27/11/2026</span><h1>Techhomes — Website & hệ thống quản lý</h1></div>
   </div>
-  <p class="muted">Website mới cho Công ty TNHH ART 868 · ~10.000 sản phẩm · bố cục & tính năng tham chiếu thienkimhome.com · giao diện dùng bộ <code class="inline">ponagar.css</code> riêng: màu đỏ và font chữ dáng vuông (Chakra Petch) theo logo PONAGAR. Dữ liệu mẫu.</p>
+  <p class="muted">Website mới cho Techhomes (đại lý Häfele & Blum, 3 showroom TP.HCM) · ~10.000 mã hàng · giao diện theo phong cách ponagar.co: logo giữa, menu chữ in hoa, ảnh lớn, lưới sản phẩm kẻ mảnh · màu đỏ–xám theo logo TECHHOMES, font Be Vietnam Pro. Tên, mã, giá, ảnh sản phẩm lấy từ techhomes.vn để minh hoạ.</p>
   <div class="pal">
     <span><i style="--c:var(--brand)"></i>--brand · đỏ logo</span>
     <span><i style="--c:var(--brand-dark)"></i>--brand-dark</span>
     <span><i style="--c:var(--brand-tint)"></i>--brand-tint</span>
-    <span><i style="--c:var(--accent)"></i>--accent · kem da</span>
+    <span><i style="--c:var(--accent)"></i>--accent · xám logo</span>
     <span><i style="--c:var(--ink)"></i>--ink</span>
-    <span><i style="--c:var(--bg)"></i>--bg · nền giấy</span>
+    <span><i style="--c:var(--bg)"></i>--bg · nền sáng</span>
   </div>
 
   <h2 style="font-size:15px;margin:26px 0 10px">Website (khách hàng)</h2>
   <div class="stat-grid">
-    <a class="stat-card" href="home.html"><i class="ti ti-home"></i><b>Trang chủ</b><p>Bố cục theo thienkimhome.com: menu danh mục + slider + 3 banner, khối sản phẩm theo ngành hàng, bộ sưu tập</p></a>
-    <a class="stat-card" href="category.html"><i class="ti ti-adjustments-horizontal"></i><b>Danh mục + bộ lọc</b><p>Lọc theo chủ đề tranh, màu da, giá, kích thước, tình trạng</p></a>
-    <a class="stat-card" href="product.html"><i class="ti ti-shopping-bag"></i><b>Chi tiết sản phẩm</b><p>Chọn màu da, size, vẽ tên miễn phí, đặt làm theo mẫu</p></a>
-    <a class="stat-card" href="cart.html"><i class="ti ti-shopping-cart"></i><b>Giỏ hàng & đặt hàng</b><p>Đặt nhanh 1 trang, COD, VietQR, gói quà</p></a>
+    <a class="stat-card" href="home.html"><i class="ti ti-home"></i><b>Trang chủ</b><p>Theo ponagar.co: ảnh công trình tràn viền, chọn theo không gian (bếp, tủ bếp, cửa & khóa, phòng tắm), sản phẩm nổi bật, lắp đặt, nhà thầu, showroom, câu hỏi thường gặp</p></a>
+    <a class="stat-card" href="category.html"><i class="ti ti-adjustments-horizontal"></i><b>Danh mục + bộ lọc</b><p>Lọc theo thương hiệu, loại, giá, tình trạng, showroom có sẵn, thông số (số vùng nấu, chiều rộng)</p></a>
+    <a class="stat-card" href="product.html"><i class="ti ti-shopping-bag"></i><b>Chi tiết sản phẩm</b><p>Giá niêm yết / giá bán / % giảm, mã Häfele, tồn từng showroom, kèm lắp đặt, catalogue PDF, báo giá nhà thầu</p></a>
+    <a class="stat-card" href="cart.html"><i class="ti ti-shopping-cart"></i><b>Giỏ hàng & đặt hàng</b><p>Giao & lắp tận nơi hoặc nhận tại showroom, chọn ngày lắp, COD, VietQR, công nợ nhà thầu</p></a>
   </div>
 
   <h2 style="font-size:15px;margin:10px 0 10px">Quản trị</h2>
   <div class="stat-grid">
-    <a class="stat-card" href="admin-orders.html"><i class="ti ti-plug-connected"></i><b>Đơn hàng + đồng bộ MISA</b><p>Trạng thái đơn, kho xuất, chứng từ tự sang MISA AMIS Kế toán</p></a>
-    <a class="stat-card" href="admin-products.html"><i class="ti ti-file-spreadsheet"></i><b>Sản phẩm + Nhập Excel</b><p>Nhập 10.000 SP từ file xuất Haravan, báo lỗi từng dòng, tồn theo kho, mã hàng MISA</p></a>
+    <a class="stat-card" href="admin-orders.html"><i class="ti ti-plug-connected"></i><b>Đơn hàng + đồng bộ MISA</b><p>Trạng thái đơn (chờ hàng về, đã lắp đặt), kho xuất theo showroom, chứng từ tự sang MISA AMIS Kế toán</p></a>
+    <a class="stat-card" href="admin-products.html"><i class="ti ti-file-spreadsheet"></i><b>Sản phẩm + Nhập Excel</b><p>Nhập ~10.000 mã từ dữ liệu web cũ / Excel, báo lỗi từng dòng, tồn 3 showroom, khớp mã hàng MISA</p></a>
   </div>
 
   <p class="muted" style="font-size:13px">Tài liệu: <a style="color:var(--brand);font-weight:700" href="../specs/index.html">docs/specs</a> — yêu cầu, đề xuất, báo giá, design system, cấu hình VPS.</p>

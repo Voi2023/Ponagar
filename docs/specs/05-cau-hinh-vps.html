@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="../gate.js"></script>
-<title>Ponagar — 05 · Cấu hình VPS</title>
+<title>Techhomes — 05 · Cấu hình VPS</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="../prototype/assets/ponagar.css">
+<link rel="stylesheet" href="../prototype/assets/techhomes.css">
 <style>
 body{background:var(--bg)}
 .doc-top{background:var(--brand);color:var(--surface);position:sticky;top:0;z-index:10}
@@ -40,10 +40,10 @@ body{background:var(--bg)}
 </style>
 </head>
 <body>
-<header class="doc-top"><div class="in"><b><img class="logo-w" src="../prototype/assets/logo.png" alt="Ponagar" style="height:15px;width:auto">· Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class=""><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class=""><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class=""><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class="on"><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
+<header class="doc-top"><div class="in"><b><img class="logo-w" src="../prototype/assets/logo.svg" alt="Techhomes" style="height:24px;width:auto">· Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class=""><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class=""><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class=""><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class="on"><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
 <main class="doc"><article class="panel guide">
 <h1>05 — Cấu hình VPS &amp; search engine</h1>
-<h2>1. Chọn search engine cho 10.000 sản phẩm</h2>
+<h2>1. Chọn search engine cho ~10.000 mã hàng</h2>
 <div class="table-scroll"><table class="data">
 <thead>
 <tr>
@@ -63,7 +63,7 @@ body{background:var(--bg)}
 <td><strong>≥ 2GB</strong> (Java)</td>
 </tr>
 <tr>
-<td>Gõ không dấu ("tui da ve tay")</td>
+<td>Gõ không dấu ("bep tu hafele")</td>
 <td>Có (unaccent)</td>
 <td><strong>Có sẵn</strong></td>
 <td>Có sẵn</td>
@@ -108,8 +108,8 @@ body{background:var(--bg)}
 </table></div>
 <p><strong>Chọn Meilisearch</strong> (mã nguồn mở, tự cài miễn phí trên VPS):</p>
 <ul>
-<li>10.000 sản phẩm là quy mô nhỏ với Meilisearch: index vài chục MB, tìm &lt; 50ms.</li>
-<li>Có sẵn <strong>tìm không dấu, sửa lỗi chính tả, đếm bộ lọc, sắp xếp</strong> → làm được bộ lọc kiểu thienkimhome mà không phải tự viết.</li>
+<li>10.000 mã hàng là quy mô nhỏ với Meilisearch: index vài chục MB, tìm &lt; 50ms.</li>
+<li>Có sẵn <strong>tìm không dấu, sửa lỗi chính tả, đếm bộ lọc, sắp xếp</strong> → làm được bộ lọc theo thương hiệu, giá, tính năng mà không phải tự viết.</li>
 <li><strong>PostgreSQL vẫn là dữ liệu gốc.</strong> Meilisearch chỉ là bản sao để tìm; hỏng thì dựng lại index trong ~1 phút.</li>
 <li><strong>Dự phòng:</strong> nếu Meilisearch tạm ngừng, API tự chuyển sang tìm bằng PostgreSQL (pg_trgm) → web không chết.</li>
 <li>Elasticsearch quá nặng cho VPS 4GB; Typesense ngang Meilisearch nhưng cộng đồng nhỏ hơn.</li>
@@ -193,7 +193,7 @@ body{background:var(--bg)}
     mem_limit: 128m
 
   app:
-    image: ponagar/web:latest            # build từ repo (Nuxt 3, Node 22)
+    image: techhomes/web:latest            # build từ repo (Nuxt 3, Node 22)
     restart: unless-stopped
     env_file: .env
     environment:
@@ -206,8 +206,8 @@ body{background:var(--bg)}
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ponagar
-      POSTGRES_USER: ponagar
+      POSTGRES_DB: techhomes
+      POSTGRES_USER: techhomes
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     command: &gt;
       postgres -c shared_buffers=768MB -c effective_cache_size=2GB
@@ -232,7 +232,7 @@ volumes:
   caddy_data:
 </code></pre>
 <h2>4. Caddyfile</h2>
-<pre><code>ponagar.co, www.ponagar.co {
+<pre><code>techhomes.vn, www.techhomes.vn {
   encode zstd gzip
   @img path /uploads/*
   handle @img {
@@ -244,28 +244,27 @@ volumes:
 }
 </code></pre>
 <h2>5. .env (không commit lên git)</h2>
-<pre><code>DATABASE_URL=postgres://ponagar:&lt;DB_PASSWORD&gt;@db:5432/ponagar
+<pre><code>DATABASE_URL=postgres://techhomes:&lt;DB_PASSWORD&gt;@db:5432/techhomes
 DB_PASSWORD=&lt;ngẫu nhiên&gt;
 MEILI_HOST=http://search:7700
 MEILI_MASTER_KEY=&lt;ngẫu nhiên 32+ ký tự&gt;
 MEILI_SEARCH_KEY=&lt;key chỉ-tìm, tạo từ master key&gt;
-OMS_PROVIDER=kiotviet            # kiotviet | sapo | haravan | nhanh | pancake | none
-OMS_CLIENT_ID= / OMS_SECRET=     # do phần mềm quản lý đơn cấp
+MISA_APP_ID= / MISA_ACCESS_CODE=   # do MISA AMIS Kế toán cấp khi duyệt kết nối
 NOTIFY_TELEGRAM_BOT= / NOTIFY_TELEGRAM_CHAT=
-NOTIFY_EMAIL=ponagar.co@gmail.com
+NOTIFY_EMAIL=&lt;email nhận cảnh báo của Techhomes&gt;
 </code></pre>
 <h2>6. Cấu hình index Meilisearch (<code>products</code>)</h2>
 <p>Áp tự động mỗi lần deploy (script <code>npm run search:setup</code>):</p>
 <pre><code class="language-json">{
-  &quot;searchableAttributes&quot;: [&quot;name&quot;, &quot;sku&quot;, &quot;theme&quot;, &quot;collection&quot;, &quot;category&quot;, &quot;leather_colors&quot;, &quot;tags&quot;, &quot;short_desc&quot;],
-  &quot;filterableAttributes&quot;: [&quot;category&quot;, &quot;type&quot;, &quot;collection&quot;, &quot;theme&quot;, &quot;leather_colors&quot;, &quot;size&quot;, &quot;price&quot;, &quot;in_stock&quot;, &quot;made_to_order&quot;, &quot;visible&quot;],
+  &quot;searchableAttributes&quot;: [&quot;name&quot;, &quot;sku&quot;, &quot;sku_plain&quot;, &quot;brand&quot;, &quot;category&quot;, &quot;tags&quot;, &quot;short_desc&quot;],
+  &quot;filterableAttributes&quot;: [&quot;category&quot;, &quot;type&quot;, &quot;brand&quot;, &quot;features&quot;, &quot;size&quot;, &quot;price&quot;, &quot;discount&quot;, &quot;in_stock&quot;, &quot;visible&quot;],
   &quot;sortableAttributes&quot;: [&quot;price&quot;, &quot;created_at&quot;, &quot;sold_count&quot;],
   &quot;rankingRules&quot;: [&quot;words&quot;, &quot;typo&quot;, &quot;proximity&quot;, &quot;attribute&quot;, &quot;sort&quot;, &quot;exactness&quot;, &quot;sold_count:desc&quot;],
   &quot;typoTolerance&quot;: { &quot;minWordSizeForTypos&quot;: { &quot;oneTypo&quot;: 4, &quot;twoTypos&quot;: 8 } },
   &quot;synonyms&quot;: {
-    &quot;ví&quot;: [&quot;bóp&quot;], &quot;bóp&quot;: [&quot;ví&quot;],
-    &quot;túi chéo&quot;: [&quot;túi đeo chéo&quot;], &quot;balo&quot;: [&quot;ba lô&quot;],
-    &quot;quà tặng&quot;: [&quot;quà&quot;]
+    &quot;máy rửa chén&quot;: [&quot;máy rửa bát&quot;], &quot;máy rửa bát&quot;: [&quot;máy rửa chén&quot;],
+    &quot;khóa điện tử&quot;: [&quot;khóa thông minh&quot;], &quot;hút mùi&quot;: [&quot;hút khói&quot;],
+    &quot;chậu rửa&quot;: [&quot;bồn rửa&quot;]
   },
   &quot;faceting&quot;: { &quot;maxValuesPerFacet&quot;: 100 },
   &quot;pagination&quot;: { &quot;maxTotalHits&quot;: 5000 }
@@ -274,6 +273,7 @@ NOTIFY_EMAIL=ponagar.co@gmail.com
 <ul>
 <li><strong>Đồng bộ:</strong> lưu/sửa/ẩn sản phẩm trong admin → đẩy ngay sang Meilisearch; mỗi đêm 02:00 <strong>dựng lại toàn bộ index</strong> từ PostgreSQL để chắc chắn khớp.</li>
 <li><strong>Bảo mật:</strong> website gọi Meilisearch <strong>qua API của Nuxt</strong> (không lộ key ra trình duyệt); Meilisearch không mở cổng ra Internet.</li>
+<li>Mã hàng lưu thêm bản bỏ dấu chấm (<code>sku_plain</code>: <code>533.09.989</code> → <code>53309989</code>) để gõ mã kiểu nào cũng ra.</li>
 <li>Mỗi tài liệu chỉ chứa trường cần tìm/lọc (không chứa mô tả dài, giá vốn).</li>
 </ul>
 <h2>7. PostgreSQL</h2>
@@ -327,7 +327,7 @@ CREATE INDEX products_name_trgm ON products USING gin (unaccent_immutable(name) 
 <h2>10. Giám sát</h2>
 <ul>
 <li>UptimeRobot (miễn phí): kiểm tra trang chủ + <code>/api/health</code> mỗi 5 phút, báo Telegram/email.</li>
-<li><code>/api/health</code> kiểm tra DB, Meilisearch, hàng đợi đẩy đơn.</li>
+<li><code>/api/health</code> kiểm tra DB, Meilisearch, hàng đợi gửi MISA.</li>
 <li>Docker log giới hạn 10MB × 3 file mỗi dịch vụ để không đầy ổ.</li>
 </ul>
 </article></main>

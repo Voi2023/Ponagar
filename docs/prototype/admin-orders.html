@@ -5,7 +5,7 @@
 <script src="../gate.js"></script>
 <title>Quản trị — Đơn hàng & MISA (prototype)</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="assets/ponagar.css">
+<link rel="stylesheet" href="assets/techhomes.css">
 <link rel="stylesheet" href="assets/admin.css">
 <script src="assets/proto.js"></script>
 <script src="assets/admin.js"></script>
@@ -23,9 +23,9 @@
     </header>
     <main class="app-content">
       <div class="stat-grid">
-        <div class="stat-card" onclick="pick('Chờ xác nhận')"><div class="label">Chờ xác nhận</div><div class="value">6</div><div class="kpi-trend">Đơn mới đã báo Telegram</div></div>
-        <div class="stat-card" onclick="pick('Đang đóng gói')"><div class="label">Đang đóng gói</div><div class="value">4</div><div class="kpi-trend">2 đơn chờ thợ vẽ tên</div></div>
-        <div class="stat-card" onclick="pick('Đã xuất kho')"><div class="label">Xuất kho hôm nay</div><div class="value">11</div><div class="kpi-trend">Đã trừ tồn thực</div></div>
+        <div class="stat-card" onclick="pick('Chờ xác nhận')"><div class="label">Chờ xác nhận</div><div class="value">6</div><div class="kpi-trend">Đơn mới đã báo nhóm bán hàng</div></div>
+        <div class="stat-card" onclick="pick('Chờ hàng về')"><div class="label">Chờ hàng về</div><div class="value">4</div><div class="kpi-trend">Đặt từ Häfele, Blum · 3–5 ngày</div></div>
+        <div class="stat-card" onclick="pick('Đã xuất kho')"><div class="label">Xuất kho hôm nay</div><div class="value">11</div><div class="kpi-trend">Đã trừ tồn · 7 đơn kèm lắp đặt</div></div>
         <div class="stat-card bad" onclick="location.hash='misa';document.getElementById('misa').scrollIntoView()"><div class="label">MISA báo lỗi</div><div class="value">1</div><div class="kpi-trend">Cần sửa rồi Gửi lại</div></div>
       </div>
 
@@ -34,8 +34,8 @@
       </div>
       <div class="toolbar">
         <input type="search" placeholder="Tìm mã đơn, tên khách, số điện thoại…">
-        <select><option>Mọi kênh bán</option><option>Website</option><option>Showroom Hoa Lan</option><option>Sân bay</option><option>Facebook / Zalo</option></select>
-        <select><option>Mọi kho</option><option>Showroom Hoa Lan</option><option>Xưởng</option><option>Sân bay</option></select>
+        <select><option>Mọi kênh bán</option><option>Website</option><option>Showroom</option><option>Báo giá nhà thầu</option><option>Zalo / điện thoại</option></select>
+        <select><option>Mọi kho</option><option>Phú Nhuận</option><option>Quận 10</option><option>Thủ Đức</option></select>
         <input type="date" value="2026-11-26">
       </div>
 
@@ -52,9 +52,9 @@
           <div class="stat-card"><div class="label">Chờ gửi</div><div class="value">0</div><div class="kpi-trend">Bình thường dưới 1 phút</div></div>
           <div class="stat-card"><div class="label">Đã gửi · chờ MISA</div><div class="value">2</div><div class="kpi-trend">Quá 15 phút sẽ báo kế toán</div></div>
           <div class="stat-card"><div class="label">MISA đã nhận</div><div class="value">8</div><div class="kpi-trend">Kế toán vào MISA lập chứng từ</div></div>
-          <div class="stat-card bad"><div class="label">Lỗi</div><div class="value">1</div><div class="kpi-trend">PNG-10471 · mã hàng chưa có bên MISA</div></div>
+          <div class="stat-card bad"><div class="label">Lỗi</div><div class="value">1</div><div class="kpi-trend">TH-20471 · mã hàng chưa có bên MISA</div></div>
         </div>
-        <div class="box-note">Đơn chỉ sang MISA <b>khi kho bấm Xuất kho</b>. Đơn huỷ trước khi xuất kho không bao giờ gửi. Mỗi đơn là một chứng từ mang mã đơn Ponagar, không gửi trùng hai lần. MISA lỗi hoặc bảo trì: website vẫn bán bình thường, đơn xếp hàng chờ gửi sau.</div>
+        <div class="box-note">Đơn chỉ sang MISA <b>khi kho bấm Xuất kho</b>. Đơn huỷ trước khi xuất kho không bao giờ gửi. Mỗi đơn là một chứng từ mang mã đơn Techhomes, không gửi trùng hai lần. MISA lỗi hoặc bảo trì: website vẫn bán bình thường, đơn xếp hàng chờ gửi sau.</div>
       </div>
     </main>
   </div>
@@ -67,23 +67,23 @@
 <script>
 renderAdmin('admin-orders.html');
 
-const ST = { 'Chờ xác nhận': 'amber', 'Đã xác nhận': 'blue', 'Đang sản xuất': 'gray', 'Đang đóng gói': 'blue', 'Đã xuất kho': 'green', 'Hoàn tất': 'green', 'Đã huỷ': 'gray', 'Trả hàng': 'red' };
+const ST = { 'Chờ xác nhận': 'amber', 'Đã xác nhận': 'blue', 'Chờ hàng về': 'gray', 'Đang chuẩn bị': 'blue', 'Đã xuất kho': 'green', 'Đã lắp đặt': 'green', 'Hoàn tất': 'green', 'Đã huỷ': 'gray', 'Trả hàng': 'red' };
 const MS = { 'Chưa đến lúc': 'gray', 'Chờ gửi': 'gray', 'Đã gửi · chờ MISA': 'amber', 'MISA đã nhận': 'green', 'Lỗi': 'red', 'Không gửi': 'gray' };
-const NEXT = { 'Chờ xác nhận': 'Xác nhận đơn', 'Đã xác nhận': 'Chuyển kho đóng gói', 'Đang đóng gói': 'Xuất kho', 'Đã xuất kho': 'Đánh dấu đã giao' };
+const NEXT = { 'Chờ xác nhận': 'Xác nhận đơn', 'Đã xác nhận': 'Chuyển kho chuẩn bị', 'Chờ hàng về': 'Báo hàng đã về', 'Đang chuẩn bị': 'Xuất kho', 'Đã xuất kho': 'Giao thợ lắp đặt', 'Đã lắp đặt': 'Hoàn tất đơn' };
 // [mã, khách, sđt, sp idx, sl, kênh, thanh toán, trạng thái, kho, misa, ghi chú]
 const ORDERS = [
-  ['PNG-10482', 'Nguyễn Lan Anh', '0903 ••• 218', 0, 1, 'Website', 'COD', 'Chờ xác nhận', 'Showroom Hoa Lan', 'Chưa đến lúc', 'Vẽ tên: LAN ANH'],
-  ['PNG-10481', 'Trần Minh Thư', '0912 ••• 640', 4, 1, 'Website', 'VietQR · đã nhận', 'Chờ xác nhận', 'Xưởng', 'Chưa đến lúc', ''],
-  ['PNG-10480', 'Lê Hoàng Yến', '0988 ••• 102', 1, 1, 'Facebook / Zalo', 'COD', 'Đã xác nhận', 'Showroom Hoa Lan', 'Chưa đến lúc', 'Gói quà + thiệp'],
-  ['PNG-10479', 'Phạm Quốc Huy', '0935 ••• 771', 17, 1, 'Website', 'VietQR · đã nhận', 'Đang sản xuất', 'Xưởng', 'Chưa đến lúc', 'Đặt làm: đổi sang da đen'],
-  ['PNG-10478', 'Võ Thị Mai', '0977 ••• 305', 6, 2, 'Website', 'COD', 'Đang đóng gói', 'Showroom Hoa Lan', 'Chưa đến lúc', 'Vẽ tên: MAI · chờ thợ vẽ'],
-  ['PNG-10477', 'Khách lẻ', '—', 12, 1, 'Sân bay', 'Thẻ · đã thu', 'Đã xuất kho', 'Sân bay', 'Đã gửi · chờ MISA', ''],
-  ['PNG-10476', 'Công ty TNHH Hoa Sen', 'MST 0312•••', 28, 20, 'Website', 'Chuyển khoản · đã nhận', 'Đã xuất kho', 'Xưởng', 'MISA đã nhận', 'Xuất hoá đơn công ty'],
-  ['PNG-10471', 'Đặng Ngọc Hân', '0909 ••• 552', 26, 1, 'Website', 'COD', 'Đã xuất kho', 'Xưởng', 'Lỗi', 'Mẫu mới tạo hôm nay'],
-  ['PNG-10468', 'Bùi Thanh Tâm', '0918 ••• 437', 2, 1, 'Showroom Hoa Lan', 'Tiền mặt · đã thu', 'Hoàn tất', 'Showroom Hoa Lan', 'MISA đã nhận', ''],
-  ['PNG-10465', 'Hồ Gia Bảo', '0966 ••• 819', 9, 1, 'Website', 'COD', 'Đã huỷ', '—', 'Không gửi', 'Khách đổi ý trước khi xuất'],
+  ['TH-20482', 'Nguyễn Minh Khoa', '0903 ••• 218', 0, 1, 'Website', 'COD', 'Chờ xác nhận', 'Phú Nhuận', 'Chưa đến lúc', 'Kèm lắp đặt · mua thêm hút mùi'],
+  ['TH-20481', 'Trần Thu Hà', '0912 ••• 640', 24, 1, 'Website', 'VietQR · đã nhận', 'Chờ xác nhận', 'Quận 10', 'Chưa đến lúc', 'Kèm lắp đặt khóa'],
+  ['TH-20480', 'Cty TNHH Nội thất An Phát', 'MST 0315•••', 12, 20, 'Báo giá nhà thầu', 'Công nợ 30 ngày', 'Đã xác nhận', 'Thủ Đức', 'Chưa đến lúc', 'Từ báo giá BG-0312 · giá nhóm nhà thầu'],
+  ['TH-20479', 'Lê Hoàng Nam', '0988 ••• 102', 2, 1, 'Zalo / điện thoại', 'Cọc 2.000.000đ', 'Chờ hàng về', '—', 'Chưa đến lúc', 'Đặt từ Häfele · dự kiến về 01/12'],
+  ['TH-20478', 'Võ Thị Mai', '0977 ••• 305', 4, 1, 'Website', 'COD', 'Đang chuẩn bị', 'Phú Nhuận', 'Chưa đến lúc', 'Kèm lắp đặt · ghi serial khi xuất'],
+  ['TH-20477', 'Khách lẻ', '—', 29, 1, 'Showroom Q.10', 'Thẻ · đã thu', 'Hoàn tất', 'Quận 10', 'Đã gửi · chờ MISA', ''],
+  ['TH-20476', 'Phạm Quốc Huy', '0935 ••• 771', 18, 1, 'Website', 'Chuyển khoản · đã nhận', 'Đã lắp đặt', 'Phú Nhuận', 'MISA đã nhận', 'Kèm lắp đặt · xuất hoá đơn công ty'],
+  ['TH-20471', 'Đặng Ngọc Hân', '0909 ••• 552', 27, 1, 'Website', 'COD', 'Đã xuất kho', 'Thủ Đức', 'Lỗi', 'Mã hàng mới tạo hôm nay'],
+  ['TH-20468', 'Bùi Thanh Tâm', '0918 ••• 437', 5, 1, 'Showroom Phú Nhuận', 'Tiền mặt · đã thu', 'Hoàn tất', 'Phú Nhuận', 'MISA đã nhận', ''],
+  ['TH-20465', 'Hồ Gia Bảo', '0966 ••• 819', 34, 1, 'Website', 'COD', 'Đã huỷ', '—', 'Không gửi', 'Khách đổi ý trước khi xuất'],
 ];
-const total = o => PRODUCTS[o[3]].price * o[4];
+const total = o => PRODUCTS[o[3]].price * o[4];   // PRODUCTS trong proto.js
 
 let filter = 'Tất cả';
 function draw() {
@@ -94,7 +94,7 @@ function draw() {
     return `<tr class="row-link" onclick="openOrder(${i})">
       <td><b class="mono">${o[0]}</b><span class="sub-muted">${o[5]}</span></td>
       <td>${o[1]}<span class="sub-muted">${o[2]}</span></td>
-      <td><div class="row-flex" style="flex-wrap:nowrap"><span class="th-sw" style="--sw:${p.sw}"><i class="ti ${p.ic}"></i></span><span>${p.name}${o[4] > 1 ? ` × ${o[4]}` : ''}${o[10] ? `<span class="sub-muted">${o[10]}</span>` : ''}</span></div></td>
+      <td><div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${p.img}" alt=""><span>${p.name}${o[4] > 1 ? ` × ${o[4]}` : ''}${o[10] ? `<span class="sub-muted">${o[10]}</span>` : ''}</span></div></td>
       <td class="right"><b>${fmt(total(o))}</b></td>
       <td>${o[6]}</td>
       <td><span class="badge ${ST[o[7]]}">${o[7]}</span></td>
@@ -109,15 +109,15 @@ function openOrder(i) {
   const o = ORDERS[i], p = PRODUCTS[o[3]], sub = total(o);
   const misaBox = o[9] === 'Lỗi'
     ? `<div class="box-note" style="background:var(--danger-bg);border-color:var(--danger)"><b>MISA từ chối:</b> mã hàng <span class="mono">${sku(p)}</span> chưa có trong danh mục vật tư hàng hoá bên MISA.<br>Cách sửa: vào <b>Kế toán › Khớp danh mục</b>, gửi mã sang MISA rồi bấm Gửi lại.
-        <div class="row-flex" style="margin-top:8px"><button class="btn btn-primary btn-sm" onclick="toast('Đã gửi mã ${sku(p)} sang MISA')">Gửi mã hàng sang MISA</button><button class="btn btn-outline btn-sm" onclick="toast('Đã xếp hàng gửi lại PNG-10471')">Gửi lại</button></div></div>`
+        <div class="row-flex" style="margin-top:8px"><button class="btn btn-primary btn-sm" onclick="toast('Đã gửi mã ${sku(p)} sang MISA')">Gửi mã hàng sang MISA</button><button class="btn btn-outline btn-sm" onclick="toast('Đã xếp hàng gửi lại TH-20471')">Gửi lại</button></div></div>`
     : `<div class="kv"><span class="muted">MISA</span><span><span class="badge ${MS[o[9]]}">${o[9]}</span></span></div>`;
   document.getElementById('dlgBody').innerHTML = `
     <div class="row-flex" style="justify-content:space-between"><h3 class="mono" style="margin:0">${o[0]}</h3><span class="badge ${ST[o[7]]}">${o[7]}</span></div>
-    <p class="sub">${o[5]} · 26/11/2026 09:${String(40 - i).padStart(2, '0')} · Người chốt đơn: Lan Anh</p>
+    <p class="sub">${o[5]} · 26/11/2026 09:${String(40 - i).padStart(2, '0')} · Người chốt đơn: Minh Thư</p>
     <div class="detail-grid">
       <div>
-        <div class="row-flex" style="flex-wrap:nowrap;align-items:flex-start"><span class="th-sw" style="--sw:${p.sw}"><i class="ti ${p.ic}"></i></span>
-          <div><b>${p.name}</b> × ${o[4]}<span class="sub-muted">SKU ${sku(p)} · ${fmt(p.price)}</span>${o[10] ? `<span class="sub-muted">${o[10]}</span>` : ''}</div></div>
+        <div class="row-flex" style="flex-wrap:nowrap;align-items:flex-start"><img class="th-img" src="${p.img}" alt="">
+          <div><b>${p.name}</b> × ${o[4]}<span class="sub-muted">Mã ${sku(p)} · ${fmt(p.price)}</span>${o[10] ? `<span class="sub-muted">${o[10]}</span>` : ''}</div></div>
         <hr class="divider" style="border:0;border-top:1px solid var(--border);margin:14px 0">
         <div class="kv"><span class="muted">Tạm tính</span><span>${fmt(sub)}</span><span class="muted">Giao hàng</span><span>Miễn phí</span><span class="muted">Khách trả</span><b>${fmt(sub)}</b><span class="muted">Trong đó VAT 8%</span><span>${fmt(Math.round(sub - sub / 1.08))}</span></div>
       </div>
@@ -125,9 +125,10 @@ function openOrder(i) {
         <div class="kv"><span class="muted">Khách</span><span>${o[1]} · ${o[2]}</span><span class="muted">Thanh toán</span><span>${o[6]}</span><span class="muted">Kho xuất</span><span>${o[8]}</span></div>
         ${misaBox}
         <ul class="timeline" style="margin-top:14px">
-          <li><div class="t-status">Khách đặt hàng</div><div class="t-meta">Hệ thống giữ hàng ở ${o[8]} · báo Telegram</div></li>
-          ${['Đã xác nhận', 'Đang sản xuất', 'Đang đóng gói', 'Đã xuất kho', 'Hoàn tất'].includes(o[7]) ? '<li><div class="t-status">Đã xác nhận</div><div class="t-meta">Lan Anh gọi khách</div></li>' : ''}
-          ${['Đã xuất kho', 'Hoàn tất'].includes(o[7]) ? '<li><div class="t-status">Đã xuất kho</div><div class="t-meta">Trừ tồn thực · tự đẩy chứng từ bán hàng sang MISA</div></li>' : ''}
+          <li><div class="t-status">Khách đặt hàng</div><div class="t-meta">Hệ thống giữ hàng ở ${o[8]} · báo nhóm bán hàng</div></li>
+          ${['Đã xác nhận', 'Chờ hàng về', 'Đang chuẩn bị', 'Đã xuất kho', 'Đã lắp đặt', 'Hoàn tất'].includes(o[7]) ? '<li><div class="t-status">Đã xác nhận</div><div class="t-meta">Minh Thư gọi khách, hẹn ngày lắp</div></li>' : ''}
+          ${['Đã xuất kho', 'Đã lắp đặt', 'Hoàn tất'].includes(o[7]) ? '<li><div class="t-status">Đã xuất kho</div><div class="t-meta">Ghi số serial · trừ tồn · tự đẩy chứng từ bán hàng sang MISA</div></li>' : ''}
+          ${['Đã lắp đặt', 'Hoàn tất'].includes(o[7]) && o[10].includes('lắp') ? '<li><div class="t-status">Đã lắp đặt</div><div class="t-meta">Thợ gửi ảnh nghiệm thu · tạo phiếu bảo hành theo serial</div></li>' : ''}
           ${o[7] === 'Đã huỷ' ? '<li><div class="t-status">Đã huỷ</div><div class="t-meta">Nhả hàng đang giữ · không gửi MISA</div></li>' : ''}
         </ul>
       </div>

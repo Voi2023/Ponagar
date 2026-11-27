@@ -4,32 +4,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script>
-/* Khoá xem dự án Ponagar bằng mật khẩu. Nạp trong <head> của mọi trang, trước script khác.
+/* Khoá xem dự án Techhomes bằng mật khẩu. Nạp trong <head> của mọi trang, trước script khác.
    Chỉ lưu mã băm SHA-256 của mật khẩu. Nhập đúng một lần, trình duyệt đó nhớ.
    ponytail: khoá chạy ở trình duyệt nên chỉ chặn người xem thông thường; mã nguồn vẫn đọc được
    nếu repo công khai. Cần bảo mật thật thì để repo private hoặc chặn bằng máy chủ. */
 (function () {
   var HASH = 'e632dc5029979dfbf45886e3ebd6aa3242b79ead156eea4c96dcc855ee9d57b2';
-  var KEY = 'ponagar-gate';
+  var KEY = 'techhomes-gate';
   try { if (localStorage.getItem(KEY) === HASH) return; } catch (e) {}
 
   var src = document.currentScript && document.currentScript.src;
-  var logo = src ? new URL('prototype/assets/logo.png', src).href : '';
+  var logo = src ? new URL('prototype/assets/logo.svg', src).href : '';
   var root = document.documentElement;
   root.classList.add('png-locked');
   var st = document.createElement('style');
   st.textContent =
     'html.png-locked{overflow:hidden}html.png-locked body{visibility:hidden}' +
     '#png-gate{visibility:visible;position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:16px;' +
-    'background:linear-gradient(125deg,#611719,#BB2E30 65%,#c9564f);font-family:"Chakra Petch","Segoe UI",system-ui,sans-serif;color:#231F1C}' +
-    '#png-gate form{width:100%;max-width:360px;background:#fff;border-radius:16px;padding:26px 24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}' +
-    '#png-gate img{height:20px;width:auto;display:block;margin-bottom:16px}' +
-    '#png-gate h1{font-size:19px;margin:0 0 4px}#png-gate p{margin:0 0 16px;color:#76695E;font-size:14px}' +
-    '#png-gate label{display:block;font-size:12.5px;font-weight:700;color:#76695E;margin-bottom:6px}' +
-    '#png-gate input{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #ECE4D8;border-radius:9px;font:inherit;font-size:15px;background:#FAF7F2}' +
-    '#png-gate input:focus{outline:2px solid #BB2E30;outline-offset:1px;background:#fff}' +
-    '#png-gate button{width:100%;margin-top:12px;padding:12px;border:0;border-radius:9px;background:#BB2E30;color:#fff;font:inherit;font-weight:700;font-size:15px;cursor:pointer}' +
-    '#png-gate button:hover{background:#89222A}#png-gate .err{color:#c62828;font-size:13px;min-height:18px;margin-top:8px}';
+    'background:linear-gradient(125deg,#282C34,#3a3f48 55%,#DB2717);font-family:"Be Vietnam Pro","Segoe UI",system-ui,sans-serif;color:#282C34}' +
+    '#png-gate form{width:100%;max-width:360px;background:#fff;border-radius:12px;padding:26px 24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}' +
+    '#png-gate img{height:40px;width:auto;display:block;margin-bottom:16px}' +
+    '#png-gate h1{font-size:19px;margin:0 0 4px}#png-gate p{margin:0 0 16px;color:#6B7378;font-size:14px}' +
+    '#png-gate label{display:block;font-size:12.5px;font-weight:700;color:#6B7378;margin-bottom:6px}' +
+    '#png-gate input{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #E6E6E2;border-radius:8px;font:inherit;font-size:15px;background:#F7F7F5}' +
+    '#png-gate input:focus{outline:2px solid #DB2717;outline-offset:1px;background:#fff}' +
+    '#png-gate button{width:100%;margin-top:12px;padding:12px;border:0;border-radius:8px;background:#DB2717;color:#fff;font:inherit;font-weight:700;font-size:15px;cursor:pointer}' +
+    '#png-gate button:hover{background:#AB1E12}#png-gate .err{color:#c62828;font-size:13px;min-height:18px;margin-top:8px}';
   document.head.appendChild(st);
 
   function sha256(s) {
@@ -41,7 +41,7 @@
   function show() {
     var g = document.createElement('div');
     g.id = 'png-gate';
-    g.innerHTML = '<form>' + (logo ? '<img src="' + logo + '" alt="PONAGAR">' : '<div style="color:#BB2E30;font-weight:700;font-size:22px;letter-spacing:.22em;margin-bottom:14px">PONAGAR</div>') +
+    g.innerHTML = '<form>' + (logo ? '<img src="' + logo + '" alt="TECHHOMES">' : '<div style="color:#DB2717;font-weight:800;font-size:22px;letter-spacing:.06em;margin-bottom:14px">TECHHOMES</div>') +
       '<h1>Tài liệu dự án</h1><p>Nhập mật khẩu để xem.</p>' +
       '<label for="png-pw">Mật khẩu</label><input id="png-pw" type="password" autocomplete="current-password" required autofocus>' +
       '<div class="err" role="alert"></div><button type="submit">Xem dự án</button></form>';
@@ -62,17 +62,17 @@
   if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
 })();
 </script>
-<title>Giới thiệu hệ thống Ponagar</title>
+<title>Giới thiệu hệ thống Techhomes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,500;0,600;0,700;1,600;1,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600;1,700&display=swap">
 <style>
-/* File tự đủ — gửi riêng cho khách vẫn xem được. Màu, font, logo theo logo PONAGAR (logo nhúng sẵn). */
+/* File tự đủ — gửi riêng cho khách vẫn xem được. Màu, font, logo theo logo TECHHOMES (logo nhúng sẵn). */
 :root{
-  --brand:#BB2E30; --brand-dark:#89222A; --brand-deep:#611719; --brand-tint:#FBF0EF;
-  --accent:#F3E6CF; --bg:#FAF7F2; --surface:#fff; --border:#ECE4D8; --gray-bg:#F2ECE3;
-  --ink:#231F1C; --muted:#76695E; --ok:#0a7d3c;
-  --font:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
-  --display:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --brand:#DB2717; --brand-dark:#AB1E12; --brand-deep:#282C34; --brand-tint:#FCEDEB; --logo:#FE321F;
+  --accent:#798585; --bg:#F7F7F5; --surface:#fff; --border:#E6E6E2; --gray-bg:#EEEEEB;
+  --ink:#282C34; --muted:#6B7378; --ok:#0a7d3c;
+  --font:"Be Vietnam Pro","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  --display:"Be Vietnam Pro","Segoe UI",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -81,29 +81,30 @@ a{color:var(--brand);font-weight:600;text-decoration:none}
 a:hover{text-decoration:underline}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
 h1,h2,h3{font-family:var(--display);line-height:1.2;margin:0}
-h2{font-size:32px;color:var(--brand-dark)}
+h2{font-size:32px;color:var(--ink)}
 .kick{font-size:12.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--brand)}
 .lead{font-size:17px;color:var(--muted);max-width:68ch;margin:10px 0 0}
 section{padding:56px 0}
 section+section{border-top:1px solid var(--border)}
 .sec-h{margin-bottom:26px}
+.ask{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:1px 9px;background:#FFF4D6;color:#7A5A00;white-space:nowrap}
 
 /* ---- Bìa ---- */
-.cover{background:linear-gradient(125deg,var(--brand-deep),var(--brand) 65%,#c9564f);color:#fff;padding:0;position:relative;overflow:hidden}
+.cover{background:linear-gradient(125deg,var(--brand-deep),#3a3f48 55%,var(--brand));color:#fff;padding:0;position:relative;overflow:hidden}
 .cover::after{content:"";position:absolute;right:-120px;top:-120px;width:460px;height:460px;border-radius:50%;border:2px dashed rgba(255,255,255,.18)}
 .cover .wrap{padding-top:26px;padding-bottom:64px;position:relative;z-index:1}
 .brandline{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
-.brandline img{height:24px;width:auto;filter:brightness(0) invert(1)}
+.brandline img{height:40px;width:auto;filter:brightness(0) invert(1)}
 .brandline small{font:600 11px var(--display);letter-spacing:.3em;opacity:.85}
 .cover h1{font-size:50px;margin:56px 0 14px;max-width:21ch}
-.cover h1 em{color:var(--accent)}
+.cover h1 em{color:var(--logo)}
 .cover p{font-size:18px;max-width:60ch;margin:0;opacity:.93}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:36px;max-width:820px}
-.stats div{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:14px 16px;font-size:13.5px;line-height:1.35}
-.stats b{display:block;font:800 30px var(--display);color:var(--accent)}
+.stats div{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:14px 16px;font-size:13.5px;line-height:1.35}
+.stats b{display:block;font:800 30px var(--display);color:#fff}
 .ctas{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px}
 .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:11px 20px;font-weight:700;font-size:14.5px;text-decoration:none!important}
-.btn.solid{background:var(--accent);color:var(--brand-dark)}
+.btn.solid{background:#fff;color:var(--brand)}
 .btn.line{border:1.5px solid rgba(255,255,255,.6);color:#fff}
 .btn.red{background:var(--brand);color:#fff}
 
@@ -125,6 +126,8 @@ section+section{border-top:1px solid var(--border)}
 .mod.hl{background:var(--brand);color:#fff;border-color:var(--brand)}
 .mod.hl .who{color:rgba(255,255,255,.8)}
 .mod.hl .no{color:rgba(255,255,255,.2)}
+.sys{margin-top:14px;font-size:14.5px;color:var(--muted)}
+.sys b{color:var(--ink)}
 
 /* ---- Luồng đơn hàng ---- */
 .flow{display:grid;grid-template-columns:repeat(6,1fr);gap:0;counter-reset:s}
@@ -135,32 +138,36 @@ section+section{border-top:1px solid var(--border)}
 .step b{display:block;font-size:15px;margin-bottom:3px}
 .step span{font-size:13.2px;color:var(--muted);display:block;line-height:1.45}
 .step .tag{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:700;font-style:normal;border-radius:999px;padding:2px 10px;background:var(--brand-tint);color:var(--brand-dark)}
-.note{background:var(--accent);border-radius:14px;padding:14px 18px;margin-top:28px;font-size:14.5px}
+.note{background:var(--brand-tint);border-radius:14px;padding:14px 18px;margin-top:28px;font-size:14.5px}
 
 /* ---- Vai trò ---- */
 .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .role{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
-.role .av{flex:none;width:42px;height:42px;border-radius:50%;background:var(--ink);color:var(--accent);display:grid;place-items:center;font:800 17px var(--display)}
+.role .av{flex:none;width:42px;height:42px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font:800 17px var(--display)}
 .role b{display:block;font-size:16px}
 .role span{font-size:14px;color:var(--muted)}
 
-/* ---- Website ---- */
+/* ---- Website (mô phỏng phong cách tối giản, ảnh lớn) ---- */
 .web{display:grid;grid-template-columns:1.25fr 1fr;gap:30px;align-items:center}
-.mock{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 20px 50px rgba(35,31,28,.12)}
-.mock .bar{background:var(--brand);height:34px;display:flex;align-items:center;gap:8px;padding:0 12px}
-.mock .bar i{display:block;height:14px;border-radius:5px;background:rgba(255,255,255,.25)}
-.mock .bar i.s{flex:1;background:#fff}
-.mock .hero{display:grid;grid-template-columns:1fr 2.2fr 1fr;gap:8px;padding:10px}
-.mock .side{display:grid;gap:5px}
-.mock .side i{height:11px;border-radius:4px;background:var(--gray-bg)}
-.mock .sl{border-radius:8px;background:linear-gradient(120deg,var(--brand-deep),var(--brand));min-height:96px;padding:12px;color:#fff;font:700 13px var(--display)}
-.mock .bns{display:grid;gap:5px}
-.mock .bns i{border-radius:6px;background:var(--brand)}
-.mock .bns i:nth-child(2){background:var(--accent)}
-.mock .bns i:nth-child(3){background:var(--ink)}
-.mock .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:4px 10px 12px}
-.mock .grid i{aspect-ratio:.72;border-radius:6px;background:linear-gradient(var(--c) 0 58%,#fff 58%);box-shadow:0 1px 3px rgba(0,0,0,.12);position:relative}
-.mock .grid i::before{content:"";position:absolute;left:0;top:5px;width:38%;height:7px;border-radius:0 4px 4px 0;background:var(--brand)}
+.mock{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 20px 50px rgba(40,44,52,.12)}
+.mock .bar{height:42px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 14px;border-bottom:1px solid var(--border)}
+.mock .bar i{display:block;height:7px;border-radius:2px;background:var(--gray-bg)}
+.mock .bar .l{width:18px}
+.mock .bar .r{width:44px;justify-self:end}
+.mock .bar .lg{display:flex;align-items:center;gap:5px}
+.mock .bar .lg i{background:var(--logo);width:13px;height:13px;border-radius:0}
+.mock .bar .lg i+i{background:var(--ink);width:60px;height:7px;border-radius:2px}
+.mock .menu{display:flex;justify-content:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+.mock .menu i{display:block;width:34px;height:5px;border-radius:2px;background:#cfd2d2}
+.mock .hero{min-height:140px;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;padding:16px;color:#fff;font:700 15px/1.3 var(--display);background:radial-gradient(circle at 78% 40%,#6b7178 0 14%,transparent 15%),radial-gradient(circle at 62% 62%,#5b6168 0 9%,transparent 10%),linear-gradient(160deg,#4a5058,#1f2228 75%)}
+.mock .hero small{display:inline-block;align-self:flex-start;border:1px solid rgba(255,255,255,.7);border-radius:999px;padding:2px 10px;font:600 10.5px var(--display)}
+.mock .grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.mock .grid div{padding:10px;border-right:1px solid var(--border)}
+.mock .grid div:last-child{border-right:0}
+.mock .grid i{display:block;aspect-ratio:1;background:#F2F2F0;position:relative}
+.mock .grid i::before{content:"";position:absolute;inset:24%;border-radius:4px;background:var(--c)}
+.mock .grid .n{display:block;height:5px;width:80%;margin-top:8px;border-radius:2px;background:var(--gray-bg)}
+.mock .grid .p{display:block;height:6px;width:50%;margin-top:5px;border-radius:2px;background:var(--brand)}
 .checks{list-style:none;padding:0;margin:14px 0 20px}
 .checks li{padding-left:28px;position:relative;margin:7px 0;font-size:15px}
 .checks li::before{content:"✓";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:var(--brand-tint);color:var(--brand);font-weight:800;font-size:12px;display:grid;place-items:center;margin-top:2px}
@@ -174,7 +181,7 @@ section+section{border-top:1px solid var(--border)}
 .road{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .ph{background:var(--surface);border:1px solid var(--border);border-top:5px solid var(--brand);border-radius:14px;padding:18px 18px 16px;display:flex;flex-direction:column}
 .ph:nth-child(2){border-top-color:var(--brand-dark)}
-.ph:nth-child(3){border-top-color:#a8794b}
+.ph:nth-child(3){border-top-color:var(--accent)}
 .ph:nth-child(4){border-top-color:var(--ink)}
 .ph small{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--muted)}
 .ph h3{font-size:19px;margin:4px 0 8px}
@@ -185,13 +192,14 @@ section+section{border-top:1px solid var(--border)}
 .bar-time span{padding:5px 0}
 .bar-time span:nth-child(1){background:var(--brand)}
 .bar-time span:nth-child(2){background:var(--brand-dark)}
-.bar-time span:nth-child(3){background:#a8794b}
+.bar-time span:nth-child(3){background:var(--accent)}
 .bar-time span:nth-child(4){background:var(--ink)}
 
 /* ---- Chi phí ---- */
 .cost{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
 .price{background:var(--ink);color:#fff;border-radius:18px;padding:28px 30px}
-.price .big{font:800 54px/1 var(--display);color:var(--accent);margin:8px 0 4px}
+.price .kick{color:rgba(255,255,255,.7)}
+.price .big{font:800 54px/1 var(--display);color:#fff;margin:8px 0 4px}
 .price p{margin:0;opacity:.85;font-size:14.5px}
 .price table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
 .price td{padding:7px 0;border-top:1px solid rgba(255,255,255,.14)}
@@ -234,7 +242,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   .gains,.mods,.roles,.safe,.road,.next{grid-template-columns:1fr}
   .price .big{font-size:42px}
   .mock .grid{grid-template-columns:repeat(3,1fr)}
-  .mock .grid i:nth-child(n+4){display:none}
+  .mock .grid div:nth-child(3){border-right:0}
+  .mock .grid div:nth-child(n+4){display:none}
 }
 @media print{
   body{background:#fff}
@@ -248,14 +257,14 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 <header class="cover">
   <div class="wrap">
-    <div class="brandline"><img src="data:image/png;base64,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" alt="PONAGAR"><small>GIỚI THIỆU HỆ THỐNG</small></div>
+    <div class="brandline"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgMTAwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlRlY2hob21lcyDigJQgSG9tZSBTb2x1dGlvbnMiPgogIDxwYXRoIGZpbGw9IiNGRTMyMUYiIGQ9Ik0wIDBIMTAyVjEwMEg3My4xVjI2LjRIMFoiLz4KICA8ZyBmaWxsPSIjNzk4NTg1Ij4KICAgIDxyZWN0IHk9IjM0LjciIHdpZHRoPSIyOC40IiBoZWlnaHQ9IjI4LjQiLz48cmVjdCB4PSIzNi43IiB5PSIzNC43IiB3aWR0aD0iMjguNiIgaGVpZ2h0PSIyOC40Ii8+CiAgICA8cmVjdCB5PSI3MS4zIiB3aWR0aD0iMjguNCIgaGVpZ2h0PSIyOC43Ii8+PHJlY3QgeD0iMzYuNyIgeT0iNzEuMyIgd2lkdGg9IjI4LjYiIGhlaWdodD0iMjguNyIvPgogIDwvZz4KICA8cmVjdCBmaWxsPSIjRkUzMjFGIiB4PSIyOC40IiB5PSI2My4xIiB3aWR0aD0iOC4zIiBoZWlnaHQ9IjguMiIvPgogIDxnIGZvbnQtZmFtaWx5PSJWZXJkYW5hLCdEZWphVnUgU2FucycsJ0JlIFZpZXRuYW0gUHJvJyxBcmlhbCxzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iNzAwIj4KICAgIDx0ZXh0IHg9IjExOCIgeT0iNTciIGZpbGw9IiNGRTMyMUYiIGZvbnQtc2l6ZT0iNTAiIHRleHRMZW5ndGg9IjI4MCIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nQW5kR2x5cGhzIj5URUNISE9NRVM8L3RleHQ+CiAgICA8dGV4dCB4PSIxMjAiIHk9IjkyIiBmaWxsPSIjMjgyQzM0IiBmb250LXNpemU9IjIxIiB0ZXh0TGVuZ3RoPSIyNzYiIGxlbmd0aEFkanVzdD0ic3BhY2luZ0FuZEdseXBocyI+SE9NRSBTT0xVVElPTlM8L3RleHQ+CiAgPC9nPgo8L3N2Zz4K" alt="TECHHOMES — Home Solutions"><small>GIỚI THIỆU HỆ THỐNG</small></div>
     <h1>Một hệ thống cho <em>cả</em> việc bán hàng lẫn vận hành</h1>
-    <p>Khách đặt trên website, kho xuất hàng, xưởng sản xuất, nhân viên chấm công nhận lương, kế toán nhận chứng từ trong MISA. Tất cả dùng chung một dữ liệu, không ai phải nhập lại.</p>
+    <p>Khách xem giá và đặt hàng trên website, kho 3 showroom xuất hàng, thợ lắp đặt tại nhà, nhân viên nhận lương và hoa hồng, kế toán nhận chứng từ trong MISA. Tất cả dùng chung một dữ liệu, không ai phải nhập lại.</p>
     <div class="stats">
-      <div><b>10.000</b>sản phẩm chuyển từ Haravan sang, giữ nguyên thứ hạng Google</div>
-      <div><b>6</b>vai trò, mỗi người chỉ thấy phần việc của mình</div>
+      <div><b>~10.000</b>mã hàng chuyển từ techhomes.vn cũ, giữ link cũ trên Google</div>
+      <div><b>3</b>showroom, tồn kho riêng từng nơi: Phú Nhuận, Q.10, Thủ Đức</div>
       <div><b>4</b>giai đoạn, xong giai đoạn nào dùng ngay giai đoạn đó</div>
-      <div><b>~18</b>tuần cho toàn bộ hệ thống</div>
+      <div><b>17–19</b>tuần cho toàn bộ hệ thống</div>
     </div>
     <div class="ctas">
       <a class="btn solid" href="prototype/home.html">Xem giao diện website →</a>
@@ -268,11 +277,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <main>
   <section>
     <div class="wrap">
-      <div class="sec-h"><span class="kick">Ponagar được gì</span><h2>Ba thay đổi lớn nhất</h2></div>
+      <div class="sec-h"><span class="kick">Techhomes được gì</span><h2>Ba thay đổi lớn nhất</h2></div>
       <div class="gains">
-        <div class="gain"><div class="ic">◆</div><h3>Website của riêng Ponagar</h3><p>Không còn trả phí thuê bao nền tảng hằng tháng. Mã nguồn và dữ liệu thuộc về công ty. Giao diện làm riêng cho túi da vẽ tay: chọn màu da, vẽ tên, đặt làm theo ảnh.</p></div>
-        <div class="gain"><div class="ic">⇄</div><h3>Đơn, kho, xưởng nối liền</h3><p>Khách đặt là kho thấy ngay. Hàng đặt làm tự sinh lệnh sản xuất cho xưởng. Web chỉ báo "còn hàng" khi kho thật sự còn, ở đúng kho đó.</p></div>
-        <div class="gain"><div class="ic">₫</div><h3>Lương và sổ sách tự ra</h3><p>Lương tính từ giờ công, số sản phẩm thợ làm và doanh số bán. Đơn xuất kho tự sang MISA thành chứng từ để kế toán duyệt, xuất hoá đơn.</p></div>
+        <div class="gain"><div class="ic">◆</div><h3>Website riêng, giá rõ ràng</h3><p>Khách thấy ngay giá niêm yết, giá bán và % giảm, không phải nhắn Zalo hỏi giá. Nhà thầu, kiến trúc sư bấm "Yêu cầu báo giá" ngay trên web. Mã nguồn và dữ liệu thuộc về Techhomes.</p></div>
+        <div class="gain"><div class="ic">⇄</div><h3>Đơn, kho 3 showroom, lắp đặt nối liền</h3><p>Đơn vào là biết showroom nào còn hàng. Xuất kho ghi số serial, lên lịch lắp cho thợ, ra phiếu bảo hành. Web chỉ báo "còn hàng" khi kho thật sự còn.</p></div>
+        <div class="gain"><div class="ic">₫</div><h3>Lương, hoa hồng và sổ sách tự ra</h3><p>Hoa hồng bán hàng và công lắp đặt của thợ tự vào bảng lương. Đơn bán, phiếu kho, phiếu thu tự sang MISA thành chứng từ để kế toán duyệt.</p></div>
       </div>
     </div>
   </section>
@@ -280,37 +289,38 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   <section>
     <div class="wrap">
       <div class="sec-h"><span class="kick">Hệ thống gồm những gì</span><h2>Sáu khối chức năng</h2>
-        <p class="lead">Mỗi khối có trang riêng trong phần quản trị. Nhân viên và thợ dùng thêm một trang gọn trên điện thoại.</p></div>
+        <p class="lead">Mỗi khối có trang riêng trong phần quản trị. Thợ lắp đặt và nhân viên dùng thêm một trang gọn trên điện thoại. Phạm vi dưới đây là đề xuất, <span class="ask">chờ Techhomes xác nhận</span>.</p></div>
       <div class="mods">
-        <div class="mod hl"><span class="no">01</span><h3>Website bán hàng</h3><div class="who">Khách hàng</div>
-          <ul><li>Menu lớn, lọc theo chủ đề tranh, màu da, giá</li><li>Tìm kiếm gợi ý ngay khi gõ, gõ không dấu vẫn ra</li><li>Chọn màu da, size, vẽ tên miễn phí</li><li>Đặt hàng COD hoặc chuyển khoản VietQR</li><li>Đặt làm riêng: gửi ảnh để hoạ sĩ vẽ</li><li>Tra cứu đơn bằng số điện thoại</li></ul></div>
+        <div class="mod hl"><span class="no">01</span><h3>Website bán hàng</h3><div class="who">Khách lẻ · Nhà thầu · Đại lý</div>
+          <ul><li>Menu theo ngành hàng và thương hiệu: Hafele, Blum, Bosch…</li><li>Lọc theo hãng, giá, kích thước, tính năng, tình trạng</li><li>Tìm theo mã hàng Hafele (533.09.989) hay Blum (22F1809)</li><li>Hiện giá niêm yết, giá bán, % giảm</li><li>Nút "Yêu cầu báo giá" và "Đặt lịch lắp đặt"</li><li>Catalogue PDF, tin tức, dự án đã làm</li></ul></div>
         <div class="mod"><span class="no">02</span><h3>Quản trị bán hàng</h3><div class="who">Chủ · Quản lý · Bán hàng</div>
-          <ul><li>Nhận và xác nhận đơn, báo đơn mới qua Telegram</li><li>Bán tại quầy ở showroom và sân bay</li><li>Đổi trả, hoàn tiền</li><li>Sản phẩm, biến thể, nhập/xuất Excel</li><li>Mã giảm giá, banner, bài viết</li><li>Báo cáo doanh thu, mẫu bán chạy</li></ul></div>
-        <div class="mod"><span class="no">03</span><h3>Kho &amp; sản xuất</h3><div class="who">Kho · Quản lý xưởng · Thợ</div>
-          <ul><li>Tồn theo từng kho, chuyển kho, kiểm kê</li><li>Đóng gói, quét mã, in tem mã vạch</li><li>Nguyên liệu, nhà cung cấp, nhập mua</li><li>Định mức da cho từng mẫu túi</li><li>Lệnh sản xuất qua Cắt · May · Vẽ · Hoàn thiện</li><li>Cảnh báo nguyên liệu sắp hết</li></ul></div>
-        <div class="mod"><span class="no">04</span><h3>Nhân sự &amp; lương</h3><div class="who">Quản lý · Kế toán · Nhân viên</div>
-          <ul><li>Hồ sơ nhân viên, xếp ca, đăng ký ca</li><li>Chấm công bằng điện thoại tại nơi làm</li><li>Đơn xin nghỉ, ứng lương</li><li>Lương khoán theo sản phẩm, hoa hồng bán hàng</li><li>Bảng lương tháng, phiếu lương trên điện thoại</li></ul></div>
-        <div class="mod"><span class="no">05</span><h3>Kế toán &amp; MISA</h3><div class="who">Kế toán</div>
-          <ul><li>Đơn xuất kho tự sang MISA AMIS Kế toán</li><li>Kế toán duyệt chứng từ, xuất hoá đơn trong MISA</li><li>Đối soát tiền COD hãng vận chuyển trả về</li><li>Đối chiếu tồn kho với MISA</li><li>Đơn lỗi được báo và gửi lại</li></ul></div>
-        <div class="mod"><span class="no">06</span><h3>Hệ thống</h3><div class="who">Chủ</div>
-          <ul><li>Tài khoản, bật tắt quyền cho từng người</li><li>Nhật ký: ai sửa tồn kho, sửa lương, lúc nào</li><li>Thông báo Telegram cho việc cần làm</li><li>Sao lưu tự động hằng ngày</li></ul></div>
+          <ul><li>Đơn từ web, Zalo, điện thoại, tại showroom về một chỗ</li><li>Lập báo giá, khách đồng ý là chuyển thành đơn</li><li>Khách chia nhóm: lẻ, nhà thầu, đại lý</li><li>Bảng giá chiết khấu riêng cho từng nhóm</li><li>Khuyến mãi, banner, bài viết, dự án</li><li>Báo cáo doanh thu theo showroom, theo hãng</li></ul></div>
+        <div class="mod"><span class="no">03</span><h3>Kho</h3><div class="who">Kho · Quản lý showroom</div>
+          <ul><li>Tồn riêng 3 kho: Phú Nhuận, Q.10, Thủ Đức</li><li>Nhập mua từ Hafele Việt Nam, Blum và các hãng</li><li>Chuyển kho giữa các showroom, kiểm kê</li><li>Ghi số serial bếp, máy rửa chén, khóa điện tử</li><li>Tồn thật hiện lên website</li></ul></div>
+        <div class="mod"><span class="no">04</span><h3>Lắp đặt &amp; bảo hành</h3><div class="who">Quản lý · Thợ lắp đặt</div>
+          <ul><li>Lịch lắp đặt, phân thợ theo ngày</li><li>Phiếu lắp đặt, thợ chụp ảnh nghiệm thu</li><li>Biểu phí lắp đặt có sẵn khi báo giá</li><li>Phiếu bảo hành theo số serial</li><li>Tiếp nhận và theo dõi yêu cầu bảo hành</li></ul></div>
+        <div class="mod"><span class="no">05</span><h3>Nhân sự &amp; lương</h3><div class="who">Quản lý · Kế toán · Nhân viên</div>
+          <ul><li>Chấm công</li><li>Hoa hồng cho nhân viên bán hàng</li><li>Công lắp đặt tính theo phiếu cho thợ</li><li>Bảng lương tháng</li></ul></div>
+        <div class="mod"><span class="no">06</span><h3>Kế toán &amp; MISA</h3><div class="who">Kế toán</div>
+          <ul><li>Đơn bán, phiếu nhập/xuất kho, phiếu thu tự sang MISA AMIS Kế toán</li><li>Chứng từ xếp hàng đợi, lỗi thì báo và gửi lại</li><li>Không bao giờ gửi trùng</li><li>Không cần KiotViet hay Sapo</li></ul></div>
       </div>
+      <p class="sys"><b>Dùng chung cho cả hệ thống:</b> mỗi người một tài khoản, quyền theo vai trò; nhật ký ghi lại ai sửa giá, sửa tồn, sửa lương, lúc nào; sao lưu tự động hằng ngày.</p>
     </div>
   </section>
 
   <section>
     <div class="wrap">
       <div class="sec-h"><span class="kick">Ví dụ</span><h2>Một đơn hàng đi qua hệ thống</h2>
-        <p class="lead">Từ lúc khách bấm đặt đến lúc kế toán có chứng từ. Nhãn đỏ là việc hệ thống tự làm, không ai phải nhập tay.</p></div>
+        <p class="lead">Khách đặt một bếp từ Hafele trên web, đến lúc kế toán có chứng từ. Nhãn đỏ là việc hệ thống tự làm, không ai phải nhập tay.</p></div>
       <div class="flow">
-        <div class="step"><b>Khách đặt hàng</b><span>Trên website, chọn COD hoặc VietQR</span><em class="tag">Tự giữ hàng</em></div>
-        <div class="step"><b>Shop xác nhận</b><span>Bán hàng gọi khách, bấm Xác nhận</span><em class="tag">Báo Telegram</em></div>
-        <div class="step"><b>Kho chuẩn bị</b><span>Lấy hàng, thợ vẽ tên, gói quà</span><em class="tag">Tự tạo việc cho thợ</em></div>
-        <div class="step"><b>Xuất kho &amp; giao</b><span>Quét mã, bấm Xuất kho, khách nhận mã vận đơn</span><em class="tag">Tự trừ tồn</em></div>
+        <div class="step"><b>Khách đặt bếp</b><span>Trên website, chọn ngày muốn lắp</span><em class="tag">Tự giữ hàng</em></div>
+        <div class="step"><b>Showroom xác nhận</b><span>Bán hàng gọi khách, chốt giá và lịch lắp</span><em class="tag">Báo đơn mới</em></div>
+        <div class="step"><b>Xuất kho</b><span>Từ showroom gần khách nhất còn hàng</span><em class="tag">Tự trừ tồn, ghi serial</em></div>
+        <div class="step"><b>Lắp đặt tại nhà</b><span>Thợ lắp xong, chụp ảnh nghiệm thu</span><em class="tag">Tự tính công thợ</em></div>
+        <div class="step"><b>Phiếu bảo hành</b><span>Theo số serial của chiếc bếp</span><em class="tag">Tự tạo phiếu</em></div>
         <div class="step"><b>Sang MISA</b><span>Kế toán duyệt chứng từ, xuất hoá đơn</span><em class="tag">Tự đẩy chứng từ</em></div>
-        <div class="step"><b>Tính hoa hồng</b><span>Khi đơn hoàn tất, hết hạn đổi trả</span><em class="tag">Tự vào bảng lương</em></div>
       </div>
-      <div class="note"><b>Đơn huỷ trước khi xuất kho không bao giờ sang MISA.</b> Lúc khách đặt, hệ thống chỉ giữ hàng để người khác không mua trùng. Tồn kho chỉ giảm khi kho bấm Xuất kho.</div>
+      <div class="note"><b>Đơn huỷ trước khi xuất kho không bao giờ sang MISA.</b> Lúc khách đặt, hệ thống chỉ giữ hàng để người khác không mua trùng. Tồn kho chỉ giảm khi kho bấm Xuất kho. Đơn hoàn tất thì hoa hồng của người bán tự vào bảng lương.</div>
     </div>
   </section>
 
@@ -318,12 +328,12 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="wrap">
       <div class="sec-h"><span class="kick">Ai dùng gì</span><h2>Mỗi người một phần việc</h2></div>
       <div class="roles">
-        <div class="role"><span class="av">C</span><div><b>Chủ</b><span>Xem toàn bộ, phân quyền, duyệt bảng lương, xem lãi gộp</span></div></div>
-        <div class="role"><span class="av">Q</span><div><b>Quản lý</b><span>Đơn hàng, sản phẩm, khuyến mãi, xếp ca, duyệt đơn từ</span></div></div>
-        <div class="role"><span class="av">B</span><div><b>Bán hàng</b><span>Chốt đơn online, bán tại showroom và sân bay</span></div></div>
-        <div class="role"><span class="av">K</span><div><b>Kho &amp; xưởng</b><span>Nhập xuất, kiểm kê, lệnh sản xuất, nguyên liệu</span></div></div>
-        <div class="role"><span class="av">T</span><div><b>Kế toán</b><span>Đối soát, chứng từ sang MISA, lập bảng lương</span></div></div>
-        <div class="role"><span class="av">N</span><div><b>Nhân viên · thợ</b><span>Chấm công, đăng ký ca, xem tiền khoán trên điện thoại</span></div></div>
+        <div class="role"><span class="av">C</span><div><b>Chủ</b><span>Xem toàn bộ 3 showroom, phân quyền, duyệt bảng lương, xem lãi gộp</span></div></div>
+        <div class="role"><span class="av">Q</span><div><b>Quản lý</b><span>Đơn hàng, báo giá, bảng giá theo nhóm khách, lịch lắp đặt</span></div></div>
+        <div class="role"><span class="av">B</span><div><b>Bán hàng</b><span>Tư vấn, báo giá cho nhà thầu, chốt đơn online và tại showroom</span></div></div>
+        <div class="role"><span class="av">K</span><div><b>Kho</b><span>Nhập hàng từ hãng, chuyển kho, kiểm kê, ghi serial</span></div></div>
+        <div class="role"><span class="av">T</span><div><b>Kế toán</b><span>Thu tiền, chứng từ sang MISA, lập bảng lương</span></div></div>
+        <div class="role"><span class="av">L</span><div><b>Thợ lắp đặt</b><span>Xem lịch lắp, chụp ảnh nghiệm thu, xem công trên điện thoại</span></div></div>
       </div>
     </div>
   </section>
@@ -332,36 +342,38 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="wrap web">
       <div>
         <span class="kick">Giao diện</span><h2>Website quen mắt, mua dễ</h2>
-        <p class="lead">Bố cục theo kiểu các trang bán hàng lớn ở Việt Nam mà khách đã quen, mặc màu đỏ logo và chất thủ công của Ponagar.</p>
+        <p class="lead">Giao diện theo phong cách ponagar.co: tối giản, ảnh lớn, nhiều khoảng trắng. Hợp với thiết bị bếp và phụ kiện cao cấp, mặc màu đỏ logo Techhomes.</p>
         <ul class="checks">
-          <li>Thanh trên cùng: danh mục, tìm kiếm, số gọi mua hàng, giỏ hàng</li>
-          <li>Menu danh mục bên trái, banner chạy ở giữa, ba banner ưu đãi bên phải</li>
-          <li>Mỗi ngành hàng một khối, thẻ sản phẩm có % giảm giá và quà tặng kèm</li>
-          <li>Nút Gọi · Zalo · Messenger luôn nằm ở góc màn hình</li>
-          <li>Xem tốt trên điện thoại</li>
+          <li>Đầu trang gọn: logo ở giữa, tìm kiếm, hotline, giỏ hàng</li>
+          <li>Ảnh lớn toàn chiều ngang, menu theo ngành hàng và thương hiệu</li>
+          <li>Lưới sản phẩm thoáng, kẻ mảnh; mỗi thẻ có giá niêm yết, giá bán, % giảm</li>
+          <li>Trang sản phẩm có tab thông số, câu hỏi thường gặp, dải dịch vụ lắp đặt và bảo hành</li>
+          <li>Nút Gọi · Zalo luôn nằm ở góc màn hình. Xem tốt trên điện thoại</li>
         </ul>
         <a class="btn red" href="prototype/home.html">Mở bản mẫu click được →</a>
       </div>
       <div class="mock" aria-hidden="true">
-        <div class="bar"><i style="width:60px"></i><i style="width:46px"></i><i class="s"></i><i style="width:50px"></i><i style="width:30px"></i></div>
-        <div class="hero">
-          <div class="side"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <div class="sl">Quà ấm mùa đông<br>ưu đãi đến 20%</div>
-          <div class="bns"><i></i><i></i><i></i></div>
+        <div class="bar"><i class="l"></i><span class="lg"><i></i><i></i></span><i class="r"></i></div>
+        <div class="menu"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="hero">Bếp từ Hafele<br>giảm đến 30%<small>Xem ngay</small></div>
+        <div class="grid">
+          <div><i style="--c:#282C34"></i><span class="n"></span><span class="p"></span></div>
+          <div><i style="--c:#B9BEC1"></i><span class="n"></span><span class="p"></span></div>
+          <div><i style="--c:#798585"></i><span class="n"></span><span class="p"></span></div>
+          <div><i style="--c:#3F4448"></i><span class="n"></span><span class="p"></span></div>
         </div>
-        <div class="grid"><i style="--c:#B98552"></i><i style="--c:#C98B86"></i><i style="--c:#7E2427"></i><i style="--c:#8A5A3B"></i><i style="--c:#3D5A6C"></i></div>
       </div>
     </div>
   </section>
 
   <section>
     <div class="wrap">
-      <div class="sec-h"><span class="kick">Yên tâm</span><h2>Dữ liệu của Ponagar, trên máy chủ của Ponagar</h2></div>
+      <div class="sec-h"><span class="kick">Yên tâm</span><h2>Dữ liệu của Techhomes, trên máy chủ của Techhomes</h2></div>
       <div class="safe">
-        <div><b>Sở hữu trọn vẹn</b>Bàn giao toàn bộ mã nguồn. Máy chủ do công ty đứng tên.</div>
+        <div><b>Sở hữu trọn vẹn</b>Bàn giao toàn bộ mã nguồn. Máy chủ do Techhomes đứng tên.</div>
         <div><b>Sao lưu mỗi ngày</b>Tự động, lưu ở nơi khác máy chủ chính. Khôi phục được khi có sự cố.</div>
-        <div><b>Giữ thứ hạng Google</b>Đường dẫn cũ trên Haravan tự chuyển sang trang mới tương ứng.</div>
-        <div><b>Biết ai làm gì</b>Mỗi người một tài khoản. Sửa tồn, sửa lương đều ghi lại.</div>
+        <div><b>Giữ thứ hạng Google</b>Link cũ như techhomes.vn/bep-tu-hafele tự chuyển (301) sang trang mới tương ứng.</div>
+        <div><b>Biết ai làm gì</b>Mỗi người một tài khoản. Sửa giá, sửa tồn, sửa lương đều ghi lại.</div>
       </div>
     </div>
   </section>
@@ -371,10 +383,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <div class="sec-h"><span class="kick">Lộ trình</span><h2>Bốn giai đoạn, dùng được ngay từng phần</h2>
         <p class="lead">Website lên trước để bán hàng. Các khối vận hành nối vào sau, theo thứ tự khối sau cần dữ liệu của khối trước.</p></div>
       <div class="road">
-        <div class="ph"><small>GIAI ĐOẠN 1</small><h3>Website &amp; đơn hàng</h3><p>Website mới thay Haravan, quản trị đơn và sản phẩm, chuyển 10.000 sản phẩm.</p><div class="meta"><span>~5 tuần</span><b>16 triệu</b></div></div>
-        <div class="ph"><small>GIAI ĐOẠN 2</small><h3>Kho &amp; MISA</h3><p>Tồn theo kho, đóng gói, bán tại quầy, đổi trả, chứng từ sang MISA.</p><div class="meta"><span>~4–5 tuần</span><b>14 triệu</b></div></div>
-        <div class="ph"><small>GIAI ĐOẠN 3</small><h3>Nguyên liệu &amp; sản xuất</h3><p>Nhập da, định mức, lệnh sản xuất, kiểm hàng, giá vốn.</p><div class="meta"><span>~4 tuần</span><b>10 triệu</b></div></div>
-        <div class="ph"><small>GIAI ĐOẠN 4</small><h3>Nhân sự &amp; lương</h3><p>Chấm công, xếp ca, lương khoán, hoa hồng, phiếu lương.</p><div class="meta"><span>~4–5 tuần</span><b>10 triệu</b></div></div>
+        <div class="ph"><small>GIAI ĐOẠN 1</small><h3>Website &amp; đơn hàng</h3><p>Website mới thay techhomes.vn cũ, giữ link cũ, quản trị đơn và báo giá, chuyển ~10.000 mã hàng.</p><div class="meta"><span>~5 tuần</span><b>16 triệu</b></div></div>
+        <div class="ph"><small>GIAI ĐOẠN 2</small><h3>Kho &amp; MISA</h3><p>Tồn riêng 3 showroom, nhập mua từ hãng, chuyển kho, số serial, chứng từ sang MISA.</p><div class="meta"><span>~4–5 tuần</span><b>14 triệu</b></div></div>
+        <div class="ph"><small>GIAI ĐOẠN 3</small><h3>Lắp đặt &amp; bảo hành</h3><p>Lịch lắp, phân thợ, phiếu nghiệm thu có ảnh, phiếu bảo hành theo serial.</p><div class="meta"><span>~4 tuần</span><b>10 triệu</b></div></div>
+        <div class="ph"><small>GIAI ĐOẠN 4</small><h3>Nhân sự &amp; lương</h3><p>Chấm công, hoa hồng bán hàng, công lắp đặt, bảng lương tháng.</p><div class="meta"><span>~4–5 tuần</span><b>10 triệu</b></div></div>
       </div>
       <div class="bar-time"><span>GĐ1</span><span>GĐ2</span><span>GĐ3</span><span>GĐ4</span></div>
     </div>
@@ -385,21 +397,21 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <div class="sec-h"><span class="kick">Chi phí</span><h2>Trả một lần, duy trì nhẹ</h2></div>
       <div class="cost">
         <div class="price">
-          <span class="kick" style="color:var(--accent)">Phí làm toàn hệ thống</span>
+          <span class="kick">Phí làm toàn hệ thống</span>
           <div class="big">50.000.000đ</div>
           <p>Trả một lần, chia theo giai đoạn. Chưa gồm VAT.</p>
           <table>
             <tr><td>GĐ1 · Website &amp; đơn hàng</td><td>16.000.000đ</td></tr>
-            <tr><td>GĐ2 · Kho thành phẩm &amp; MISA</td><td>14.000.000đ</td></tr>
-            <tr><td>GĐ3 · Nguyên liệu &amp; sản xuất</td><td>10.000.000đ</td></tr>
+            <tr><td>GĐ2 · Kho &amp; MISA</td><td>14.000.000đ</td></tr>
+            <tr><td>GĐ3 · Lắp đặt &amp; bảo hành</td><td>10.000.000đ</td></tr>
             <tr><td>GĐ4 · Nhân sự &amp; lương</td><td>10.000.000đ</td></tr>
           </table>
         </div>
         <div class="side-cost">
-          <div><span class="kick">Duy trì hằng năm</span><div class="big">~4.000.000đ</div><p>Máy chủ VPS 2 nhân, 4GB RAM. Công ty trả trực tiếp nhà cung cấp. Không phí thuê bao phần mềm.</p></div>
+          <div><span class="kick">Duy trì hằng năm</span><div class="big">4.000.000đ</div><p>Máy chủ VPS 2 nhân, 4GB RAM. Techhomes trả trực tiếp nhà cung cấp. Không phí thuê bao phần mềm.</p></div>
           <div><span class="kick">Thanh toán 4 đợt</span>
             <div class="pay"><span><b>30%</b>Khi ký</span><span><b>30%</b>Xong GĐ1</span><span><b>20%</b>Xong GĐ3</span><span><b>20%</b>Xong GĐ4</span></div>
-            <p style="margin-top:10px">Bảo hành 3 tháng sau mỗi giai đoạn. <a href="specs/03-bao-gia.html">Xem báo giá chi tiết</a></p></div>
+            <p style="margin-top:10px">Tỉ lệ 30/30/20/20 là đề xuất, <span class="ask">chờ Techhomes xác nhận</span>. Bảo hành 3 tháng sau mỗi giai đoạn. <a href="specs/03-bao-gia.html">Xem báo giá chi tiết</a></p></div>
         </div>
       </div>
     </div>
@@ -410,9 +422,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <div class="sec-h"><span class="kick">Bắt đầu</span><h2>Bước tiếp theo</h2></div>
       <div class="next">
         <div><b>Duyệt giao diện</b>Xem bản mẫu website, góp ý màu sắc, bố cục.</div>
-        <div><b>Trả lời câu hỏi</b>11 câu về MISA, kho, xưởng, lương ở <a href="tai-lieu/index.html#lo-trinh">mục 7 tài liệu</a>.</div>
-        <div><b>Ký hợp đồng</b>Chốt phạm vi và lịch từng giai đoạn.</div>
-        <div><b>Gửi dữ liệu</b>File xuất sản phẩm từ Haravan, logo, thông tin showroom.</div>
+        <div><b>Trả lời câu hỏi</b>Các câu về MISA, kho, lắp đặt, lương ở <a href="tai-lieu/index.html#lo-trinh">mục 7 tài liệu</a>.</div>
+        <div><b>Ký hợp đồng</b>Chốt phạm vi, lịch từng giai đoạn, tên công ty và mã số thuế.</div>
+        <div><b>Gửi dữ liệu</b>Danh sách mã hàng và giá, bảng chiết khấu theo nhóm khách, biểu phí lắp đặt, file logo gốc.</div>
       </div>
     </div>
   </section>
@@ -420,7 +432,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 <footer>
   <div class="wrap">
-    <span><b style="color:var(--ink)">Ponagar</b> · Công ty TNHH ART 868 · Giới thiệu hệ thống · 26/11/2026</span>
+    <span><b style="color:var(--ink)">Techhomes</b> · Showroom Hafele · Giới thiệu hệ thống · 27/11/2026 · Tên công ty, MST: <span class="ask">cần Techhomes xác nhận</span></span>
     <span>Người lập: Bùi Tín</span>
   </div>
 </footer>

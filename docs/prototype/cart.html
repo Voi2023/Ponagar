@@ -3,63 +3,61 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="../gate.js"></script>
-<title>Giỏ hàng & đặt hàng (prototype)</title>
+<title>Giỏ hàng & đặt hàng — Techhomes (prototype)</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="assets/ponagar.css">
+<link rel="stylesheet" href="assets/techhomes.css">
 <link rel="stylesheet" href="assets/shop.css">
 <script src="assets/proto.js"></script>
 </head>
 <body class="shop">
 <div id="chrome-top"></div>
 
-<main class="shop-wrap">
-  <nav class="shop-bc"><a href="home.html">Trang chủ</a> › <b>Giỏ hàng</b></nav>
-  <div class="shop-checkout">
-    <div>
-      <section class="shop-sec"><div class="shop-sec-h"><h2><span>Giỏ hàng (<b id="cnt">2</b>)</span></h2><a href="category.html">Mua thêm ›</a></div><div id="lines"></div></section>
+<main id="main" class="container">
+  <nav class="crumbs" aria-label="Đường dẫn"><a href="home.html">Trang chủ</a><span>/</span><b>Giỏ hàng</b></nav>
+  <div class="page-head"><h1>Giỏ hàng</h1><span id="cnt"></span></div>
 
-      <section class="shop-sec">
-        <div class="shop-sec-h"><h2>Thông tin nhận hàng</h2></div>
-        <div class="shop-pay" style="flex-direction:row;margin-bottom:14px">
-          <label style="flex:1"><input type="radio" name="ship" checked><i class="ti ti-truck-delivery"></i> Giao tận nơi</label>
-          <label style="flex:1"><input type="radio" name="ship"><i class="ti ti-building-store"></i> Nhận tại showroom</label>
+  <div class="checkout">
+    <div>
+      <section class="co-sec"><h2>Sản phẩm <a href="category.html">Mua thêm</a></h2><div id="lines"></div></section>
+
+      <section class="co-sec">
+        <h2>Nhận hàng</h2>
+        <div class="radio-cards radio-cards--2">
+          <label><input type="radio" name="ship" checked onchange="store.hidden=true"><span><b>Giao & lắp tận nơi</b><small>Giao trong ngày tại TP.HCM khi còn hàng</small></span></label>
+          <label><input type="radio" name="ship" onchange="store.hidden=false"><span><b>Nhận tại showroom</b><small>Phú Nhuận · Quận 10 · Thủ Đức</small></span></label>
         </div>
-        <div class="grid-2" style="gap:0 14px">
-          <div class="field"><label>Họ tên</label><input value="Nguyễn Lan Anh"></div>
-          <div class="field"><label>Số điện thoại</label><input type="tel" value="0903 456 218"></div>
-          <div class="field"><label>Tỉnh / Thành phố</label><select><option>TP. Hồ Chí Minh</option><option>Hà Nội</option><option>Đà Nẵng</option></select></div>
-          <div class="field"><label>Phường / Xã</label><select><option>Phường Cầu Kiệu</option><option>Phường Phú Nhuận</option></select></div>
-        </div>
-        <div class="field"><label>Địa chỉ</label><input placeholder="Số nhà, tên đường"></div>
-        <div class="field"><label>Ghi chú</label><textarea rows="2" placeholder="Giờ nhận hàng, lời nhắn cho shop…"></textarea></div>
-        <label class="row-flex" style="font-size:13.5px;margin-bottom:8px"><input type="checkbox" checked> Gói quà + thiệp viết tay (miễn phí)</label>
-        <label class="row-flex" style="font-size:13.5px"><input type="checkbox" onchange="vat.style.display=this.checked?'grid':'none'"> Xuất hoá đơn công ty</label>
-        <div class="grid-2" id="vat" style="display:none;gap:0 14px;margin-top:10px">
-          <div class="field"><label>Mã số thuế</label><input placeholder="0312345678"></div>
-          <div class="field"><label>Tên công ty</label><input></div>
+        <div class="form" style="margin-top:14px">
+          <label id="store" hidden>Showroom nhận hàng<select id="storeSel"></select></label>
+          <div class="f2"><label>Họ tên<input value="Nguyễn Minh Khoa"></label><label>Số điện thoại<input type="tel" value="0903 456 218"></label></div>
+          <div class="f2"><label>Tỉnh / Thành phố<select><option>TP. Hồ Chí Minh</option><option>Bình Dương</option><option>Đồng Nai</option></select></label><label>Phường / Xã<select><option>Phường 8, Phú Nhuận</option><option>Phường 12, Quận 10</option></select></label></div>
+          <label>Địa chỉ<input placeholder="Số nhà, tên đường, toà nhà, căn hộ"></label>
+          <div class="f2"><label>Ngày lắp mong muốn<input type="date"></label><label>Buổi<select><option>Sáng</option><option>Chiều</option></select></label></div>
+          <label>Ghi chú<textarea rows="2" placeholder="Mặt đá đã khoét chưa, có thang máy chở hàng không…"></textarea></label>
+          <label class="addon" style="text-transform:none;letter-spacing:0;font:300 14px/1.5 var(--font-family);flex-direction:row"><input type="checkbox" onchange="vat.hidden=!this.checked"><span><b>Xuất hoá đơn công ty</b></span></label>
+          <div class="f2" id="vat" hidden><label>Mã số thuế<input placeholder="0312345678"></label><label>Tên công ty<input></label></div>
         </div>
       </section>
 
-      <section class="shop-sec">
-        <div class="shop-sec-h"><h2>Thanh toán</h2></div>
-        <div class="shop-pay">
-          <label><input type="radio" name="pay" checked><i class="ti ti-cash"></i> Thanh toán khi nhận hàng (COD)</label>
-          <label><input type="radio" name="pay"><i class="ti ti-qrcode"></i> Chuyển khoản VietQR · quét mã, tự xác nhận</label>
-          <label><input type="radio" name="pay" disabled><i class="ti ti-credit-card"></i> Thẻ / ví VNPay, MoMo <span class="badge gray soon">Tuỳ chọn thêm</span></label>
+      <section class="co-sec">
+        <h2>Thanh toán</h2>
+        <div class="radio-cards">
+          <label><input type="radio" name="pay" checked><span><b>Thanh toán khi nhận hàng (COD)</b><small>Trả tiền mặt hoặc chuyển khoản cho thợ khi giao/lắp xong</small></span></label>
+          <label><input type="radio" name="pay"><span><b>Chuyển khoản VietQR</b><small>Quét mã, hệ thống tự xác nhận đã nhận tiền</small></span></label>
+          <label><input type="radio" name="pay"><span><b>Công nợ nhà thầu</b><small>Chỉ hiện với tài khoản nhà thầu có hợp đồng</small></span></label>
         </div>
       </section>
     </div>
 
-    <aside class="shop-sec" style="position:sticky;top:96px">
-      <div class="shop-sec-h"><h2>Đơn hàng</h2></div>
-      <div class="row-flex" style="flex-wrap:nowrap;margin-bottom:12px"><input class="input" style="flex:1" placeholder="Mã giảm giá"><button class="btn btn-outline btn-sm" onclick="toast('Mã PONAGAR10: giảm 10%')">Áp dụng</button></div>
-      <div class="shop-sum"><span>Tạm tính</span><span id="sub"></span></div>
-      <div class="shop-sum"><span>Vẽ tên</span><span>Miễn phí</span></div>
-      <div class="shop-sum"><span>Phí giao hàng</span><span style="color:var(--ok);font-weight:700">Miễn phí</span></div>
-      <div class="shop-sum total"><span>Tổng cộng</span><span id="tot"></span></div>
-      <p class="muted" style="font-size:12px;margin:4px 0 12px">Giá đã gồm VAT.</p>
-      <button class="btn btn-primary" style="width:100%;padding:13px" onclick="toast('Đặt hàng thành công · Mã đơn PNG-10482')">ĐẶT HÀNG</button>
-      <p class="muted" style="font-size:12.5px;margin:10px 0 0"><i class="ti ti-phone-call"></i> Shop gọi xác nhận trong 30 phút (8h–21h). Tra cứu đơn bằng số điện thoại.</p>
+    <aside class="summary">
+      <h2>Đơn hàng</h2>
+      <form class="coupon" onsubmit="event.preventDefault();toast('Mã TECHHOMES11: giảm thêm 2% (minh hoạ)')"><input placeholder="Mã giảm giá" aria-label="Mã giảm giá"><button>Áp dụng</button></form>
+      <div class="sum-row"><span>Tạm tính</span><span id="sub"></span></div>
+      <div class="sum-row"><span>Tiết kiệm so với giá niêm yết</span><span id="save" style="color:var(--brand)"></span></div>
+      <div class="sum-row"><span>Lắp đặt</span><span id="inst"></span></div>
+      <div class="sum-row"><span>Giao hàng nội thành</span><span>Miễn phí</span></div>
+      <div class="sum-row total"><span>Tổng cộng</span><b id="tot"></b></div>
+      <button class="btn btn--dark btn--block" style="margin-top:18px" onclick="toast('Đặt hàng thành công · Mã đơn TH-20481')">Đặt hàng</button>
+      <p class="note"><i class="ti ti-phone-call"></i> Techhomes gọi xác nhận trong giờ làm việc và báo giờ thợ đến. Giá đã gồm VAT. Phí lắp đặt là số minh hoạ, theo biểu phí của Techhomes.</p>
     </aside>
   </div>
 </main>
@@ -67,19 +65,23 @@
 <div id="chrome-bottom"></div>
 <script>
 renderChrome('cart.html');
-const lines = [{ p: PRODUCTS[0], opt: 'Màu Bò sáp · Size S · Vẽ tên: <b>LAN ANH</b>', q: 1 }, { p: PRODUCTS[6], opt: 'Màu Xanh rêu', q: 1 }];
+document.getElementById('storeSel').innerHTML = STORES.map(s => `<option>${s.name} — ${s.addr}</option>`).join('');
+const lines = [{ p: byId(5), q: 1, inst: 350000 }, { p: byId(21), q: 1, inst: 300000 }, { p: byId(61), q: 1, inst: 0 }];
 function draw() {
-  document.getElementById('lines').innerHTML = lines.map((l, i) => `<div class="shop-line">
-    <span class="th" style="--sw:${l.p.sw}"><i class="ti ${l.p.ic}"></i></span>
-    <div><b>${l.p.name}</b><div class="muted" style="font-size:12.8px">${l.opt}</div>
-      <div class="row-flex" style="margin-top:6px"><span class="shop-qty"><button onclick="q(${i},-1)">−</button><input value="${l.q}" readonly><button onclick="q(${i},1)">+</button></span>
-      <a href="#" class="muted" style="font-size:12.5px" onclick="event.preventDefault();lines.splice(${i},1);draw()"><i class="ti ti-trash"></i> Xoá</a></div></div>
-    <div class="shop-price" style="flex-direction:column;align-items:flex-end;gap:0"><span class="now">${fmt(l.p.price * l.q)}</span>${l.p.old ? `<span class="old">${fmt(l.p.old * l.q)}</span>` : ''}</div>
-  </div>`).join('') || '<p class="muted">Giỏ hàng trống.</p>';
-  const s = lines.reduce((a, l) => a + l.p.price * l.q, 0);
-  document.getElementById('sub').textContent = fmt(s);
-  document.getElementById('tot').textContent = fmt(s);
-  document.getElementById('cnt').textContent = lines.reduce((a, l) => a + l.q, 0);
+  document.getElementById('lines').innerHTML = lines.map((l, i) => `<div class="line">
+    <img src="${l.p.img}" alt="">
+    <div><div class="line__name">${l.p.name}</div>
+      <div class="line__meta">${l.p.brand} · Mã ${l.p.code}${l.inst ? ` · Kèm lắp đặt ${fmt(l.inst)}` : ''}</div>
+      <div class="line__act"><span class="qty"><button onclick="q(${i},-1)" aria-label="Giảm">−</button><input value="${l.q}" readonly aria-label="Số lượng"><button onclick="q(${i},1)" aria-label="Tăng">+</button></span>
+        <a href="#" onclick="event.preventDefault();lines.splice(${i},1);draw()">Xoá</a></div></div>
+    <div class="line__price"><b>${fmt(l.p.price * l.q)}</b>${l.p.old ? `<s>${fmt(l.p.old * l.q)}</s>` : ''}</div>
+  </div>`).join('') || '<p class="body-copy">Giỏ hàng trống.</p>';
+  const sub = lines.reduce((a, l) => a + l.p.price * l.q, 0), save = lines.reduce((a, l) => a + (l.p.old - l.p.price) * l.q, 0), inst = lines.reduce((a, l) => a + l.inst * l.q, 0);
+  document.getElementById('sub').textContent = fmt(sub);
+  document.getElementById('save').textContent = '−' + fmt(save);
+  document.getElementById('inst').textContent = inst ? fmt(inst) : 'Không';
+  document.getElementById('tot').textContent = fmt(sub + inst);
+  document.getElementById('cnt').textContent = lines.reduce((a, l) => a + l.q, 0) + ' sản phẩm';
 }
 function q(i, d) { lines[i].q = Math.max(1, lines[i].q + d); draw(); }
 draw();

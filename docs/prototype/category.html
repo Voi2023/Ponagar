@@ -3,48 +3,48 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="../gate.js"></script>
-<title>Túi da vẽ tay nữ — Danh mục (prototype)</title>
+<title>Thiết bị bếp chính hãng — Techhomes (prototype)</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="assets/ponagar.css">
+<link rel="stylesheet" href="assets/techhomes.css">
 <link rel="stylesheet" href="assets/shop.css">
 <script src="assets/proto.js"></script>
 </head>
 <body class="shop">
 <div id="chrome-top"></div>
 
-<main class="shop-wrap">
-  <nav class="shop-bc"><a href="home.html">Trang chủ</a> › <a href="category.html">Túi xách nữ</a> › <b>Túi đeo chéo</b></nav>
-  <div class="row-flex" style="margin-bottom:14px"><h1 style="margin:0;font-size:30px">Túi da vẽ tay nữ</h1><span class="muted">(1.284 mẫu)</span></div>
-  <div class="shop-chips-q" id="chips"></div>
+<main id="main">
+  <div class="container">
+    <nav class="crumbs" aria-label="Đường dẫn"><a href="home.html">Trang chủ</a><span>/</span><b>Thiết bị bếp</b></nav>
+    <div class="page-head"><h1>Thiết bị bếp</h1><span>1.284 sản phẩm · Häfele, Bosch, Smeg, Teka, Malloca, Miele</span></div>
+  </div>
+  <div class="tabset" id="types" role="tablist"></div>
 
-  <div class="shop-listing">
-    <aside class="shop-facet" id="facet">
-      <div class="fhead"><span><i class="ti ti-adjustments-horizontal"></i> Bộ lọc</span>
-        <span class="row-flex"><a href="#" onclick="event.preventDefault();document.querySelectorAll('#facet input[type=checkbox]').forEach(i=>i.checked=false)">Xoá tất cả</a>
-        <button class="btn btn-primary btn-sm shop-filter-mb" onclick="facet.classList.remove('open')">Xong</button></span></div>
-      <div id="facets"></div>
-    </aside>
+  <div class="container">
+    <div class="listing">
+      <aside class="facet" id="facet" aria-label="Bộ lọc">
+        <div class="facet__head"><span class="eyebrow">Bộ lọc</span>
+          <span><a href="#" onclick="event.preventDefault();document.querySelectorAll('#facet input[type=checkbox]').forEach(i=>i.checked=false)">Xoá tất cả</a>
+          <button class="icon-btn facet-mb" onclick="facet.classList.remove('open')" aria-label="Đóng bộ lọc"><i class="ti ti-x"></i></button></span></div>
+        <div id="facets"></div>
+      </aside>
 
-    <div>
-      <div class="shop-active-f">Đang lọc:
-        <span class="chip">Đồng quê <i class="ti ti-x"></i></span>
-        <span class="chip">Bò sáp <i class="ti ti-x"></i></span>
-        <span class="chip">3 – 5 triệu <i class="ti ti-x"></i></span>
+      <div>
+        <div class="toolbar-s">
+          <button class="btn btn--line facet-mb" style="min-height:38px;padding:0 14px" onclick="facet.classList.add('open')"><i class="ti ti-adjustments-horizontal"></i> Lọc (2)</button>
+          <div class="on-f"><button class="pill">Häfele <i class="ti ti-x"></i></button><button class="pill">Còn hàng tại showroom <i class="ti ti-x"></i></button></div>
+          <span class="count">12 / 1.284</span>
+          <select aria-label="Sắp xếp"><option>Bán chạy</option><option>Mới nhất</option><option>Giá thấp → cao</option><option>Giá cao → thấp</option><option>Giảm nhiều nhất</option></select>
+        </div>
+        <div class="grid grid--hair grid--3" id="grid"></div>
+        <nav class="pager" aria-label="Trang"><a href="#">‹</a><a class="on" href="#">1</a><a href="#">2</a><a href="#">3</a><a href="#">…</a><a href="#">107</a><a href="#">›</a></nav>
       </div>
-      <div class="shop-sortbar">
-        <button class="btn btn-outline btn-sm shop-filter-mb" onclick="facet.classList.add('open')"><i class="ti ti-adjustments-horizontal"></i> Bộ lọc (3)</button>
-        <div class="tabs" id="sort"></div>
-        <span class="count">Hiển thị <b>212</b> mẫu</span>
-      </div>
-      <div class="shop-grid c4" id="grid"></div>
-      <div class="shop-pager"><a href="#">‹</a><a class="on" href="#">1</a><a href="#">2</a><a href="#">3</a><a href="#">…</a><a href="#">18</a><a href="#">›</a></div>
-
-      <section class="shop-sec shop-seo">
-        <h2>Túi da vẽ tay nữ chủ đề đồng quê</h2>
-        <p>Đoạn giới thiệu cho trang danh mục × chủ đề, admin tự viết. Mỗi tổ hợp danh mục và chủ đề tranh là một trang có đường dẫn riêng (ví dụ <code>/tui-xach-nu/dong-que</code>) để lên Google với từ khoá như "túi da vẽ tay đồng quê".</p>
-        <p>Trang lọc theo màu da, giá chỉ dùng cho khách lọc nhanh, không tạo trang mới trên Google (gắn canonical về trang chính).</p>
-      </section>
     </div>
+
+    <section class="seo">
+      <h2>Thiết bị bếp Häfele chính hãng tại TP.HCM</h2>
+      <p>Đoạn giới thiệu cho từng danh mục, admin tự viết. Mỗi tổ hợp danh mục × thương hiệu là một trang có đường dẫn riêng (ví dụ <code>/thiet-bi-bep/hafele</code>) để lên Google với từ khoá như "bếp từ Hafele chính hãng".</p>
+      <p>Đường dẫn cũ của techhomes.vn (ví dụ <code>techhomes.vn/bep-tu-hafele</code>) chuyển hướng 301 về trang mới để giữ thứ hạng. Trang lọc theo giá, tình trạng chỉ để khách lọc nhanh, gắn canonical về trang chính.</p>
+    </section>
   </div>
 </main>
 
@@ -52,23 +52,20 @@
 <script>
 renderChrome('category.html');
 const CAT = CATS[0];
-document.getElementById('chips').innerHTML = ['Tất cả', ...CAT.types].map((t, i) => `<a href="#" class="${i === 1 ? 'on' : ''}">${t}</a>`).join('');
-document.getElementById('sort').innerHTML = ['Mới nhất', 'Bán chạy', 'Giá thấp', 'Giá cao'].map((t, i) =>
-  `<button class="${i ? '' : 'active'}" onclick="this.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('active'));this.classList.add('active')">${t}</button>`).join('');
+document.getElementById('types').innerHTML = ['Tất cả', ...CAT.types].map((t, i) => `<button class="${i ? '' : 'on'}" onclick="this.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('on'));this.classList.add('on')">${t}</button>`).join('');
 
-const box = (label, n, on, extra = '') => `<label><input type="checkbox" ${on ? 'checked' : ''}>${extra}${label}<span class="n">${n}</span></label>`;
-const LNAME = { hong: 'Hồng phấn', nau: 'Nâu bò', do: 'Đỏ đô', reu: 'Xanh rêu', bo: 'Bò sáp', den: 'Đen', xanh: 'Xanh navy', kem: 'Kem' };
+const box = (label, n, on) => `<label><input type="checkbox" ${on ? 'checked' : ''}>${label}<span class="n">${n}</span></label>`;
 const group = (title, body, open = true) => `<details ${open ? 'open' : ''}><summary>${title}</summary><div class="opts">${body}</div></details>`;
 document.getElementById('facets').innerHTML =
-  group('Chủ đề tranh', '<input class="find" placeholder="Tìm chủ đề…">' + THEMES.map((t, i) => box(t, [212, 348, 97, 64, 121, 85][i], i === 0)).join('')) +
-  group('Màu da', Object.entries(LNAME).map(([k, n], i) => box(n, [40, 57, 74, 91, 108, 66, 112, 38][i], k === 'bo',
-    `<span style="width:16px;height:16px;border-radius:50%;background:${LEATHER[k]};flex:none"></span>`)).join('')) +
-  group('Mức giá', PRICES.map((p, i) => box(p, [96, 402, 517, 269][i], i === 2)).join('') + '<div class="range"><input placeholder="Từ"><input placeholder="Đến"></div>') +
-  group('Kiểu dáng', CAT.types.map((t, i) => box(t, [388, 214, 302, 196, 184][i], false)).join(''), false) +
-  group('Kích thước', ['Mini', 'S', 'M', 'L'].map((t, i) => box(t, [143, 521, 412, 208][i], false)).join(''), false) +
-  group('Tình trạng', box('Còn hàng', 1031, false) + box('Đặt làm 7–10 ngày', 253, false) + box('Độc bản', 412, false), false);
+  group('Thương hiệu', CAT.brands.map((b, i) => box(b, [612, 214, 98, 131, 167, 62][i], i === 0)).join('')) +
+  group('Loại', CAT.types.map((t, i) => box(t, [188, 241, 96, 173, 352, 84, 150][i], false)).join('')) +
+  group('Mức giá', PRICES.map((p, i) => box(p, [402, 288, 251, 236, 107][i], false)).join('') + '<div class="range"><input placeholder="Từ" aria-label="Giá từ"><input placeholder="Đến" aria-label="Giá đến"></div>') +
+  group('Tình trạng', box('Còn hàng tại showroom', 846, true) + box('Đặt hàng từ hãng 3–5 ngày', 438, false) + box('Đang giảm giá', 1102, false)) +
+  group('Showroom có sẵn', STORES.map((s, i) => box(s.name, [612, 401, 288][i], false)).join(''), false) +
+  group('Số vùng nấu (bếp từ)', ['2 vùng', '3 vùng', '4 vùng', 'Domino 1 vùng'].map((t, i) => box(t, [96, 41, 33, 18][i], false)).join(''), false) +
+  group('Chiều rộng', ['60 cm', '70 cm', '80 cm', '90 cm'].map((t, i) => box(t, [204, 133, 87, 66][i], false)).join(''), false);
 
-document.getElementById('grid').innerHTML = [0, 3, 8, 1, 2, 4, 5, 9, 10, 11, 0, 3].map(i => cardHTML(PRODUCTS[i], { compare: true })).join('');
+document.getElementById('grid').innerHTML = PRODUCTS.filter(p => p.cat === 'bep').map(cardHTML).join('');
 </script>
 </body>
 </html>

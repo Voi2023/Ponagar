@@ -1,157 +1,209 @@
-/* Prototype Ponagar — dữ liệu mẫu + render header/menu/footer dùng chung.
-   Bố cục header / thẻ sản phẩm / footer tham chiếu thienkimhome.com, màu theo logo Ponagar.
-   Sản phẩm/giá là dữ liệu mẫu. Bản thật là component Nuxt Shop*. */
+/* Prototype Techhomes — dữ liệu mẫu + header/menu/footer dùng chung.
+   Bố cục theo phong cách ponagar.co (logo giữa, menu chữ in hoa, lưới sản phẩm kẻ mảnh, ảnh lớn).
+   Tên, mã, giá, ảnh sản phẩm lấy từ techhomes.vn (11/2026) để minh hoạ. Bản thật là component Nuxt Shop*. */
 
-const LOGO = 'assets/logo.png';   // logo chữ PONAGAR màu đỏ; nền đỏ thì thêm class logo-w
+const LOGO = 'assets/logo.svg';
 const COMPANY = {
-  name: 'Công ty TNHH ART 868', mst: '0319090382',
-  addr: '166 Hoa Lan, P. Cầu Kiệu, TP.HCM',
-  phone: '0909 720 027', tel: '0909720027', email: 'ponagar.co@gmail.com',
+  name: 'Techhomes', slogan: 'Home Solutions',
+  phone: '0988 128 302', tel: '0988128302', phone2: '0908 523 234', email: 'thamnguyen@techhomes.vn',
+  legal: 'Tên pháp nhân & MST: chờ Techhomes cung cấp',
 };
-
-/* Màu da = dữ liệu sản phẩm (admin nhập mã màu cho từng biến thể), không phải màu giao diện */
-const LEATHER = { hong: '#C98B86', nau: '#8A5A3B', do: '#7E2427', reu: '#4F5B3A', bo: '#B98552', den: '#2E2826', xanh: '#3D5A6C', kem: '#CDB894' };
+const STORES = [
+  { name: 'Showroom Phú Nhuận', short: 'Phú Nhuận', note: 'Trụ sở', addr: '132 Nguyễn Trọng Tuyển, Phú Nhuận, TP.HCM' },
+  { name: 'Chi nhánh Quận 10', short: 'Q.10', note: 'CN1', addr: '283/57 Cách Mạng Tháng Tám, P.12, Q.10, TP.HCM' },
+  { name: 'Chi nhánh Thủ Đức', short: 'Thủ Đức', note: 'CN2', addr: '17 B3 Khu Đông Tăng Long, Thủ Đức, TP.HCM' },
+];
 
 const CATS = [
-  { name: 'Túi xách nữ', ic: 'ti-shopping-bag', types: ['Túi đeo chéo', 'Túi tote', 'Túi xách tay', 'Túi mini', 'Balo nữ'] },
-  { name: 'Túi xách nam', ic: 'ti-briefcase', types: ['Túi đeo chéo nam', 'Cặp công sở', 'Túi bao tử'] },
-  { name: 'Ví da', ic: 'ti-wallet', types: ['Ví nữ dài', 'Ví nữ ngắn', 'Ví nam', 'Ví đựng thẻ'] },
-  { name: 'Phụ kiện', ic: 'ti-eyeglass', types: ['Thắt lưng', 'Bao mắt kính', 'Bao hộ chiếu', 'Guốc gỗ quai da', 'Móc khoá'] },
-  { name: 'Tranh da', ic: 'ti-photo', types: ['Tranh treo tường', 'Tranh quà tặng'] },
-  { name: 'Quà tặng doanh nghiệp', ic: 'ti-gift', types: ['Bộ quà tặng', 'Khắc logo', 'Đơn số lượng lớn'] },
+  { key: 'bep', name: 'Thiết bị bếp', types: ['Bếp từ', 'Máy hút mùi', 'Máy rửa chén', 'Lò nướng & vi sóng', 'Chậu & vòi rửa', 'Tủ lạnh & tủ rượu', 'Máy lọc nước'], brands: ['Hafele', 'Bosch', 'Smeg', 'Teka', 'Malloca', 'Miele'] },
+  { key: 'blum', name: 'Phụ kiện Blum', types: ['Tay nâng AVENTOS', 'Bản lề CLIP top', 'Ray hộp LEGRABOX', 'Ray hộp TANDEMBOX', 'Tủ đồ khô SPACE TOWER', 'Hệ điện SERVO-DRIVE'], brands: ['Blum'] },
+  { key: 'noithat', name: 'Phụ kiện tủ bếp', types: ['Giá bát nâng hạ', 'Rổ góc', 'Giá xoong nồi', 'Thùng gạo', 'Thùng rác âm tủ', 'Phụ kiện tủ áo'], brands: ['Hafele', 'Kesseböhmer', 'Garis', 'Eurogold'] },
+  { key: 'cua', name: 'Phụ kiện cửa', types: ['Tay nắm cửa', 'Ruột & thân khóa', 'Bản lề sàn', 'Tay đẩy hơi', 'Cửa trượt Slido', 'Phụ kiện cửa kính'], brands: ['Hafele', 'GEZE', 'Yale', 'Bauma'] },
+  { key: 'khoa', name: 'Khóa điện tử', types: ['Khóa Face ID', 'Khóa vân tay', 'Khóa thẻ từ', 'Khóa cửa kính', 'Khóa cửa nhôm', 'Chuông cửa màn hình'], brands: ['Hafele', 'Yale', 'Philips', 'Samsung', 'Kaadas'] },
+  { key: 'vesinh', name: 'Thiết bị vệ sinh', types: ['Bồn cầu', 'Bồn tắm', 'Sen vòi', 'Lavabo', 'Phụ kiện phòng tắm'], brands: ['Hafele', 'Hansgrohe', 'Duravit', 'TOTO'] },
 ];
-const THEMES = ['Đồng quê', 'Hoa & trái', 'Biển & trời', 'Non sông VN', 'Trừu tượng', 'Romance'];
-const PRICES = ['Dưới 1,5 triệu', '1,5 – 3 triệu', '3 – 5 triệu', 'Trên 5 triệu'];
+const BRANDS = ['Häfele', 'Blum', 'Bosch', 'Smeg', 'Miele', 'Teka', 'Hansgrohe', 'Duravit', 'TOTO', 'GEZE', 'Cleansui', 'Yale'];
+const PRICES = ['Dưới 2 triệu', '2 – 5 triệu', '5 – 10 triệu', '10 – 20 triệu', 'Trên 20 triệu'];
 
-const P = (id, cat, name, theme, ic, sw, sws, price, old, tags = []) => ({ id, cat, name, theme, ic, sw: LEATHER[sw], sws, price, old, tags });
+/* id = số ảnh trong assets/img/p/ · giá niêm yết (old) và giá bán lấy từ techhomes.vn */
+const P = (id, cat, type, brand, name, code, price, old, tags = []) => ({ id, cat, type, brand, name, code, price, old, tags, img: `assets/img/p/${id}.jpg` });
 const PRODUCTS = [
-  P(1, 'Túi xách nữ', 'Túi Dozza TR-X182', 'Đồng Nội', 'ti-plant', 'bo', ['bo', 'nau', 'den'], 3600000, 4100000, ['Độc bản', 'Bán chạy']),
-  P(2, 'Túi xách nữ', 'Túi MiNa Premium H153', 'Sương Hồng', 'ti-flower', 'hong', ['hong', 'kem'], 4900000, 5400000, ['Mới']),
-  P(3, 'Túi xách nữ', 'Túi Phương Đông (S) H513', 'Romance', 'ti-heart', 'do', ['do', 'den'], 3990000, 0, ['Độc bản']),
-  P(4, 'Túi xách nữ', 'Túi Cát Tường B511', 'Quê Hương', 'ti-home-2', 'nau', ['nau', 'bo'], 4600000, 5100000),
-  P(5, 'Túi xách nữ', 'Túi Marina X78-V174', 'Biển', 'ti-sailboat', 'xanh', ['xanh', 'kem'], 6150000, 0, ['Độc bản']),
-  P(6, 'Túi xách nữ', 'Túi Crush X193', 'Bóng Chiều', 'ti-sun', 'do', ['do', 'nau'], 4200000, 4800000, ['Bán chạy']),
-  P(7, 'Ví da', 'Ví Leaf V174', 'Romance', 'ti-leaf', 'reu', ['reu', 'nau', 'hong'], 1390000, 1550000, ['Mới']),
-  P(8, 'Phụ kiện', 'Bao mắt kính K04 H252', 'Hoa Đào', 'ti-flower', 'hong', ['hong', 'den'], 1190000, 0),
-  P(9, 'Túi xách nữ', 'Túi Amara C176-C190', 'Làng Hoa', 'ti-plant-2', 'kem', ['kem', 'bo'], 5900000, 6500000, ['Độc bản']),
-  P(10, 'Túi xách nữ', 'Túi Eva K179-De33', 'Song Hạc', 'ti-feather', 'den', ['den', 'do'], 4600000, 5200000),
-  P(11, 'Túi xách nữ', 'Túi Hoa Cau TR-215', 'Hoa Cau', 'ti-plant', 'reu', ['reu', 'kem'], 3300000, 3700000),
-  P(12, 'Túi xách nữ', 'Túi Thu Hà Nội H301', 'Phố Cổ', 'ti-building-arch', 'bo', ['bo', 'do'], 4350000, 0, ['Mới']),
-  P(13, 'Ví da', 'Ví dài Hoa Sen V210', 'Sen Hồ', 'ti-flower', 'nau', ['nau', 'hong'], 1290000, 1490000),
-  P(14, 'Ví da', 'Ví ngắn Cánh Bướm V118', 'Romance', 'ti-butterfly', 'hong', ['hong', 'kem'], 890000, 990000),
-  P(15, 'Ví da', 'Ví nam Đồng Quê VN05', 'Đồng Quê', 'ti-plant-2', 'den', ['den', 'nau'], 990000, 1150000),
-  P(16, 'Ví da', 'Ví đựng thẻ Cánh Diều', 'Tuổi Thơ', 'ti-kite', 'xanh', ['xanh', 'bo'], 450000, 0),
-  P(17, 'Túi xách nam', 'Túi đeo chéo nam Phố Hội N21', 'Phố Hội', 'ti-building-arch', 'nau', ['nau', 'den'], 2450000, 2800000),
-  P(18, 'Túi xách nam', 'Cặp công sở Sông Nước C08', 'Sông Nước', 'ti-sailboat', 'den', ['den', 'nau'], 3900000, 4300000),
-  P(19, 'Túi xách nam', 'Túi bao tử Hội An N33', 'Phố Hội', 'ti-lamp', 'bo', ['bo', 'den'], 1650000, 0),
-  P(20, 'Túi xách nam', 'Balo da Đường Xưa B12', 'Quê Hương', 'ti-road', 'nau', ['nau', 'reu'], 4800000, 5300000),
-  P(21, 'Túi xách nam', 'Clutch nam Mây Trời CL3', 'Biển & trời', 'ti-cloud', 'xanh', ['xanh', 'den'], 1350000, 1500000),
-  P(22, 'Phụ kiện', 'Thắt lưng Rồng Mây TL02', 'Non sông VN', 'ti-cloud', 'den', ['den', 'nau'], 990000, 1150000),
-  P(23, 'Phụ kiện', 'Bao hộ chiếu Sen Hồng', 'Sen Hồ', 'ti-flower', 'hong', ['hong', 'kem'], 650000, 750000),
-  P(24, 'Phụ kiện', 'Móc khoá Áo Dài', 'Non sông VN', 'ti-key', 'do', ['do', 'kem'], 180000, 0),
-  P(25, 'Phụ kiện', 'Guốc gỗ quai da Hoa Mai', 'Hoa & trái', 'ti-flower-2', 'bo', ['bo', 'do'], 590000, 690000),
-  P(26, 'Tranh da', 'Tranh da Phố Hội 40×60', 'Phố Hội', 'ti-photo', 'bo', ['bo'], 3200000, 0, ['Độc bản']),
-  P(27, 'Tranh da', 'Tranh da Sen Quê 30×40', 'Sen Hồ', 'ti-photo', 'kem', ['kem'], 1800000, 2100000),
-  P(28, 'Tranh da', 'Tranh da Thuyền Buồm 50×70', 'Biển & trời', 'ti-sailboat', 'xanh', ['xanh'], 4500000, 0),
-  P(29, 'Quà tặng doanh nghiệp', 'Bộ quà Ví + Thắt lưng khắc logo', 'Quà tặng', 'ti-gift', 'nau', ['nau', 'den'], 1890000, 2240000),
-  P(30, 'Quà tặng doanh nghiệp', 'Sổ da A5 khắc logo', 'Quà tặng', 'ti-notebook', 'do', ['do', 'nau', 'den'], 520000, 600000),
+  P(5, 'bep', 'Bếp từ', 'Hafele', 'Bếp từ 2 vùng nấu HC-I7326B', '533.09.989', 18472999, 26389999, ['Bán chạy']),
+  P(11, 'bep', 'Bếp từ', 'Hafele', 'Bếp từ 2 vùng nấu HC-I73242B', '536.61.857', 13852999, 19789999),
+  P(4, 'bep', 'Máy rửa chén', 'Hafele', 'Máy rửa chén độc lập Free-standing', '535.29.700', 21273000, 30390000),
+  P(6, 'bep', 'Máy rửa chén', 'Hafele', 'Máy rửa chén độc lập HDW-F60EB', '538.21.310', 17374000, 24820000, ['Mới']),
+  P(12, 'bep', 'Lò nướng & vi sóng', 'Hafele', 'Lò vi sóng âm tủ HM-B38C', '538.01.111', 12123999, 17319999),
+  P(21, 'bep', 'Máy hút mùi', 'Hafele', 'Máy hút mùi HH-SG70A', '533.89.021', 8322999, 11889999),
+  P(26, 'bep', 'Máy hút mùi', 'Hafele', 'Máy hút mùi HH-TG60E', '539.81.073', 6687800, 9554000),
+  P(17, 'bep', 'Chậu & vòi rửa', 'Hafele', 'Chậu đá đơn HS-GS7545', '570.30.800', 10241770, 14631100),
+  P(61, 'bep', 'Chậu & vòi rửa', 'Hafele', 'Vòi bếp Hydros HT-C456', '570.82.230', 11257329, 16081899),
+  P(63, 'bep', 'Chậu & vòi rửa', 'Hafele', 'Vòi bếp HT21-CH1P254', '577.55.200', 2864889, 4092699),
+  P(19, 'bep', 'Máy lọc nước', 'Hafele', 'Máy lọc nước HWP-UNT400D', '577.95.700', 9731260, 13901800),
+  P(38, 'bep', 'Tủ lạnh & tủ rượu', 'Hafele', 'Tủ lạnh mini cửa kính HC-M48G', '568.30.301', 4204200, 5605600),
+  P(44, 'blum', 'Tay nâng AVENTOS', 'Blum', 'Bộ tay nâng AVENTOS HF top 22F1809', '22F1809', 3454920, 4935600, ['Bán chạy']),
+  P(50, 'blum', 'Tay nâng AVENTOS', 'Blum', 'Bộ tay nâng AVENTOS HL top 22L1509', '22L1509', 3801923, 5431320),
+  P(9, 'blum', 'Tủ đồ khô SPACE TOWER', 'Blum', 'Tủ đồ khô SPACE TOWER LEGRABOX, xám', '1766107', 14208264, 20297520),
+  P(35, 'blum', 'Ray hộp LEGRABOX', 'Blum', 'Kệ gia vị SPACE TWIN LEGRABOX 200–300mm', '6400298', 4710636, 6729480),
+  P(25, 'blum', 'Hệ điện SERVO-DRIVE', 'Blum', 'Bộ đẩy điện SERVO-DRIVE cho 3 ngăn kéo', '7841868', 6990732, 9986760),
+  P(42, 'blum', 'Bản lề CLIP top', 'Blum', 'Bản lề nối cánh giữa CLIP top 134°', '78ZT5500T', 103125, 137500),
+  P(7, 'cua', 'Bản lề sàn', 'GEZE', 'Bản lề sàn TS 550NV tải 300kg', '932.10.061', 16927400, 24182000),
+  P(34, 'cua', 'Bản lề sàn', 'Hafele', 'Bản lề sàn tải 150kg', '932.84.046', 4741800, 6774000),
+  P(39, 'cua', 'Tay đẩy hơi', 'Hafele', 'Cơ cấu đóng cửa âm', '931.84.269', 4143999, 5919999),
+  P(56, 'cua', 'Cửa trượt Slido', 'Hafele', 'Cửa trượt đồng bộ Slido Telescopic 80kg', '940.81.140', 2439500, 3485000),
+  P(60, 'cua', 'Phụ kiện cửa kính', 'Hafele', 'Tay nắm phòng tắm kính', '903.02.250', 1168999, 1669999),
+  P(3, 'cua', 'Cửa trượt Slido', 'Hafele', 'Bộ cửa trượt tự động SL300D', '935.11.022', 24882200, 35546000, ['Mới']),
+  P(8, 'khoa', 'Khóa Face ID', 'Hafele', 'Khóa điện tử PP9100 3D Face ID', '912.20.697', 15799699, 22570999, ['Bán chạy']),
+  P(20, 'khoa', 'Khóa vân tay', 'Hafele', 'Khóa điện tử PP8100 BLE, màu đen', '912.20.286', 9400000, 14472000),
+  P(32, 'khoa', 'Khóa thẻ từ', 'Hafele', 'Khóa điện tử DL6100', '912.20.582', 5386500, 7695000),
+  P(83, 'khoa', 'Khóa vân tay', 'Hafele', 'Khóa điện tử Horizon PP2501W', '499.21.224', 15717100, 22453000, ['Mới']),
+  P(29, 'khoa', 'Khóa cửa nhôm', 'Hafele', 'Khóa điện tử cho cửa nhôm', '912.20.145', 6078100, 8683000),
+  P(77, 'noithat', 'Giá bát nâng hạ', 'Hafele', 'Giá bát nâng hạ Lento', '504.76.010', 7198799, 10283999),
+  P(71, 'noithat', 'Thùng gạo', 'Hafele', 'Thùng gạo âm tủ', '549.32.758', 3173099, 4532999),
+  P(22, 'noithat', 'Rổ góc', 'Hafele', 'Rổ góc Kosmo Olla', '595.50.804', 7103600, 10148000),
+  P(74, 'noithat', 'Giá xoong nồi', 'Hafele', 'Giá xoong nồi inox Cappella', '549.08.034', 2486400, 3552000),
+  P(72, 'noithat', 'Thùng rác âm tủ', 'Hafele', 'Thùng rác Viola 400mm 14 lít', '502.24.006', 965300, 1379000),
+  P(99, 'vesinh', 'Bồn tắm', 'Hafele', 'Bồn tắm độc lập Nagoya 1700', '588.99.600', 22548539, 32212199),
+  P(100, 'vesinh', 'Bồn cầu', 'Hafele', 'Bồn cầu treo tường Sapporo', '588.79.410', 5989549, 8556499),
+  P(103, 'vesinh', 'Sen vòi', 'Hafele', 'Thanh sen kết hợp kệ Intensity', '589.23.155', 5064429, 7234899),
+  P(105, 'vesinh', 'Phụ kiện phòng tắm', 'Hafele', 'Kệ treo khăn Kyoto', '580.57.210', 3854270, 5506100),
 ];
+const byId = id => PRODUCTS.find(p => p.id === id);
+const inCat = k => PRODUCTS.filter(p => p.cat === k);
 
 const fmt = v => v.toLocaleString('vi-VN') + 'đ';
 const pct = p => p.old ? Math.round((1 - p.price / p.old) * 100) : 0;
-const reviews = p => (p.id * 7) % 23;
-const sku = p => 'SP' + String(p.id).padStart(4, '0');   // mã hàng = mã bên MISA
+const sku = p => p.code;   // mã hàng = mã hãng (Hafele 533.09.989, Blum 22F1809) = mã bên MISA
 
-function cardHTML(p, opt = {}) {
-  return `<a class="shop-card" href="product.html">
-    ${p.old ? `<span class="off">Giảm ${pct(p)}%</span>` : ''}
-    ${opt.compare ? '<label class="cmp" onclick="event.preventDefault();this.querySelector(\'input\').checked^=1"><input type="checkbox"> Yêu thích</label>' : ''}
-    <div class="img" style="--sw:${p.sw}"><i class="ti ${p.ic}"></i></div>
-    <div class="name">${p.name}</div>
-    <div class="shop-price"><span class="now">${fmt(p.price)}</span>${p.old ? `<span class="old">${fmt(p.old)}</span>` : ''}</div>
-    <div class="tk-gift"><span class="lb">Tặng thêm</span>
-      <div><small>Vẽ tên</small><b>miễn phí</b></div>
-      <div><small>Trị giá</small><b class="v">150.000đ</b></div>
-    </div>
-    <div class="tk-rate"><span class="stars">★★★★★</span>${reviews(p)} đánh giá
-      <span class="sws">${p.sws.map(k => `<span style="--sw:${LEATHER[k]}"></span>`).join('')}</span></div>
+function cardHTML(p) {
+  return `<a class="card" href="product.html">
+    <div class="card__media"><img src="${p.img}" alt="${p.name}" loading="lazy">
+      ${p.tags.length ? `<span class="card__tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</span>` : ''}</div>
+    <span class="card__brand">${p.brand}</span>
+    <span class="card__name">${p.name}</span>
+    <span class="card__code">Mã ${p.code}</span>
+    <span class="card__price"><b>${fmt(p.price)}</b>${p.old ? `<s>${fmt(p.old)}</s><em>−${pct(p)}%</em>` : ''}</span>
   </a>`;
 }
 
+const I = n => `<i class="ti ti-${n}" aria-hidden="true"></i>`;
+
 function renderChrome(active) {
   const header = `
-  <header class="shop-header"><div class="shop-wrap">
-    <a class="shop-logo" href="home.html"><img class="logo-w" src="${LOGO}" alt="Ponagar"><small>Handmade leather</small></a>
-    <button class="tk-hbtn shop-cat-btn" onclick="toggleMega()"><i class="ti ti-menu-2"></i>Danh mục<i class="ti ti-chevron-down dd"></i></button>
-    <button class="tk-hbtn tk-lang"><i class="ti ti-world"></i><span class="t"><small>Ngôn ngữ</small>Tiếng Việt<i class="ti ti-chevron-down dd"></i></span></button>
-    <div class="shop-search">
-      <i class="ti ti-search si"></i>
-      <input type="search" placeholder="Bạn cần tìm gì?">
-      <div class="shop-suggest">
-        <div class="grp">Từ khoá</div>
-        <a href="category.html"><i class="ti ti-search"></i> túi đeo chéo vẽ hoa</a>
-        <a href="category.html"><i class="ti ti-search"></i> ví da khắc tên</a>
-        <div class="grp">Sản phẩm</div>
-        ${PRODUCTS.slice(0, 3).map(p => `<a href="product.html"><span class="th" style="background:${p.sw};color:var(--surface)"><i class="ti ${p.ic}"></i></span>${p.name} – ${p.theme}<span class="p">${fmt(p.price)}</span></a>`).join('')}
-        <div class="grp">Bộ sưu tập</div>
-        <a href="category.html"><i class="ti ti-palette"></i> Đồng quê (48 mẫu)</a>
+  <a class="skip-link" href="#main">Bỏ qua đến nội dung</a>
+  <header class="site-header">
+    <div class="site-header__bar">
+      <div class="site-header__side">
+        <button class="icon-btn" aria-label="Menu" onclick="openDrawer('menu')">${I('menu-2')}</button>
+        <button class="icon-btn" aria-label="Tìm kiếm" onclick="openDrawer('search')">${I('search')}</button>
+        <a class="hdr-hot" href="tel:${COMPANY.tel}">${I('phone')}<span>${COMPANY.phone}</span></a>
+      </div>
+      <a class="logo" href="home.html"><img src="${LOGO}" alt="Techhomes — Home Solutions"></a>
+      <div class="site-header__side site-header__side--end">
+        <button class="hdr-link" onclick="openForm('quote')">Báo giá nhà thầu</button>
+        <a class="icon-btn" href="#" aria-label="Tài khoản">${I('user')}</a>
+        <a class="icon-btn cart-btn" href="cart.html" aria-label="Giỏ hàng">${I('shopping-bag')}<span class="cart-btn__count">2</span></a>
       </div>
     </div>
-    <a class="tk-hlink" href="tel:${COMPANY.tel}"><i class="ti ti-phone"></i><span class="t">Gọi mua hàng<b>${COMPANY.phone}</b></span></a>
-    <a class="tk-hlink" href="#showroom"><i class="ti ti-map-pin"></i><span class="t">Cửa hàng<br>gần bạn</span></a>
-    <button class="tk-hbtn tk-guide"><i class="ti ti-book-2"></i><span class="t">Cẩm nang</span><i class="ti ti-chevron-down dd"></i></button>
-    <a class="tk-hlink" href="cart.html"><i class="ti ti-shopping-bag"><span class="shop-cart-count">2</span></i><span class="t">Giỏ<br>hàng</span></a>
-    <a class="tk-hbtn tk-member" href="#"><i class="ti ti-user-circle"></i><span class="t">Thành viên</span></a>
-  </div></header>
-  <div class="shop-wrap shop-mega-host"><div class="shop-mega" id="mega">
-    <div class="shop-mega-l">${CATS.map((c, i) => `<a href="category.html" class="${i === 0 ? 'on' : ''}" onmouseenter="megaShow(${i},this)"><i class="ti ${c.ic}"></i>${c.name}</a>`).join('')}</div>
-    <div class="shop-mega-r" id="megaR"></div>
-  </div></div>`;
+    <nav class="site-nav" aria-label="Danh mục"><ul class="site-nav__list">
+      ${CATS.map((c, i) => `<li class="has-mega"><a class="site-nav__link ${active === 'category.html' && i === 0 ? 'on' : ''}" href="category.html">${c.name}</a>
+        <div class="mega"><div class="mega__inner">
+          <div><span class="eyebrow">Theo loại</span>${c.types.map(t => `<a href="category.html">${t}</a>`).join('')}</div>
+          <div><span class="eyebrow">Thương hiệu</span>${c.brands.map(b => `<a href="category.html">${c.name} ${b}</a>`).join('')}</div>
+          <div><span class="eyebrow">Theo mức giá</span>${PRICES.map(t => `<a href="category.html">${t}</a>`).join('')}</div>
+          <a class="mega__feat" href="product.html"><img src="${inCat(c.key)[0].img}" alt=""><span>${inCat(c.key)[0].name}</span></a>
+        </div></div></li>`).join('')}
+      <li><a class="site-nav__link" href="#" onclick="event.preventDefault();openForm('install')">Lắp đặt</a></li>
+      <li><a class="site-nav__link" href="#">Dự án</a></li>
+    </ul></nav>
+  </header>
+
+  <div class="scrim" onclick="closeDrawer()"></div>
+  <aside class="drawer drawer--left" id="dr-menu" aria-label="Menu">
+    <div class="drawer__head"><span class="eyebrow">Menu</span><button class="icon-btn" onclick="closeDrawer()" aria-label="Đóng">${I('x')}</button></div>
+    <nav class="drawer__body menu-tree">
+      <a class="menu-tree__link" href="home.html">Trang chủ</a>
+      ${CATS.map(c => `<details><summary>${c.name}</summary><a href="category.html">Xem tất cả ${c.name.toLowerCase()}</a>${c.types.map(t => `<a href="category.html">${t}</a>`).join('')}</details>`).join('')}
+      <a class="menu-tree__link" href="#" onclick="event.preventDefault();closeDrawer();openForm('install')">Lắp đặt tận nơi</a>
+      <a class="menu-tree__link" href="#" onclick="event.preventDefault();closeDrawer();openForm('quote')">Báo giá nhà thầu</a>
+      <a class="menu-tree__link" href="#">Dự án & tin tức</a>
+      <div class="menu-tree__extra">
+        <a href="tel:${COMPANY.tel}">${I('phone')} ${COMPANY.phone}</a>
+        <a href="#">${I('message-circle')} Chat Zalo</a>
+        ${STORES.map(s => `<a href="#showroom">${I('map-pin')} ${s.addr}</a>`).join('')}
+      </div>
+    </nav>
+  </aside>
+  <aside class="drawer drawer--top" id="dr-search" aria-label="Tìm kiếm">
+    <form class="search-form container" onsubmit="event.preventDefault();location.href='category.html'">
+      ${I('search')}<input class="search-form__input" type="search" placeholder="Tìm tên sản phẩm hoặc mã hàng, ví dụ 533.09.989">
+      <button type="button" class="icon-btn" onclick="closeDrawer()" aria-label="Đóng">${I('x')}</button>
+    </form>
+    <div class="search-sug container">
+      <div><span class="eyebrow">Tìm nhiều</span>${['bếp từ hafele', 'tay nâng blum', 'khóa vân tay', 'máy rửa chén', 'bản lề giảm chấn'].map(t => `<a href="category.html">${t}</a>`).join('')}</div>
+      <div class="search-sug__p"><span class="eyebrow">Khớp mã hàng</span>${PRODUCTS.slice(0, 3).map(p => `<a href="product.html"><img src="${p.img}" alt=""><span>${p.name}<small>Mã ${p.code}</small></span><b>${fmt(p.price)}</b></a>`).join('')}</div>
+    </div>
+  </aside>`;
 
   const footer = `
-  <footer class="shop-footer" id="showroom">
-    <div class="shop-wrap cols">
-      <div><h4>Thông tin</h4><a href="#">Giới thiệu Ponagar</a><a href="#">Câu chuyện xưởng vẽ</a><a href="#">Hệ thống showroom</a><a href="#">Tuyển dụng</a><a href="#">Quà tặng doanh nghiệp</a><a href="#">Cam kết chất lượng</a></div>
-      <div><h4>Liên hệ</h4><a href="tel:${COMPANY.tel}">Gọi mua hàng: <b class="hot">${COMPANY.phone}</b></a><a href="tel:${COMPANY.tel}">Gọi khiếu nại: <b class="hot">${COMPANY.phone}</b></a><a href="#">Zalo: <b class="hot">${COMPANY.phone}</b></a>
-        <h4 style="margin-top:14px">Kết nối với chúng tôi</h4><div class="soc"><i class="ti ti-brand-facebook"></i><i class="ti ti-brand-youtube"></i><i class="ti ti-brand-tiktok"></i><i class="ti ti-brand-instagram"></i></div></div>
-      <div><h4>Hỗ trợ khách hàng</h4><a href="#">Chính sách thanh toán</a><a href="#">Hướng dẫn mua hàng</a><a href="#">Vận chuyển và giao nhận</a><a href="#">Bảo hành trọn đời</a><a href="#">Đổi trả, hoàn tiền</a><a href="#">Chính sách bảo mật</a><a href="#">Chính sách kiểm hàng</a></div>
-      <div><h4>Thông tin khuyến mãi</h4><p>Đăng ký nhận bản tin để không bỏ lỡ mẫu mới và ưu đãi.</p>
-        <form class="tk-news" onsubmit="event.preventDefault();toast('Đã đăng ký nhận tin')"><input type="email" placeholder="Email của bạn" required><button>Đăng ký</button></form></div>
+  <section class="services"><ul class="services__list container">
+    ${[['rosette-discount-check', 'Chính hãng 100%', 'Đại lý Häfele, Blum. Hàng có tem, phiếu bảo hành hãng.'],
+       ['truck-delivery', 'Giao & lắp đặt', 'Đội thợ Techhomes lắp tận nơi theo biểu phí công khai.'],
+       ['shield-check', 'Bảo hành theo hãng', 'Tra bảo hành bằng số serial hoặc số điện thoại.'],
+       ['building-skyscraper', 'Giá riêng nhà thầu', 'Bảng chiết khấu theo nhóm khách, báo giá trong ngày.']]
+      .map(([ic, t, d]) => `<li class="services__item">${I(ic)}<div><h3 class="services__title">${t}</h3><p>${d}</p></div></li>`).join('')}
+  </ul></section>
+  <footer class="site-footer" id="showroom">
+    <div class="container site-footer__inner">
+      <div class="site-footer__brand"><img src="${LOGO}" alt="Techhomes"><p>Đại lý phân phối Häfele & Blum tại TP.HCM. Thiết bị bếp, phụ kiện tủ, phụ kiện cửa, khóa điện tử, thiết bị vệ sinh.</p>
+        <nav class="site-footer__social">${[['brand-facebook', 'Facebook'], ['brand-youtube', 'YouTube'], ['brand-tiktok', 'TikTok'], ['message-circle', 'Zalo']].map(([i, t]) => `<a href="#" aria-label="${t}">${I(i)}</a>`).join('')}</nav></div>
+      <nav class="site-footer__links"><p class="site-footer__h">Techhomes</p><a href="#">Giới thiệu</a><a href="#">Dự án</a><a href="#">Catalogue Häfele</a><a href="#">Tin tức & cẩm nang</a><a href="#">Tuyển dụng</a></nav>
+      <nav class="site-footer__links"><p class="site-footer__h">Chính sách</p><a href="#">Hướng dẫn mua hàng</a><a href="#">Vận chuyển & giao hàng</a><a href="#">Lắp đặt & biểu phí</a><a href="#">Bảo hành</a><a href="#">Thanh toán</a><a href="#">Bảo mật</a></nav>
+      <div class="site-footer__contact"><p class="site-footer__h">Liên hệ</p>
+        <a href="tel:${COMPANY.tel}">${COMPANY.phone}</a><a href="tel:0908523234">${COMPANY.phone2}</a><a href="mailto:${COMPANY.email}">${COMPANY.email}</a>
+        <form class="news" onsubmit="event.preventDefault();toast('Đã đăng ký nhận ưu đãi')"><input type="email" placeholder="Email nhận ưu đãi" required aria-label="Email"><button aria-label="Đăng ký">${I('arrow-right')}</button></form></div>
     </div>
-    <div class="shop-wrap tk-stores">
-      <div><h4>Showroom Hoa Lan</h4>${COMPANY.addr}<br>Hotline: <b>${COMPANY.phone}</b><br>Làm việc 9h → 21h hằng ngày<br><a href="#">Bản đồ <i class="ti ti-map-2"></i></a></div>
-      <div><h4>Điểm bán sân bay</h4>Địa chỉ do Ponagar cung cấp<br>Giờ mở cửa theo sân bay<br><a href="#">Bản đồ <i class="ti ti-map-2"></i></a></div>
-      <div><h4>Xưởng sản xuất</h4>Địa chỉ do Ponagar cung cấp<br>Nhận đặt làm riêng, quà tặng doanh nghiệp<br><a href="#">Bản đồ <i class="ti ti-map-2"></i></a></div>
-    </div>
-    <div class="copy">© Bản quyền thuộc về Ponagar · ${COMPANY.name} · Số ĐKKD ${COMPANY.mst} · ${COMPANY.addr} · ${COMPANY.email} · Prototype — dữ liệu mẫu</div>
+    <div class="container site-footer__stores">${STORES.map(s => `<div><span class="eyebrow">${s.note}</span><b>${s.name}</b><span>${s.addr}</span></div>`).join('')}</div>
+    <p class="container site-footer__copy">© 2026 Techhomes — Home Solutions · ${COMPANY.legal} · Prototype, dữ liệu minh hoạ lấy từ techhomes.vn</p>
   </footer>
-  <div class="shop-contactbar"><a class="call" href="tel:${COMPANY.tel}" title="Gọi"><i class="ti ti-phone"></i></a><a class="zalo" href="#" title="Zalo">Zalo</a><a class="msg" href="#" title="Messenger"><i class="ti ti-brand-messenger"></i></a></div>
+  <a class="fab fab--zalo" href="#" aria-label="Chat Zalo">Zalo</a>
+  <a class="fab fab--call" href="tel:${COMPANY.tel}" aria-label="Gọi">${I('phone')}</a>
+
+  <dialog class="dlg" id="dlg-form"><form method="dialog" class="dlg__body" id="dlg-inner"></form></dialog>
   <div class="proto-bar">${[['index.html', 'Mục lục'], ['home.html', 'Trang chủ'], ['category.html', 'Danh mục'], ['product.html', 'Chi tiết'], ['cart.html', 'Giỏ hàng'], ['admin-orders.html', 'Admin']]
     .map(([h, t]) => `<a href="${h}" class="${h === active ? 'on' : ''}">${t}</a>`).join('')}</div>`;
 
   document.getElementById('chrome-top').innerHTML = header;
   document.getElementById('chrome-bottom').innerHTML = footer;
-  megaShow(0);
 }
 
-/* Cột phải của menu danh mục (dùng chung cho mega menu và menu trái trang chủ) */
-const megaCols = c => `
-    <div><h4>Theo kiểu</h4>${c.types.map(t => `<a href="category.html">${t}</a>`).join('')}</div>
-    <div><h4>Theo chủ đề tranh</h4>${THEMES.map(t => `<a href="category.html">${c.name} – ${t}</a>`).join('')}</div>
-    <div><h4>Theo mức giá</h4>${PRICES.map(p => `<a href="category.html">${p}</a>`).join('')}</div>`;
+function openDrawer(k) { document.body.classList.add('drawer-open'); document.getElementById('dr-' + k).classList.add('open'); document.querySelector('#dr-' + k + ' input')?.focus(); }
+function closeDrawer() { document.body.classList.remove('drawer-open'); document.querySelectorAll('.drawer.open').forEach(d => d.classList.remove('open')); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 
-function megaShow(i, el) {
-  document.querySelectorAll('.shop-mega-l a').forEach(a => a.classList.remove('on'));
-  if (el) el.classList.add('on'); else document.querySelector('.shop-mega-l a')?.classList.add('on');
-  document.getElementById('megaR').innerHTML = megaCols(CATS[i]);
+/* Form "Yêu cầu báo giá" (nhà thầu, tủ bếp) và "Đặt lịch lắp đặt" — 1 dialog dùng chung */
+const FORMS = {
+  quote: ['Yêu cầu báo giá', 'Nhà thầu, kiến trúc sư, xưởng tủ bếp: gửi danh sách hoặc bản vẽ, Techhomes báo giá theo nhóm khách trong ngày làm việc.',
+    `<div class="f2"><label>Họ tên<input required autofocus></label><label>Số điện thoại<input type="tel" required></label></div>
+     <label>Bạn là<select><option>Nhà thầu / công ty thi công</option><option>Kiến trúc sư / thiết kế</option><option>Xưởng tủ bếp</option><option>Khách lẻ — báo giá tủ bếp</option></select></label>
+     <label>Danh sách cần báo giá<textarea rows="3" placeholder="Ví dụ: 20 bộ tay nâng Blum HF top 22F1809, 40 bản lề CLIP top…"></textarea></label>
+     <label>Bản vẽ / file Excel (tuỳ chọn)<input type="file"></label>`, 'Gửi yêu cầu', 'Đã gửi · Techhomes sẽ gọi lại trong giờ làm việc'],
+  install: ['Đặt lịch lắp đặt', 'Đội thợ Techhomes lắp tận nơi trong TP.HCM. Phí theo biểu phí lắp đặt, báo trước khi đến.',
+    `<div class="f2"><label>Họ tên<input required autofocus></label><label>Số điện thoại<input type="tel" required></label></div>
+     <label>Cần lắp<select><option>Bếp từ / hút mùi / máy rửa chén</option><option>Tay nâng, ray, bản lề Blum</option><option>Khóa điện tử</option><option>Phụ kiện cửa, bản lề sàn</option><option>Thiết bị vệ sinh</option></select></label>
+     <div class="f2"><label>Ngày mong muốn<input type="date"></label><label>Buổi<select><option>Sáng</option><option>Chiều</option></select></label></div>
+     <label>Địa chỉ lắp<input placeholder="Số nhà, đường, phường, quận"></label>`, 'Đặt lịch', 'Đã nhận lịch · điều phối sẽ gọi xác nhận giờ thợ đến'],
+};
+function openForm(k) {
+  const [t, d, body, btn, ok] = FORMS[k];
+  document.getElementById('dlg-inner').innerHTML = `<button class="icon-btn dlg__x" value="x" formnovalidate aria-label="Đóng">${I('x')}</button>
+    <span class="eyebrow eyebrow--accent">Techhomes</span><h2 class="title">${t}</h2><p class="body-copy">${d}</p>${body}
+    <button class="btn btn--dark btn--block" value="ok">${btn}</button>`;
+  const dlg = document.getElementById('dlg-form');
+  dlg.onclose = () => { if (dlg.returnValue === 'ok') toast(ok); };
+  dlg.showModal();
 }
-function toggleMega() { document.getElementById('mega').classList.toggle('open'); }
-document.addEventListener('click', e => {
-  const m = document.getElementById('mega');
-  if (m && m.classList.contains('open') && !e.target.closest('#mega') && !e.target.closest('.shop-cat-btn')) m.classList.remove('open');
-});
 
 function toast(msg) {
   const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
-  document.body.appendChild(t); setTimeout(() => t.remove(), 2400);
+  document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
 }

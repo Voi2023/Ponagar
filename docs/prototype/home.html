@@ -3,78 +3,123 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="../gate.js"></script>
-<title>Ponagar — Túi da vẽ tay (prototype)</title>
+<title>Techhomes — Thiết bị bếp, phụ kiện Häfele & Blum chính hãng (prototype)</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="assets/ponagar.css">
+<link rel="stylesheet" href="assets/techhomes.css">
 <link rel="stylesheet" href="assets/shop.css">
 <script src="assets/proto.js"></script>
 </head>
 <body class="shop">
 <div id="chrome-top"></div>
 
-<main class="shop-wrap">
-  <!-- Hero: menu danh mục trái · slider giữa · 3 banner phải (bố cục thienkimhome.com) -->
-  <section class="tk-hero">
-    <nav class="tk-side" id="side"></nav>
-
-    <div class="tk-slider">
-      <div class="tk-slides">
-        <a class="tk-slide s1 on" href="category.html">
-          <span class="kick">Bộ sưu tập Đông 2026</span>
-          <h2>Quà ấm <em>mùa đông</em><br>ưu đãi đến 20%</h2>
-          <span class="date">05/11/2026 – 26/12/2026</span>
-          <span class="btn btn-accent">Mua ngay <i class="ti ti-arrow-right"></i></span>
-          <i class="ti ti-snowflake big"></i>
-        </a>
-        <a class="tk-slide s2" href="#">
-          <span class="kick">Đặt làm riêng</span>
-          <h2>Vẽ theo <em>ảnh của bạn</em></h2>
-          <p>Chọn màu da, chọn tranh hoặc gửi ảnh. Hoạ sĩ vẽ tay từng chiếc tại xưởng Sài Gòn.</p>
-          <span class="btn btn-accent">Bắt đầu thiết kế <i class="ti ti-arrow-right"></i></span>
-          <i class="ti ti-brush big"></i>
-        </a>
-        <a class="tk-slide s3" href="category.html">
-          <span class="kick">Quà Tết doanh nghiệp 2027</span>
-          <h2>Khắc logo <em>miễn phí</em><br>đơn từ 20 sản phẩm</h2>
-          <span class="date">Nhận đặt đến 15/01/2027</span>
-          <span class="btn btn-accent">Nhận báo giá <i class="ti ti-arrow-right"></i></span>
-          <i class="ti ti-gift big"></i>
-        </a>
-      </div>
-      <div class="tk-tabs" id="tabs">
-        <button class="on">Ưu đãi mùa đông<br><small>05/11 – 26/12/2026</small></button>
-        <button>Đặt làm riêng<br><small>Vẽ theo ảnh</small></button>
-        <button>Quà Tết doanh nghiệp<br><small>Đến 15/01/2027</small></button>
+<main id="main">
+  <!-- Hero: ảnh lớn tràn viền, 2 cảnh chuyển mờ (bố cục ponagar.co). Ảnh: công trình Techhomes trên techhomes.vn -->
+  <section class="hero" aria-label="Ưu đãi">
+    <div class="hero__slide on">
+      <img src="assets/img/hero-1.jpg" alt="Bếp chung cư Catavil do Techhomes thi công">
+      <div class="hero__copy">
+        <span class="eyebrow eyebrow--light">Ưu đãi tháng 11 · Häfele</span>
+        <p class="display">Bếp chuẩn Đức, giá đã giảm đến 30%</p>
+        <p>Bếp từ, hút mùi, máy rửa chén Häfele chính hãng. Giá hiện rõ trên web, không phải hỏi Zalo.</p>
+        <a class="btn btn--light" href="category.html">Xem thiết bị bếp</a>
       </div>
     </div>
+    <div class="hero__slide">
+      <img src="assets/img/hero-2.jpg" alt="Tủ bếp chữ L với lò Häfele âm tủ">
+      <div class="hero__copy">
+        <span class="eyebrow eyebrow--light">Phụ kiện tủ bếp Blum</span>
+        <p class="display">Mở nhẹ, đóng êm, dùng hàng chục năm</p>
+        <p>Tay nâng AVENTOS, ray LEGRABOX, bản lề CLIP top. Đại lý Blum, lắp đặt tận nơi tại TP.HCM.</p>
+        <a class="btn btn--light" href="category.html">Xem phụ kiện Blum</a>
+      </div>
+    </div>
+    <div class="hero__dots"><button class="on" aria-label="Cảnh 1"></button><button aria-label="Cảnh 2"></button></div>
+  </section>
 
-    <div class="tk-banners">
-      <a class="tk-bn" href="#"><small>Mua trên website</small><b>Vẽ tên miễn phí</b><span class="cta">Xem ngay</span><i class="ti ti-signature"></i></a>
-      <a class="tk-bn alt" href="#"><small>Freeship từ 500K</small><b>COD toàn quốc</b><span class="cta">Chính sách giao hàng</span><i class="ti ti-truck-delivery"></i></a>
-      <a class="tk-bn dk" href="#"><small>Đường may · khoá · nút</small><b>Bảo hành trọn đời</b><span class="cta">Tìm hiểu</span><i class="ti ti-shield-check"></i></a>
+  <section class="sec">
+    <div class="container narrow center">
+      <img class="intro__mark" src="assets/logo.svg" alt="">
+      <h1 class="intro__title">Techhomes — đại lý Häfele & Blum tại TP.HCM</h1>
+      <p class="body-copy">Thiết bị bếp, phụ kiện tủ, phụ kiện cửa, khóa điện tử và thiết bị vệ sinh từ các hãng châu Âu. Ba showroom ở Phú Nhuận, Quận 10, Thủ Đức để xem tận tay; đội thợ riêng giao và lắp tận nhà.</p>
     </div>
   </section>
 
-  <!-- Các khối ngành hàng: mỗi khối 1 tiêu đề + "Xem tất cả" + lưới 5 cột -->
-  <div id="sections"></div>
-
-  <section class="tk-sec">
-    <div class="tk-sec-h"><h2>Bộ sưu tập</h2><a class="tk-all" href="category.html">Xem tất cả</a></div>
-    <div class="tk-cols" id="cols"></div>
+  <!-- Chọn theo không gian (thay khối "Bạn yêu bức tranh nào?" của ponagar.co) -->
+  <section class="sec sec--flush" aria-labelledby="h-room">
+    <header class="sec-head sec-head--center container">
+      <span class="eyebrow eyebrow--accent">Chọn theo không gian</span>
+      <h2 class="title" id="h-room">Bạn đang làm phần nào của ngôi nhà?</h2>
+    </header>
+    <div class="tabset tabset--center" id="rooms" role="tablist"></div>
+    <div class="panel-meta"><span id="room-note"></span><span id="room-count"></span></div>
+    <div class="grid grid--hair" id="room-grid"></div>
+    <div class="center sec-foot"><a class="btn btn--line" href="category.html" id="room-all">Xem tất cả</a></div>
   </section>
 
-  <section class="tk-about" id="about">
-    <h1>Ponagar — Túi da vẽ tay từ năm 2010</h1>
-    <div class="body">
-      <p>Ponagar là thương hiệu túi da vẽ tay của Công ty TNHH ART 868. Mỗi sản phẩm được cắt từ da bò nguyên tấm, may thủ công và vẽ tay tại xưởng Sài Gòn, nên không có hai chiếc giống nhau.</p>
-      <h3>Sản phẩm đa dạng, mỗi chiếc một câu chuyện</h3>
-      <p>Túi xách nữ, túi nam, ví, thắt lưng, bao hộ chiếu, tranh da và quà tặng doanh nghiệp. Hơn 200 chủ đề tranh: đồng quê, phố Hội, sen, biển trời, non sông Việt Nam…</p>
-      <h3>Đặt làm riêng theo ý bạn</h3>
-      <p>Chọn màu da, chọn tranh từ thư viện của xưởng hoặc gửi ảnh để hoạ sĩ vẽ theo. Vẽ tên miễn phí khi mua trên website.</p>
-      <h3>Cam kết của Ponagar</h3>
-      <p>Bảo hành trọn đời đường may, khoá kéo, nút. Đổi hàng trong 5 ngày. Giao hàng COD toàn quốc, miễn phí từ 500.000đ.</p>
+  <!-- Sản phẩm nổi bật (thay "Câu chuyện mùa này") -->
+  <section class="sec">
+    <div class="story__inner container">
+      <a class="story__media" href="product.html"><img src="assets/img/p/8.jpg" alt="Khóa điện tử Häfele PP9100 Face ID"></a>
+      <div class="story__copy">
+        <span class="eyebrow eyebrow--accent">Nổi bật tháng này</span>
+        <h2 class="title title--lg">Khóa điện tử Häfele PP9100 — mở cửa bằng khuôn mặt</h2>
+        <p class="body-copy">Nhận diện khuôn mặt 3D, vân tay, mã số, thẻ từ và ứng dụng điện thoại. Thợ Techhomes khoan lắp, cài đặt và hướng dẫn tại nhà; bảo hành theo số serial ngay trên phiếu.</p>
+        <div class="story__price"><b>15.799.699đ</b><s>22.570.999đ</s><em>−30%</em></div>
+        <a class="btn btn--dark" href="product.html">Xem chi tiết khóa</a>
+      </div>
     </div>
-    <button class="more" onclick="this.parentNode.classList.toggle('open');this.firstChild.textContent=this.parentNode.classList.contains('open')?'Thu gọn ':'Xem thêm '">Xem thêm <i class="ti ti-chevron-down"></i></button>
+  </section>
+
+  <section class="brands" aria-label="Thương hiệu phân phối"><ul class="brands__list" id="brands"></ul></section>
+
+  <!-- Lắp đặt tận nơi (thay "Đặt làm riêng") -->
+  <section class="sec">
+    <div class="split__inner container">
+      <img class="split__img" src="assets/img/lap-dat.jpg" alt="Thợ Techhomes lắp tay nâng điện Blum cho tủ bếp trên" loading="lazy">
+      <div class="split__copy">
+        <span class="eyebrow eyebrow--accent">Lắp đặt tận nơi</span>
+        <h2 class="title title--lg">Thiết bị tốt cần lắp đúng mới bền</h2>
+        <p class="body-copy">Đội thợ Techhomes lắp bếp, máy rửa chén, phụ kiện Blum, khóa điện tử, bản lề sàn. Đặt lịch trên web, phí theo biểu phí công khai, nghiệm thu có ảnh và phiếu bảo hành điện tử.</p>
+        <ul class="checks">
+          <li><i class="ti ti-check"></i>Chọn ngày và buổi, điều phối gọi xác nhận</li>
+          <li><i class="ti ti-check"></i>Thợ mang phiếu lắp đặt, khách ký nghiệm thu</li>
+          <li><i class="ti ti-check"></i>Bảo hành tra bằng số serial hoặc số điện thoại</li>
+        </ul>
+        <button class="btn btn--dark" onclick="openForm('install')">Đặt lịch lắp đặt</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nhà thầu & kiến trúc sư -->
+  <section class="trade sec">
+    <div class="trade__inner container">
+      <div>
+        <span class="eyebrow eyebrow--light">Nhà thầu · Kiến trúc sư · Xưởng tủ bếp</span>
+        <h2 class="title title--lg">Bảng giá riêng khi đăng nhập tài khoản nhà thầu</h2>
+        <p class="body-copy">Gửi danh sách hoặc bản vẽ, nhận báo giá trong ngày. Đơn số lượng xuất kho từ showroom gần công trình, xuất hoá đơn công ty, công nợ theo hợp đồng.</p>
+        <button class="btn btn--light" onclick="openForm('quote')">Yêu cầu báo giá</button>
+      </div>
+      <div class="trade__nums">
+        <div><b>3</b><span>showroom & kho tại TP.HCM</span></div>
+        <div><b>~10.000</b><span>mã hàng có giá trên web</span></div>
+        <div><b>30%</b><span>chiết khấu so với giá niêm yết</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="visit sec" id="visit">
+    <div class="container">
+      <span class="eyebrow eyebrow--accent">Showroom</span>
+      <h2 class="title title--lg">Ghé showroom Techhomes</h2>
+      <p class="body-copy">Bật thử bếp, kéo thử ray, mở thử khóa trước khi mua. Giờ mở cửa do Techhomes xác nhận.</p>
+      <div class="stores" id="stores"></div>
+      <div class="visit__cta"><a class="btn btn--dark" href="#">Chỉ đường</a><a class="btn btn--line" href="#">Chat Zalo</a></div>
+    </div>
+  </section>
+
+  <section class="faq sec container narrow">
+    <h2 class="title center">Câu hỏi thường gặp</h2>
+    <div class="accordion" id="faq"></div>
   </section>
 </main>
 
@@ -82,42 +127,46 @@
 <script>
 renderChrome('home.html');
 
-/* Menu trái: rê chuột vào 1 dòng → bảng con hiện đè lên slider */
-document.getElementById('side').innerHTML = [...CATS, { name: 'Đặt làm riêng', ic: 'ti-brush', types: ['Vẽ theo ảnh', 'Vẽ tên, chữ ký', 'Khắc logo'] }]
-  .map(c => `<div class="row"><a class="tk-side-it" href="category.html"><span class="ic"><i class="ti ${c.ic}"></i></span>${c.name}<i class="ti ti-chevron-right"></i></a>
-    <div class="tk-fly shop-mega-r">${megaCols(c)}</div></div>`).join('');
-
-/* Slider tự chạy 5 giây, bấm tab để chuyển */
-const slides = document.querySelectorAll('.tk-slide'), tabs = document.querySelectorAll('#tabs button');
+/* Hero tự chuyển 6 giây, bấm vạch để chuyển */
+const slides = document.querySelectorAll('.hero__slide'), dots = document.querySelectorAll('.hero__dots button');
 let cur = 0;
-const go = i => { cur = i; slides.forEach((s, k) => s.classList.toggle('on', k === i)); tabs.forEach((t, k) => t.classList.toggle('on', k === i)); };
-tabs.forEach((t, i) => t.onclick = () => go(i));
-setInterval(() => go((cur + 1) % slides.length), 5000);
+const go = i => { cur = i; slides.forEach((s, k) => s.classList.toggle('on', k === i)); dots.forEach((d, k) => d.classList.toggle('on', k === i)); };
+dots.forEach((d, i) => d.onclick = () => go(i));
+setInterval(() => go((cur + 1) % slides.length), 6000);
 
-/* Khối ngành hàng */
-const SECS = [
-  { name: 'Túi xách nữ', cat: 'Túi xách nữ', n: 10 },
-  { name: 'Ví da', cat: 'Ví da', n: 5 },
-  { name: 'Túi xách nam', cat: 'Túi xách nam', n: 5 },
-  { name: 'Phụ kiện da', cat: 'Phụ kiện', n: 5 },
-  { name: 'Tranh da & quà tặng', cat: ['Tranh da', 'Quà tặng doanh nghiệp'], n: 5 },
+/* Chọn theo không gian */
+const ROOMS = [
+  ['Tất cả', 'Thiết bị & phụ kiện bán chạy', null],
+  ['Bếp', 'Bếp từ, hút mùi, máy rửa chén, chậu vòi', ['bep']],
+  ['Tủ bếp & Blum', 'Tay nâng, ray hộp, giá bát, rổ góc', ['blum', 'noithat']],
+  ['Cửa & khóa', 'Khóa điện tử, bản lề sàn, cửa trượt', ['khoa', 'cua']],
+  ['Phòng tắm', 'Bồn cầu, bồn tắm, sen vòi, phụ kiện', ['vesinh']],
 ];
-document.getElementById('sections').innerHTML = SECS.map(s => {
-  const cats = [].concat(s.cat), c = CATS.find(x => x.name === cats[0]);
-  const items = PRODUCTS.filter(p => cats.includes(p.cat)).slice(0, s.n);
-  return `<section class="tk-sec">
-    <div class="tk-sec-h"><h2>${s.name}</h2>
-      <div class="sub">${c.types.map(t => `<a href="category.html">${t}</a>`).join('')}</div>
-      <a class="tk-all" href="category.html">Xem tất cả</a></div>
-    <div class="shop-grid">${items.map(p => cardHTML(p)).join('')}</div>
-  </section>`;
-}).join('');
+function room(i) {
+  const [, note, cats] = ROOMS[i];
+  const items = cats ? PRODUCTS.filter(p => cats.includes(p.cat)) : PRODUCTS.filter(p => p.tags.length).concat(PRODUCTS.filter(p => !p.tags.length));
+  document.querySelectorAll('#rooms button').forEach((b, k) => { b.classList.toggle('on', k === i); b.setAttribute('aria-selected', k === i); });
+  document.getElementById('room-note').textContent = note;
+  document.getElementById('room-count').textContent = 'Mẫu: ' + Math.min(8, items.length) + ' sản phẩm';
+  document.getElementById('room-grid').innerHTML = items.slice(0, 8).map(cardHTML).join('');
+  document.getElementById('room-all').textContent = i ? 'Xem tất cả ' + ROOMS[i][0].toLowerCase() : 'Xem tất cả';
+}
+document.getElementById('rooms').innerHTML = ROOMS.map(([t], i) => `<button role="tab" onclick="room(${i})">${t}</button>`).join('');
+room(0);
 
-/* Bộ sưu tập theo chủ đề tranh (thay khối "Thương hiệu" của trang mẫu) */
-document.getElementById('cols').innerHTML = [
-  ['Đồng quê', 'ti-plant-2', 'bo', 48], ['Phố Hội', 'ti-building-arch', 'nau', 36], ['Sen Hồ', 'ti-flower', 'hong', 42], ['Biển & trời', 'ti-sailboat', 'xanh', 31], ['Non sông VN', 'ti-mountain', 'reu', 27],
-  ['Hoa & trái', 'ti-cherry', 'do', 39], ['Song Hạc', 'ti-feather', 'den', 18], ['Romance', 'ti-heart', 'hong', 25], ['Trừu tượng', 'ti-brush', 'kem', 22], ['Tuổi thơ', 'ti-kite', 'xanh', 15],
-].map(([n, ic, sw, k]) => `<a href="category.html"><i class="ti ${ic}" style="--sw:${LEATHER[sw]}"></i><span>${n}<small>${k} mẫu</small></span></a>`).join('');
+document.getElementById('brands').innerHTML = BRANDS.map(b => `<li>${b}</li>`).join('');
+document.getElementById('stores').innerHTML = STORES.map(s => `<div><span class="eyebrow eyebrow--muted">${s.note}</span><b>${s.name}</b><span><i class="ti ti-map-pin"></i>${s.addr}</span><span><i class="ti ti-phone"></i>${COMPANY.phone}</span></div>`).join('');
+
+const FAQ = [
+  ['Hàng ở Techhomes có chính hãng không?', 'Techhomes là đại lý phân phối Häfele và Blum. Mỗi sản phẩm có tem, phiếu bảo hành của hãng; thiết bị điện được ghi số serial lên phiếu bảo hành điện tử.'],
+  ['Giá trên web đã là giá cuối chưa?', 'Giá bán trên web đã gồm VAT và đã trừ chiết khấu so với giá niêm yết của hãng. Nhà thầu, kiến trúc sư đăng nhập tài khoản để thấy bảng giá riêng theo nhóm.'],
+  ['Phí lắp đặt tính thế nào?', 'Theo biểu phí lắp đặt công khai cho từng loại (bếp, máy rửa chén, tay nâng Blum, khóa điện tử…). Phí hiện ngay khi chọn "Kèm lắp đặt" ở trang sản phẩm và giỏ hàng.'],
+  ['Bao lâu thì giao hàng?', 'Hàng có sẵn ở showroom gần nhất giao trong ngày hoặc hôm sau tại TP.HCM. Hàng đặt từ hãng 3–5 ngày làm việc. Giao toàn quốc qua đơn vị vận chuyển.'],
+  ['Bảo hành ở đâu, tra thế nào?', 'Nhập số serial hoặc số điện thoại ở mục Tra bảo hành. Yêu cầu bảo hành gửi trên web, điều phối xếp lịch thợ đến kiểm tra.'],
+  ['Có xuất hoá đơn công ty không?', 'Có. Chọn "Xuất hoá đơn công ty" khi đặt hàng và nhập mã số thuế; hoá đơn gửi qua email.'],
+  ['Thanh toán bằng cách nào?', 'Tiền mặt khi nhận hàng (COD), chuyển khoản VietQR tự xác nhận, hoặc công nợ theo hợp đồng cho nhà thầu.'],
+];
+document.getElementById('faq').innerHTML = FAQ.map(([q, a]) => `<details><summary>${q}</summary><div class="rte">${a}</div></details>`).join('');
 </script>
 </body>
 </html>

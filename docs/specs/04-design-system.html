@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="../gate.js"></script>
-<title>Ponagar — 04 · Design system</title>
+<title>Techhomes — 04 · Design system</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="../prototype/assets/ponagar.css">
+<link rel="stylesheet" href="../prototype/assets/techhomes.css">
 <style>
 body{background:var(--bg)}
 .doc-top{background:var(--brand);color:var(--surface);position:sticky;top:0;z-index:10}
@@ -40,66 +40,67 @@ body{background:var(--bg)}
 </style>
 </head>
 <body>
-<header class="doc-top"><div class="in"><b><img class="logo-w" src="../prototype/assets/logo.png" alt="Ponagar" style="height:15px;width:auto">· Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class=""><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class=""><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class="on"><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class=""><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
+<header class="doc-top"><div class="in"><b><img class="logo-w" src="../prototype/assets/logo.svg" alt="Techhomes" style="height:24px;width:auto">· Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class=""><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class=""><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class="on"><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class=""><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
 <main class="doc"><article class="panel guide">
 <h1>04 — Design system</h1>
 <blockquote>
-<p>Bản 26/11/2026. Giao diện dùng <strong>một bộ riêng của Ponagar</strong> (<code>ponagar.css</code>): màu đỏ, chữ và logo lấy từ logo PONAGAR. Không phụ thuộc bộ giao diện bên ngoài.</p>
+<p>Bản 27/11/2026. Giao diện dùng <strong>một bộ riêng của Techhomes</strong> (<code>techhomes.css</code>): màu đỏ và xám lấy từ logo TECHHOMES, font <strong>Be Vietnam Pro</strong>, phong cách tối giản học theo ponagar.co. Không phụ thuộc bộ giao diện bên ngoài.</p>
 </blockquote>
 <h2>1. Logo</h2>
-<p><img src="../prototype/assets/logo.png" alt="PONAGAR" style="height:26px;width:auto;margin:6px 0"></p>
+<p><img src="../prototype/assets/logo.svg" alt="TECHHOMES — Home Solutions" style="height:48px;width:auto;margin:6px 0"></p>
 <ul>
-<li>Logo chữ <strong>PONAGAR</strong>, file <code>prototype/assets/logo.png</code> (1737×135, nền trong suốt, màu đỏ #BB2E30). Lưu ngay trong mã nguồn, không dẫn link CDN Haravan (sẽ mất khi rời Haravan).</li>
-<li><strong>Nền sáng</strong> (footer, trang mục lục, hoá đơn): dùng logo đỏ nguyên bản.</li>
-<li><strong>Nền đỏ</strong> (header website, menu quản trị, bìa tài liệu): thêm class <code>logo-w</code> để logo thành chữ trắng. Không đặt logo đỏ lên nền đỏ.</li>
-<li>Chiều cao gợi ý: header website 21px (điện thoại 16px), menu quản trị 17px, tiêu đề tài liệu 26–30px. Không kéo giãn, không đổi màu khác.</li>
-<li>Bản thật nên xin file gốc dạng SVG để logo nét ở mọi cỡ.</li>
+<li>Logo <strong>TECHHOMES / HOME SOLUTIONS</strong>: hình chữ L màu đỏ <strong>#FE321F</strong> ôm 4 ô vuông xám <strong>#798585</strong>, chữ TECHHOMES đỏ, dòng HOME SOLUTIONS màu chữ đậm. File <code>prototype/assets/logo.svg</code> (dạng vector, nét ở mọi cỡ).</li>
+<li>File hiện tại vẽ lại từ logo trên techhomes.vn để làm prototype. Bản thật cần <strong>file logo gốc dạng vector</strong> từ Techhomes (<em>cần Techhomes cung cấp</em>).</li>
+<li><strong>Nền sáng</strong> (header website nền trắng, footer, hoá đơn, phiếu bảo hành): dùng logo màu nguyên bản.</li>
+<li><strong>Nền tối hoặc nền đỏ</strong> (bìa tài liệu, thanh trên tài liệu): thêm class <code>logo-w</code> để logo thành trắng. Menu quản trị nền tối đặt logo màu trên ô trắng nhỏ. Không đặt logo màu lên nền đỏ; không dùng <code>logo-w</code> trên nền trắng.</li>
+<li>Chiều cao gợi ý (logo ngang, tỉ lệ 4:1): header website 40px (điện thoại 32px), menu quản trị 30px, tiêu đề tài liệu 48px. Không kéo giãn, không đổi màu khác.</li>
 </ul>
 <h2>2. Màu</h2>
 <div class="table-scroll"><table class="data">
 <thead><tr><th>Biến</th><th>Giá trị</th><th>Dùng cho</th></tr></thead>
 <tbody>
-<tr><td><code>--brand</code></td><td><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--brand);vertical-align:-2px"></span> <strong>#BB2E30</strong> (đỏ logo)</td><td>Header, nút chính, nhãn giảm giá, menu quản trị</td></tr>
+<tr><td><code>--brand</code></td><td><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--brand);vertical-align:-2px"></span> <strong>#DB2717</strong> (đỏ Techhomes)</td><td>Nút chính, link, nhãn giảm giá, mục đang chọn trong menu quản trị. Đậm hơn đỏ logo một chút để chữ trên nền trắng đủ tương phản</td></tr>
+<tr><td><code>--brand-logo</code></td><td><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--brand-logo);vertical-align:-2px"></span> #FE321F (đỏ đúng logo)</td><td>Chỉ cho mảng màu lớn (banner, dải dịch vụ); không dùng cho chữ nhỏ</td></tr>
 <tr><td><code>--brand-dark</code> / <code>--brand-deeper</code> / <code>--brand-tint</code></td><td>tự suy từ <code>--brand</code></td><td>Hover, nền banner, nền nhạt</td></tr>
-<tr><td><code>--accent</code></td><td><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--accent);box-shadow:0 0 0 1px var(--border);vertical-align:-2px"></span> #F3E6CF (kem da thuộc)</td><td>Nút phụ, banner phụ, mục đang chọn trong menu quản trị</td></tr>
-<tr><td><code>--ink</code></td><td>#231F1C (nâu đen)</td><td>Chữ chính</td></tr>
-<tr><td><code>--muted</code></td><td>#76695E</td><td>Chữ phụ</td></tr>
-<tr><td><code>--bg</code> / <code>--surface</code></td><td>#FAF7F2 (nền giấy ấm) / #FFFFFF</td><td>Nền trang / thẻ, bảng</td></tr>
-<tr><td><code>--border</code> / <code>--gray-bg</code></td><td>#ECE4D8 / #F2ECE3</td><td>Viền, nền chip</td></tr>
-<tr><td><code>--ok</code> <code>--warn</code> <code>--danger</code> <code>--info</code></td><td>xanh lá / vàng nâu / đỏ / xanh dương</td><td>Chỉ cho trạng thái (đơn, MISA, tồn kho), không dùng trang trí</td></tr>
+<tr><td><code>--accent</code></td><td><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--accent);vertical-align:-2px"></span> #798585 (xám ô vuông logo)</td><td>Chi tiết trang trí (ô vuông logo), không dùng cho chữ nhỏ</td></tr>
+<tr><td><code>--ink</code></td><td>#282C34 (theo dòng HOME SOLUTIONS)</td><td>Chữ chính</td></tr>
+<tr><td><code>--muted</code></td><td>#6B7378</td><td>Chữ phụ, giá niêm yết gạch ngang</td></tr>
+<tr><td><code>--bg</code> / <code>--surface</code></td><td>#F7F7F5 (nền sáng trung tính) / #FFFFFF</td><td>Nền trang / thẻ, bảng</td></tr>
+<tr><td><code>--border</code> / <code>--gray-bg</code></td><td>#E6E6E2 / #EFEFEC</td><td>Đường kẻ mảnh, viền, nền chip</td></tr>
+<tr><td><code>--ok</code> <code>--warn</code> <code>--danger</code> <code>--info</code></td><td>xanh lá / vàng / đỏ / xanh dương</td><td>Chỉ cho trạng thái (đơn, MISA, tồn kho, bảo hành), không dùng trang trí</td></tr>
 </tbody>
 </table></div>
-<p><strong>Màu da sản phẩm</strong> (bò sáp, nâu bò, đỏ đô, xanh rêu…) là <strong>dữ liệu sản phẩm</strong> do admin nhập, không phải màu giao diện. Giá bán dùng <code>--danger</code>.</p>
+<p><strong>Màu sản phẩm</strong> (inox, đen mờ, vàng đồng…) là <strong>dữ liệu sản phẩm</strong> do admin nhập, không phải màu giao diện. Giá bán dùng <code>--danger</code>.</p>
 <h2>3. Font chữ</h2>
 <div class="table-scroll"><table class="data">
 <thead><tr><th>Biến</th><th>Font</th><th>Dùng cho</th></tr></thead>
 <tbody>
-<tr><td><code>--font-display</code></td><td><strong style="font-family:var(--font-display);font-size:17px">Chakra Petch — Túi da vẽ tay</strong></td><td>Toàn bộ website và trang quản trị; tiêu đề trong tài liệu</td></tr>
-<tr><td><code>--font-family</code></td><td>Segoe UI / font hệ thống</td><td>Đoạn văn dài trong tài liệu (dễ đọc hơn)</td></tr>
+<tr><td><code>--font-display</code></td><td><strong style="font-family:var(--font-display);font-size:17px">Be Vietnam Pro — Bếp từ Hafele, tay nâng Blum</strong></td><td>Toàn bộ website và trang quản trị; tiêu đề trong tài liệu</td></tr>
+<tr><td><code>--font-family</code></td><td>Be Vietnam Pro (dự phòng: Segoe UI / font hệ thống)</td><td>Đoạn văn, bảng, ô nhập</td></tr>
 </tbody>
 </table></div>
-<p>Chữ trong logo là kiểu hình học rộng, góc vuông bo tròn. Đã so các font cùng dáng trên Google Fonts: <em>Orbitron</em>, <em>Oxanium</em>, <em>Michroma</em> giống logo hơn nhưng <strong>không có dấu tiếng Việt</strong> (dấu bị vỡ). <strong>Chakra Petch</strong> là font gần dáng logo nhất mà vẫn hiển thị đúng tiếng Việt, miễn phí, dùng được cho web.</p>
+<p><strong>Be Vietnam Pro</strong> là font ponagar.co đang dùng: chữ không chân, gọn, đọc rõ trên điện thoại, <strong>đủ dấu tiếng Việt</strong>, miễn phí trên Google Fonts, có nhiều độ đậm (300–800). Hợp với chữ in đậm không chân của logo. Logo giữ dạng hình (SVG), không gõ lại bằng font.</p>
 <h2>4. Quy tắc</h2>
 <ol>
-<li>Thứ tự nạp CSS: <code>ponagar.css</code> → <code>shop.css</code> (website) hoặc <code>admin.css</code> (quản trị).</li>
+<li>Thứ tự nạp CSS: <code>techhomes.css</code> → <code>shop.css</code> (website) hoặc <code>admin.css</code> (quản trị).</li>
 <li><strong>Cấm hardcode mã màu</strong> trong trang; mọi màu dùng <code>var(--…)</code>. Đổi <code>--brand</code> là cả họ màu đỏ đổi theo.</li>
 <li>Không Tailwind/Bootstrap; icon Tabler (<code>ti ti-*</code>).</li>
-<li>Thành phần dùng chung trong <code>ponagar.css</code>: nút <code>.btn</code>, nhãn <code>.badge</code>, <code>.chip</code>, ô nhập <code>.field</code>, bảng <code>table.data</code>, <code>.panel</code>, <code>.stat-card</code>, <code>.tabs</code>, <code>.modal</code>, <code>.timeline</code>, <code>.toast</code>, khung quản trị <code>.app-shell</code>.</li>
+<li>Thành phần dùng chung trong <code>techhomes.css</code>: nút <code>.btn</code>, nhãn <code>.badge</code>, <code>.chip</code>, ô nhập <code>.field</code>, bảng <code>table.data</code>, <code>.panel</code>, <code>.stat-card</code>, <code>.tabs</code>, <code>.modal</code>, <code>.timeline</code>, <code>.toast</code>, khung quản trị <code>.app-shell</code>.</li>
 </ol>
 <h2>5. Thành phần riêng của website</h2>
 <div class="table-scroll"><table class="data">
 <thead><tr><th>Thành phần</th><th>Dùng ở</th></tr></thead>
 <tbody>
-<tr><td>Header một thanh (logo, danh mục, tìm kiếm, gọi mua hàng, giỏ) · menu danh mục nhiều tầng</td><td>Mọi trang</td></tr>
-<tr><td>Đầu trang chủ: menu trái + banner chạy có tab + 3 banner phải</td><td>Trang chủ</td></tr>
-<tr><td>Thẻ sản phẩm: nhãn "Giảm x%", giá, giá cũ, ô "Tặng thêm", số sao, chấm màu da</td><td>Trang chủ, danh mục, liên quan</td></tr>
-<tr><td>Bộ lọc có số đếm (chủ đề tranh, màu da, giá, kích thước, tình trạng)</td><td>Danh mục, tìm kiếm</td></tr>
-<tr><td>Chọn màu da · Vẽ tên miễn phí · Đặt làm theo mẫu</td><td>Chi tiết sản phẩm</td></tr>
-<tr><td>Nút nổi Gọi / Zalo / Messenger · footer 4 cột + showroom</td><td>Mọi trang</td></tr>
+<tr><td>Header nền trắng, logo ở giữa · menu ngành hàng &amp; thương hiệu nhiều tầng · tìm theo tên hoặc mã hàng · hotline · giỏ hàng</td><td>Mọi trang</td></tr>
+<tr><td>Ảnh lớn đầu trang (công trình thực tế) · khối ngành hàng · khối thương hiệu · dự án đã thi công</td><td>Trang chủ</td></tr>
+<tr><td>Lưới sản phẩm thoáng, đường kẻ mảnh · thẻ sản phẩm: ảnh, thương hiệu, mã hàng, giá niêm yết gạch, giá bán, nhãn "-x%"</td><td>Trang chủ, danh mục, liên quan</td></tr>
+<tr><td>Bộ lọc có số đếm (thương hiệu, giá, kích thước, tính năng, tình trạng)</td><td>Danh mục, tìm kiếm</td></tr>
+<tr><td>Tab mô tả / thông số / catalogue PDF / bảo hành · nút Yêu cầu báo giá, Đặt lịch lắp đặt · hỏi đáp dạng mở/đóng</td><td>Chi tiết sản phẩm</td></tr>
+<tr><td>Dải dịch vụ (giao hàng, lắp đặt, bảo hành chính hãng, 3 showroom) · footer có 3 địa chỉ showroom · nút nổi Gọi / Zalo</td><td>Mọi trang</td></tr>
 </tbody>
 </table></div>
 <h2>6. Prototype</h2>
-<p><code>docs/prototype/</code>: mở <code>index.html</code>. Dữ liệu sản phẩm là dữ liệu mẫu; ảnh sản phẩm tạm thay bằng nền màu da + biểu tượng.</p>
+<p><code>docs/prototype/</code>: mở <code>index.html</code>. Dữ liệu sản phẩm là dữ liệu mẫu (mã, giá lấy ví dụ từ techhomes.vn); ảnh sản phẩm là ảnh tạm.</p>
 </article></main>
 </body>
 </html>

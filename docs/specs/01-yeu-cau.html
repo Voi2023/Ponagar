@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="../gate.js"></script>
-<title>Ponagar — 01 · Yêu cầu</title>
+<title>Techhomes — 01 · Yêu cầu</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="../prototype/assets/ponagar.css">
+<link rel="stylesheet" href="../prototype/assets/techhomes.css">
 <style>
 body{background:var(--bg)}
 .doc-top{background:var(--brand);color:var(--surface);position:sticky;top:0;z-index:10}
@@ -40,16 +40,19 @@ body{background:var(--bg)}
 </style>
 </head>
 <body>
-<header class="doc-top"><div class="in"><b><img class="logo-w" src="../prototype/assets/logo.png" alt="Ponagar" style="height:15px;width:auto">· Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class="on"><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class=""><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class=""><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class=""><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
+<header class="doc-top"><div class="in"><b><img class="logo-w" src="../prototype/assets/logo.svg" alt="Techhomes" style="height:24px;width:auto">· Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class="on"><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class=""><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class=""><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class=""><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
 <main class="doc"><article class="panel guide">
 <h1>01 — Tóm tắt yêu cầu khách hàng</h1>
 <h2>1. Bối cảnh</h2>
 <ul>
-<li><strong>Ponagar</strong> (Công ty TNHH ART 868) đang bán túi da vẽ tay trên <strong>ponagar.co</strong> (Haravan, dựng bằng Muse AI).</li>
-<li>Muốn <strong>làm lại</strong> website với quy mô <strong>~10.000 sản phẩm</strong>, bố cục và tính năng mạnh như <strong>thienkimhome.com</strong>.</li>
-<li>Ngân sách ban đầu (29/10): dưới 15 triệu cho riêng website. <strong>Cập nhật 26/11:</strong> phạm vi mở rộng thêm kho, sản xuất, nhân sự, MISA → phí làm <strong>50 triệu</strong> + <strong>4 triệu/năm</strong> server (xem <a href="03-bao-gia.html">03</a>).</li>
+<li><strong>Techhomes</strong> ("Techhomes Showroom Hafele") là đại lý phân phối <strong>Hafele</strong> và <strong>Blum</strong> tại TP.HCM, có <strong>3 điểm bán</strong>: Phú Nhuận (trụ sở), Q.10, Thủ Đức.</li>
+<li>Bán phụ kiện tủ bếp Blum, thiết bị bếp (Hafele, Bosch, Smeg, Teka, Malloca…), phụ kiện cửa và nội thất Hafele, khóa điện tử, thiết bị vệ sinh, lọc nước; kèm dịch vụ <strong>lắp đặt</strong> và báo giá tủ bếp.</li>
+<li>Khách mua gồm <strong>khách lẻ</strong>, <strong>nhà thầu / kiến trúc sư / xưởng tủ bếp</strong> (mua số lượng, cần báo giá) và <strong>đại lý</strong>.</li>
+<li>Website hiện tại <strong>techhomes.vn</strong> tự viết, giao diện cũ (từ 2019), menu rất dài, nhiều banner chữ; nhiều sản phẩm khách phải <strong>nhắn Zalo để hỏi giá</strong>.</li>
+<li>Muốn <strong>làm lại</strong> website với quy mô <strong>~10.000 mã hàng</strong> (ước tính), giao diện gọn theo phong cách <strong>ponagar.co</strong>, và quản lý đơn, kho 3 điểm bán, lắp đặt, bảo hành, lương, kế toán trong một hệ thống. Phí làm <strong>50 triệu</strong> + <strong>4 triệu/năm</strong> server (xem <a href="03-bao-gia.html">03</a>).</li>
 </ul>
 <h2>2. Khách muốn gì</h2>
+<p class="muted" style="font-size:13px">Phạm vi 6 khối dưới đây là đề xuất, chờ Techhomes xác nhận.</p>
 <div class="table-scroll"><table class="data">
 <thead>
 <tr>
@@ -61,68 +64,49 @@ body{background:var(--bg)}
 <tbody>
 <tr>
 <td>1</td>
-<td><strong>Menu lớn</strong>: loại sản phẩm → chủ đề tranh → mức giá</td>
-<td>Túi nữ, túi nam, ví, phụ kiện, tranh da, quà doanh nghiệp</td>
+<td><strong>Website bán hàng mới</strong>: ~10.000 mã, menu theo ngành hàng &amp; thương hiệu, lọc theo thương hiệu / giá / kích thước / tính năng / tình trạng, <strong>tìm theo mã hàng Hafele/Blum</strong>, hiện <strong>giá niêm yết + giá bán + % giảm</strong>, nút <strong>Yêu cầu báo giá</strong> và <strong>Đặt lịch lắp đặt</strong>, catalogue PDF, tin tức &amp; dự án</td>
+<td>Giá hiện công khai thay cho hỏi Zalo · SEO: giữ link cũ bằng <strong>301</strong>, sitemap, schema Product</td>
 </tr>
 <tr>
 <td>2</td>
-<td><strong>Trang danh mục + bộ lọc</strong>: chủ đề tranh, màu da, giá, kích thước, có sẵn/đặt làm</td>
-<td>Lọc nhanh trên 10.000 SP</td>
+<td><strong>Quản trị bán hàng</strong>: đơn từ web, Zalo, điện thoại, tại showroom · <strong>báo giá → chuyển thành đơn</strong> · khách hàng theo nhóm (lẻ / nhà thầu / đại lý) với <strong>bảng giá chiết khấu theo nhóm</strong> · khuyến mãi · banner, bài viết, dự án · báo cáo</td>
+<td><strong>Nhập/xuất Excel</strong> sản phẩm và bảng giá</td>
 </tr>
 <tr>
 <td>3</td>
-<td><strong>Tìm kiếm</strong> gợi ý tức thì: tên mẫu, mã, chủ đề, gõ không dấu</td>
-<td>Xem <a href="05-cau-hinh-vps.html">05 · Cấu hình VPS</a></td>
+<td><strong>Kho</strong>: 3 kho / showroom (Phú Nhuận, Q.10, Thủ Đức), nhập mua từ nhà phân phối (Hafele Việt Nam, Blum…), chuyển kho, kiểm kê, <strong>số serial</strong> cho thiết bị (bếp, máy rửa chén, khóa điện tử)</td>
+<td>Tồn kho hiện lên web</td>
 </tr>
 <tr>
 <td>4</td>
-<td><strong>Chi tiết SP</strong>: ảnh, chọn màu da, size, <strong>vẽ tên miễn phí</strong>, câu chuyện tranh</td>
-<td>Nút mua ngay / thêm giỏ / đặt làm theo mẫu / gọi lại</td>
+<td><strong>Lắp đặt &amp; bảo hành</strong>: lịch lắp đặt, phân thợ, phiếu lắp đặt có ảnh nghiệm thu, biểu phí lắp đặt, phiếu bảo hành theo serial, tiếp nhận yêu cầu bảo hành</td>
+<td>Thợ dùng điện thoại</td>
 </tr>
 <tr>
 <td>5</td>
-<td><strong>Giỏ hàng &amp; đặt hàng nhanh</strong>: COD, chuyển khoản VietQR, gói quà</td>
-<td>Không bắt tạo tài khoản</td>
+<td><strong>Nhân sự &amp; lương</strong>: chấm công, hoa hồng nhân viên bán hàng, công lắp đặt theo phiếu cho thợ, bảng lương tháng</td>
+<td></td>
 </tr>
 <tr>
 <td>6</td>
-<td><strong>Đơn và kho quản lý trong hệ thống</strong>, chứng từ tự sang <strong>MISA AMIS Kế toán</strong></td>
-<td>Cập nhật 26/11: thay hướng đẩy đơn sang phần mềm bán hàng ngoài → xem <a href="02-de-xuat.html">02</a></td>
-</tr>
-<tr>
-<td>7</td>
-<td><strong>Đặt làm riêng</strong>: chọn màu da, chọn tranh hoặc gửi ảnh</td>
-<td>Form + tải ảnh lên</td>
-</tr>
-<tr>
-<td>8</td>
-<td>Khuyến mãi: giá giảm, ưu đãi có hạn, mã giảm giá</td>
-<td></td>
-</tr>
-<tr>
-<td>9</td>
-<td>Trang câu chuyện, xưởng (video), showroom, FAQ, cẩm nang, chính sách</td>
-<td></td>
-</tr>
-<tr>
-<td>10</td>
-<td><strong>Trang quản trị</strong>: SP, danh mục, màu da, đơn, banner, bài viết</td>
-<td><strong>Nhập/xuất Excel</strong> (nhận file xuất từ Haravan)</td>
-</tr>
-<tr>
-<td>11</td>
-<td>Màu sắc đúng nhận diện logo, <strong>mobile trước</strong>, tải nhanh, SEO tốt</td>
-<td>Giữ thứ hạng Google của ponagar.co</td>
+<td><strong>Kế toán &amp; MISA</strong>: đơn bán, phiếu nhập/xuất kho, thu tiền tự gửi sang <strong>MISA AMIS Kế toán</strong> (hàng đợi, gửi lại khi lỗi, không gửi trùng)</td>
+<td>Không dùng KiotViet / Sapo → xem <a href="02-de-xuat.html">02</a></td>
 </tr>
 </tbody>
 </table></div>
-<h2>3. Câu hỏi cần khách trả lời</h2>
+<p>Chung cho cả hệ thống: <strong>phân quyền theo vai trò</strong>, <strong>nhật ký thao tác</strong>. Giao diện mobile trước, tải nhanh, đúng màu logo TECHHOMES.</p>
+<h2>3. Câu hỏi cần Techhomes trả lời</h2>
 <ol>
-<li><s>Công ty đang dùng phần mềm quản lý đơn/bán hàng nào?</s> Đã chốt 26/11: đơn, kho làm trong hệ thống Ponagar, kế toán dùng <strong>MISA AMIS</strong>. Câu hỏi về MISA, kho, xưởng, lương: xem <a href="../tai-lieu/index.html#lo-trinh">mục 7 tài liệu chức năng</a>.</li>
-<li>10.000 sản phẩm đã có đủ <strong>ảnh + mô tả trên Haravan</strong> chưa? Có xuất file được không?</li>
-<li>Giữ <strong>3 ngôn ngữ (VI/EN/JA)</strong> như site cũ hay chỉ tiếng Việt ở bản đầu?</li>
-<li>Địa chỉ <strong>điểm bán sân bay</strong> và giờ mở cửa?</li>
-<li>Ai mua/gia hạn <strong>VPS và tên miền</strong> (công ty đứng tên hay bên làm web)?</li>
+<li><strong>Tên pháp nhân và mã số thuế</strong> để ghi trên hợp đồng, báo giá, hoá đơn.</li>
+<li><strong>Số mã hàng thực tế</strong> đang bán (hiện ước tính ~10.000)? Bao nhiêu mã cần lên web ngay đợt đầu?</li>
+<li>Có <strong>file dữ liệu sản phẩm</strong> (Excel từ hãng hoặc từ phần mềm đang dùng) không? Web cũ techhomes.vn có <strong>xuất được dữ liệu</strong> (sản phẩm, ảnh, mô tả) không, và ai đang giữ mã nguồn, cơ sở dữ liệu?</li>
+<li><strong>Bảng giá theo nhóm khách</strong>: khách lẻ, nhà thầu, đại lý được chiết khấu bao nhiêu? Giá niêm yết lấy theo bảng giá hãng hay Techhomes tự đặt?</li>
+<li><strong>Quy trình lắp đặt và bảo hành</strong> hiện nay: thợ của Techhomes hay thuê ngoài? Biểu phí lắp đặt? Thời hạn bảo hành từng hãng, có chuyển bảo hành qua hãng không?</li>
+<li>Công ty <strong>đang dùng MISA AMIS Kế toán chưa</strong>? Gói nào, có mở API kết nối không? Nếu chưa thì đang làm kế toán bằng gì?</li>
+<li>Tồn kho đang theo dõi bằng gì (Excel, phần mềm)? Ba điểm bán có kho riêng không?</li>
+<li>Cách tính <strong>hoa hồng</strong> nhân viên bán hàng và <strong>đơn giá công lắp đặt</strong> cho thợ.</li>
+<li>Ảnh sản phẩm, catalogue PDF, ảnh công trình đã thi công: Techhomes có sẵn hay lấy từ hãng?</li>
+<li>Ai mua/gia hạn <strong>VPS và tên miền techhomes.vn</strong> (công ty đứng tên hay bên làm web)?</li>
 </ol>
 </article></main>
 </body>

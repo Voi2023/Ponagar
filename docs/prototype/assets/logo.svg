@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" role="img" aria-label="Techhomes — Home Solutions">
+  <!-- Vẽ lại từ logo techhomes.vn cho prototype. Khi làm thật cần file vector gốc từ Techhomes. -->
+  <path fill="#FE321F" d="M0 0H102V100H73.1V26.4H0Z"/>
+  <g fill="#798585">
+    <rect y="34.7" width="28.4" height="28.4"/><rect x="36.7" y="34.7" width="28.6" height="28.4"/>
+    <rect y="71.3" width="28.4" height="28.7"/><rect x="36.7" y="71.3" width="28.6" height="28.7"/>
+  </g>
+  <rect fill="#FE321F" x="28.4" y="63.1" width="8.3" height="8.2"/>
+  <g font-family="Verdana,'DejaVu Sans','Be Vietnam Pro',Arial,sans-serif" font-weight="700">
+    <text x="118" y="57" fill="#FE321F" font-size="50" textLength="280" lengthAdjust="spacingAndGlyphs">TECHHOMES</text>
+    <text x="120" y="92" fill="#282C34" font-size="21" textLength="276" lengthAdjust="spacingAndGlyphs">HOME SOLUTIONS</text>
+  </g>
+</svg>

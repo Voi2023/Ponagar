@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="../gate.js"></script>
-<title>Ponagar — 02 · Đề xuất</title>
+<title>Techhomes — 02 · Đề xuất</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="../prototype/assets/ponagar.css">
+<link rel="stylesheet" href="../prototype/assets/techhomes.css">
 <style>
 body{background:var(--bg)}
 .doc-top{background:var(--brand);color:var(--surface);position:sticky;top:0;z-index:10}
@@ -41,108 +41,119 @@ body{background:var(--bg)}
 </style>
 </head>
 <body>
-<header class="doc-top"><div class="in"><b><img class="logo-w" src="../prototype/assets/logo.png" alt="Ponagar" style="height:15px;width:auto">· Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class=""><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class="on"><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class=""><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class=""><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
+<header class="doc-top"><div class="in"><b><img class="logo-w" src="../prototype/assets/logo.svg" alt="Techhomes" style="height:24px;width:auto">· Specs</b><a href="index.html" class=""><i class="ti ti-home"></i>Tổng quan</a><a href="01-yeu-cau.html" class=""><i class="ti ti-clipboard-list"></i>01 · Yêu cầu</a><a href="02-de-xuat.html" class="on"><i class="ti ti-bulb"></i>02 · Đề xuất</a><a href="03-bao-gia.html" class=""><i class="ti ti-receipt"></i>03 · Báo giá</a><a href="04-design-system.html" class=""><i class="ti ti-palette"></i>04 · Design system</a><a href="05-cau-hinh-vps.html" class=""><i class="ti ti-server"></i>05 · Cấu hình VPS</a><a href="../prototype/index.html"><i class="ti ti-device-desktop"></i>Prototype</a></div></header>
 <main class="doc"><article class="panel guide">
 <h1>02 — Đề xuất các việc cần làm</h1>
 <blockquote>
-<p><strong>Bản v0.3 · 26/11/2026</strong> — thay bản 29/10. Phạm vi mở rộng từ "website bán hàng" thành <strong>hệ thống vận hành</strong>: website, quản trị bán hàng, kho &amp; sản xuất, nhân sự &amp; lương, kết nối MISA AMIS Kế toán. Đơn và kho quản lý ngay trong hệ thống Ponagar, <strong>không đẩy sang KiotViet / Sapo / Haravan nữa</strong>. Mô tả chức năng đầy đủ: <a href="../tai-lieu/index.html">Tài liệu chức năng v0.3</a>.</p>
-<p>Nguyên tắc giữ nguyên: <strong>một ứng dụng, một server, tận dụng tối đa thứ đã có</strong> (dữ liệu trên Haravan, Cloudflare miễn phí, MISA công ty đang dùng).</p>
+<p><strong>Bản 27/11/2026</strong> — đề xuất cho Techhomes. Phạm vi là <strong>hệ thống vận hành</strong>: website, quản trị bán hàng, kho, lắp đặt &amp; bảo hành, nhân sự &amp; lương, kết nối MISA AMIS Kế toán. Đơn và kho quản lý ngay trong hệ thống Techhomes, <strong>không dùng KiotViet / Sapo</strong>. Phạm vi là đề xuất, chờ Techhomes xác nhận. Mô tả chức năng đầy đủ: <a href="../tai-lieu/index.html">Tài liệu chức năng</a>.</p>
+<p>Nguyên tắc: <strong>một ứng dụng, một server, tận dụng tối đa thứ đã có</strong> (dữ liệu trên web cũ và file Excel, Cloudflare miễn phí, MISA nếu công ty đang dùng).</p>
 </blockquote>
 <h2>1. Kiến trúc gọn</h2>
 <pre><code>Khách ─► Cloudflare (DNS + CDN + SSL, miễn phí) ─► VPS 2 vCPU / 4GB
                                                     ├─ Caddy (reverse proxy)
                                                     ├─ Nuxt 3: website (SSR) + API
-                                                    │   └─ /admin: Bán hàng · Kho &amp; xưởng · Nhân sự · Kế toán · Hệ thống
-                                                    │   └─ /nv: trang nhân viên trên điện thoại (chấm công, ca, lương)
+                                                    │   └─ /admin: Bán hàng · Kho · Lắp đặt &amp; bảo hành · Nhân sự · Kế toán · Hệ thống
+                                                    │   └─ /nv: trang nhân viên trên điện thoại (chấm công, phiếu lắp đặt, lương)
                                                     ├─ PostgreSQL 16 (dữ liệu gốc, sổ kho chỉ ghi thêm)
                                                     ├─ Meilisearch (tìm kiếm + bộ lọc)
                                                     └─ Thư mục ảnh WebP (Cloudflare cache)
-Đơn xuất kho ─► hàng đợi ─► MISA AMIS Kế toán (API, kết quả trả về qua callback)
-Đơn mới, lỗi MISA, nguyên liệu sắp hết ─► Telegram cho đúng nhóm
+Đơn bán, phiếu nhập/xuất, thu tiền ─► hàng đợi ─► MISA AMIS Kế toán (API, kết quả trả về qua callback)
+Đơn mới, yêu cầu báo giá, lịch lắp đặt, lỗi MISA ─► Telegram cho đúng nhóm
 </code></pre>
 <ul>
 <li><strong>Một codebase Nuxt 3</strong> chứa website, các cổng quản trị, trang nhân viên và API → ít công nhất, dễ bảo trì.</li>
-<li>Website <strong>render phía server (SSR)</strong> để Google đọc được (quan trọng khi rời Haravan).</li>
-<li>Website và quản trị dùng chung một bộ giao diện riêng của Ponagar (<code>ponagar.css</code>: màu, font, nút, bảng, khung quản trị) → làm một lần, dùng cả hai phía. Xem <a href="04-design-system.html">04 · Design system</a>.</li>
+<li>Website <strong>render phía server (SSR)</strong> để Google đọc được (quan trọng khi thay web cũ techhomes.vn).</li>
+<li>Website và quản trị dùng chung một bộ giao diện riêng của Techhomes (<code>techhomes.css</code>: màu, font, nút, bảng, khung quản trị) → làm một lần, dùng cả hai phía. Xem <a href="04-design-system.html">04 · Design system</a>.</li>
 <li>Một máy chủ 4GB đủ cho cả website và các khối vận hành; theo dõi dung lượng khi dữ liệu kho, chấm công lớn dần. Chi tiết: <a href="05-cau-hinh-vps.html">05 · Cấu hình VPS</a>.</li>
 </ul>
-<h2>2. Dữ liệu 10.000 sản phẩm</h2>
+<h2>2. Dữ liệu ~10.000 mã hàng</h2>
 <div class="table-scroll"><table class="data">
 <thead><tr><th>Vấn đề</th><th>Đề xuất</th></tr></thead>
 <tbody>
-<tr><td>Lấy dữ liệu từ ponagar.co</td><td>Xuất Excel sản phẩm từ Haravan → <strong>công cụ nhập</strong> tự đọc, tải ảnh về, nén <strong>WebP</strong>, báo lỗi từng dòng kèm gợi ý sửa.</td></tr>
-<tr><td>Màu da, chủ đề tranh nhập không đồng nhất</td><td><strong>Danh sách chuẩn</strong> (8 màu da, các chủ đề) + gợi ý sửa khi import.</td></tr>
-<tr><td>Biến thể</td><td><strong>SP cha → biến thể</strong> (màu da × size); giá theo biến thể.</td></tr>
-<tr><td>Tồn kho</td><td><strong>Không nhập tay.</strong> Tồn tính từ sổ kho theo từng kho (nhập, xuất, chuyển, kiểm kê). Sổ chỉ ghi thêm, không sửa dòng cũ → luôn truy được vì sao tồn ra con số này.</td></tr>
-<tr><td>Mã hàng bên MISA</td><td>Mã hàng MISA = SKU. Gửi danh mục sang MISA theo lô lần đầu, sau đó từng mẫu mới. Mã chưa khớp hiện đỏ trong danh sách sản phẩm.</td></tr>
+<tr><td>Lấy dữ liệu từ web cũ</td><td>Xuất dữ liệu từ techhomes.vn hoặc file Excel Techhomes đang có → <strong>công cụ nhập</strong> tự đọc, tải ảnh về, nén <strong>WebP</strong>, báo lỗi từng dòng kèm gợi ý sửa. Web cũ có xuất được không: <em>cần Techhomes xác nhận</em>.</td></tr>
+<tr><td>Mã hàng của hãng</td><td>Giữ đúng mã hãng: Hafele dạng <code>533.09.989</code>, Blum dạng <code>22F1809</code>. Gõ thiếu dấu chấm (<code>53309989</code>) vẫn tìm ra. Mã hàng là khoá khi nhập Excel → nhập lại chỉ cập nhật, không tạo trùng.</td></tr>
+<tr><td>Thương hiệu, ngành hàng nhập không đồng nhất</td><td><strong>Danh sách chuẩn</strong> (thương hiệu, ngành hàng, thuộc tính như kích thước, kiểu lắp, tính năng) + gợi ý sửa khi import.</td></tr>
+<tr><td>Giá</td><td>Mỗi mã có <strong>giá niêm yết</strong> và <strong>giá bán</strong>, % giảm tự tính. <strong>Bảng giá theo nhóm khách</strong> (lẻ / nhà thầu / đại lý) dùng khi lập báo giá và đơn. Đổi giá hàng loạt bằng Excel theo mã hàng.</td></tr>
+<tr><td>Biến thể</td><td><strong>SP cha → biến thể</strong> (màu, kích thước, chiều dài ray…); mỗi biến thể một mã hãng, một giá.</td></tr>
+<tr><td>Tồn kho</td><td><strong>Không nhập tay.</strong> Tồn tính từ sổ kho theo từng kho trong 3 kho (nhập, xuất, chuyển, kiểm kê). Sổ chỉ ghi thêm, không sửa dòng cũ → luôn truy được vì sao tồn ra con số này.</td></tr>
+<tr><td>Số serial</td><td>Thiết bị có serial (bếp, máy rửa chén, khóa điện tử…) ghi serial khi xuất kho → dùng để lập phiếu bảo hành.</td></tr>
+<tr><td>Mã hàng bên MISA</td><td>Mã hàng MISA = mã hàng hãng (SKU). Gửi danh mục sang MISA theo lô lần đầu, sau đó từng mã mới. Mã chưa khớp hiện đỏ trong danh sách sản phẩm.</td></tr>
 <tr><td>Ảnh nặng</td><td>Mỗi ảnh tạo 3 cỡ (400/800/1600px), Cloudflare cache → VPS nhẹ.</td></tr>
-<tr><td>Giữ SEO cũ</td><td>Map URL Haravan cũ (<code>/products/...</code>, <code>/collections/...</code>) → <strong>301</strong> sang URL mới.</td></tr>
+<tr><td>Giữ SEO cũ</td><td>Map link cũ techhomes.vn (vd <code>/tay-nang-blum</code>, <code>/bep-tu-hafele</code>) → <strong>301</strong> sang URL mới.</td></tr>
 </tbody>
 </table></div>
 <h2>3. Đơn hàng, kho &amp; kết nối MISA</h2>
-<p>Bản v0.2 đề xuất đẩy đơn sang một phần mềm bán hàng ngoài (KiotViet / Sapo / Haravan / Nhanh.vn / Pancake). Bản này <strong>bỏ hướng đó</strong>: đơn, kho, sản xuất quản lý ngay trong hệ thống Ponagar; chỉ chứng từ kế toán sang <strong>MISA AMIS Kế toán</strong>.</p>
+<p>Đơn, báo giá, kho, lắp đặt quản lý ngay trong hệ thống Techhomes; chỉ chứng từ kế toán sang <strong>MISA AMIS Kế toán</strong>. Không dùng phần mềm bán hàng ngoài (KiotViet / Sapo).</p>
 <h3>Ai giữ số liệu gì</h3>
 <div class="table-scroll"><table class="data">
-<thead><tr><th>Việc</th><th>Ponagar</th><th>MISA</th></tr></thead>
+<thead><tr><th>Việc</th><th>Techhomes</th><th>MISA</th></tr></thead>
 <tbody>
-<tr><td>Đơn hàng, giao hàng, đổi trả</td><td><strong>Gốc</strong></td><td>Nhận bản sao để hạch toán</td></tr>
-<tr><td>Tồn kho hằng ngày, giữ hàng, sản xuất</td><td><strong>Gốc</strong></td><td>Tồn sổ sách, đối chiếu cuối tháng</td></tr>
+<tr><td>Đơn hàng, báo giá, giao hàng, đổi trả</td><td><strong>Gốc</strong></td><td>Nhận bản sao để hạch toán</td></tr>
+<tr><td>Tồn kho hằng ngày, giữ hàng, serial</td><td><strong>Gốc</strong></td><td>Tồn sổ sách, đối chiếu cuối tháng</td></tr>
+<tr><td>Lịch lắp đặt, phiếu bảo hành</td><td><strong>Gốc</strong></td><td>Không gửi (phí lắp đặt đi theo đơn bán)</td></tr>
 <tr><td>Chứng từ, sổ sách, công nợ, thuế, hoá đơn điện tử</td><td>Tính sẵn thuế trên từng đơn</td><td><strong>Gốc</strong></td></tr>
 <tr><td>Chấm công, tính lương</td><td><strong>Gốc</strong></td><td>Hạch toán chi phí lương (nhập Excel)</td></tr>
 </tbody>
 </table></div>
-<p>Dữ liệu chỉ đi <strong>một chiều</strong> Ponagar → MISA. MISA lỗi hoặc bảo trì: website vẫn bán bình thường, đơn xếp hàng chờ gửi sau.</p>
+<p>Dữ liệu chỉ đi <strong>một chiều</strong> Techhomes → MISA. MISA lỗi hoặc bảo trì: website vẫn bán bình thường, chứng từ xếp hàng chờ gửi sau.</p>
 <h3>Khi nào gửi sang MISA</h3>
 <div class="table-scroll"><table class="data">
 <thead><tr><th>Sự kiện</th><th>Gửi sang MISA</th></tr></thead>
 <tbody>
-<tr><td>Khách đặt, đơn chờ xác nhận</td><td>Chưa gửi (chỉ giữ hàng)</td></tr>
+<tr><td>Khách đặt, đơn chờ xác nhận · báo giá chưa chốt</td><td>Chưa gửi (đơn chỉ giữ hàng)</td></tr>
 <tr><td>Đơn huỷ trước khi xuất kho</td><td>Không bao giờ gửi</td></tr>
-<tr><td>Kho bấm <strong>Xuất kho</strong> / bán tại quầy thu tiền</td><td>Chứng từ bán hàng</td></tr>
+<tr><td>Kho bấm <strong>Xuất kho</strong> / bán tại showroom</td><td>Chứng từ bán hàng + phiếu xuất kho</td></tr>
+<tr><td>Thu tiền (tiền mặt, chuyển khoản, công nợ nhà thầu, đại lý)</td><td>Phiếu thu</td></tr>
 <tr><td>Khách trả hàng (đã duyệt, kho đã nhận)</td><td>Chứng từ trả lại hàng bán</td></tr>
-<tr><td>Nhập mua nhà cung cấp (GĐ3)</td><td>Chứng từ mua hàng</td></tr>
+<tr><td>Nhập mua từ nhà phân phối (Hafele Việt Nam, Blum…)</td><td>Chứng từ mua hàng + phiếu nhập kho</td></tr>
 </tbody>
 </table></div>
-<p><strong>Cách gửi:</strong> chứng từ vào hàng đợi → gửi trong khoảng 1 phút → lỗi mạng thì <strong>tự thử lại 5 lần</strong>. MISA xử lý không đồng thời nên kết quả thật trả về sau qua địa chỉ callback: đơn có hai trạng thái <em>Đã gửi · chờ MISA</em> và <em>MISA đã nhận</em>. MISA từ chối thì đơn hiện đỏ kèm lý do tiếng Việt và nút <strong>Gửi lại</strong>. Mỗi chứng từ mang mã đơn Ponagar làm khoá chống trùng: một đơn không bao giờ sang MISA hai lần. Bên MISA, kế toán duyệt ở <em>Đề nghị lập chứng từ</em> rồi mới ghi sổ.</p>
-<p><strong>Cần xác nhận với MISA trước GĐ2:</strong> gói AMIS Kế toán của công ty có mở API kết nối không; thời gian duyệt ClientID; API danh mục cho đẩy hàng hoá mới sang hay chỉ lấy về. Nếu không có API: xuất Excel đúng mẫu nhập của MISA theo ngày.</p>
-<h2>4. Giao diện học từ thienkimhome (làm theo kiểu Ponagar)</h2>
+<p><strong>Cách gửi:</strong> chứng từ vào hàng đợi → gửi trong khoảng 1 phút → lỗi mạng thì <strong>tự thử lại 5 lần</strong>. MISA xử lý không đồng thời nên kết quả thật trả về sau qua địa chỉ callback: chứng từ có hai trạng thái <em>Đã gửi · chờ MISA</em> và <em>MISA đã nhận</em>. MISA từ chối thì chứng từ hiện đỏ kèm lý do tiếng Việt và nút <strong>Gửi lại</strong>. Mỗi chứng từ mang mã chứng từ Techhomes làm khoá chống trùng: một chứng từ không bao giờ sang MISA hai lần. Bên MISA, kế toán duyệt ở <em>Đề nghị lập chứng từ</em> rồi mới ghi sổ.</p>
+<p><strong>Cần xác nhận trước GĐ2:</strong> công ty đã dùng MISA AMIS Kế toán chưa (<em>cần Techhomes xác nhận</em>); gói đang dùng có mở API kết nối không; thời gian MISA duyệt ClientID; API danh mục cho đẩy hàng hoá mới sang hay chỉ lấy về. Nếu không có API: xuất Excel đúng mẫu nhập của MISA theo ngày.</p>
+<h2>4. Giao diện học theo phong cách ponagar.co (làm theo nhận diện Techhomes)</h2>
 <ul>
-<li><strong>Header một thanh</strong>: danh mục, tìm kiếm, số gọi mua hàng, cửa hàng gần bạn, cẩm nang, giỏ hàng, thành viên.</li>
-<li><strong>Đầu trang chủ</strong>: menu danh mục bên trái (rê chuột hiện bảng con), banner chạy có tab ở giữa, 3 banner ưu đãi bên phải.</li>
-<li><strong>Mỗi ngành hàng một khối</strong> lưới 5 cột; thẻ sản phẩm có nhãn <em>Giảm x%</em>, giá cũ gạch, ô <em>Tặng thêm</em>, số sao đánh giá.</li>
-<li>Trang <strong>danh mục × chủ đề</strong> làm trang SEO (vd: <em>túi da vẽ tay đồng quê</em>); bộ lọc có số đếm, sắp xếp, phân trang.</li>
-<li>Footer nền trắng 4 cột + hàng địa chỉ showroom; nút <strong>Gọi / Zalo / Messenger</strong> dính màn hình.</li>
-<li>Màu đỏ logo Ponagar thay màu cam của trang mẫu. Khác biệt của Ponagar: <strong>câu chuyện bức tranh</strong>, <strong>vẽ tên miễn phí</strong>, <strong>đặt làm riêng</strong>, bộ sưu tập theo chủ đề tranh thay cho khối thương hiệu.</li>
+<li><strong>Header nền trắng, logo ở giữa</strong>; dưới là menu ngành hàng &amp; thương hiệu (bảng menu lớn khi rê chuột), thay cho menu rất dài của web cũ. Ô tìm theo tên hoặc <strong>mã hàng</strong>, hotline, giỏ hàng.</li>
+<li><strong>Trang chủ</strong>: ảnh lớn công trình thực tế (bếp, tủ bếp, cửa), khối ngành hàng, khối thương hiệu (Hafele, Blum, Bosch…), dự án đã thi công.</li>
+<li><strong>Lưới sản phẩm thoáng</strong>, đường kẻ mảnh; thẻ sản phẩm có ảnh, thương hiệu, mã hàng, giá niêm yết gạch, giá bán, nhãn <em>-x%</em>.</li>
+<li><strong>Chi tiết sản phẩm</strong>: ảnh lớn, <strong>tab</strong> mô tả / thông số kỹ thuật / catalogue PDF / bảo hành; nút <strong>Thêm vào giỏ</strong>, <strong>Yêu cầu báo giá</strong>, <strong>Đặt lịch lắp đặt</strong>; hỏi đáp dạng <strong>mở/đóng (accordion)</strong>.</li>
+<li><strong>Dải dịch vụ</strong>: giao hàng, lắp đặt, bảo hành chính hãng, 3 showroom.</li>
+<li>Trang <strong>ngành hàng × thương hiệu</strong> làm trang SEO (vd: <em>bản lề Blum</em>, <em>bếp từ Hafele</em>); bộ lọc có số đếm, sắp xếp, phân trang.</li>
+<li>Footer có địa chỉ 3 showroom và hotline; nút <strong>Gọi / Zalo</strong> dính màn hình.</li>
+<li>Màu đỏ và xám của logo TECHHOMES, font Be Vietnam Pro. Chỉ học phong cách; không sao chép nội dung, hình ảnh của ponagar.co.</li>
 <li>Xem bản click được: <a href="../prototype/home.html">prototype trang chủ</a>.</li>
 </ul>
 <h2>5. SEO</h2>
 <ul>
-<li>Schema <code>Product</code>, <code>Offer</code>, <code>BreadcrumbList</code>, <code>FAQPage</code>, <code>LocalBusiness</code> (showroom).</li>
-<li>Sitemap tự sinh (chia file ≤ 5.000 URL), canonical cho trang lọc, <strong>301 từ URL Haravan cũ</strong>.</li>
-<li>GA4 + Meta Pixel + Google Search Console.</li>
+<li>Schema <code>Product</code>, <code>Offer</code>, <code>BreadcrumbList</code>, <code>FAQPage</code>, <code>LocalBusiness</code> (3 showroom).</li>
+<li>Sitemap tự sinh (chia file ≤ 5.000 URL), canonical cho trang lọc.</li>
+<li><strong>301 từ link cũ techhomes.vn</strong>: lập bảng link cũ → link mới (vd <code>techhomes.vn/tay-nang-blum</code>, <code>techhomes.vn/bep-tu-hafele</code>); giữ nguyên đường dẫn khi được, đổi thì chuyển hướng 301. Giữ tiêu đề, mô tả của các trang đang có thứ hạng.</li>
+<li>GA4 + Meta Pixel + Google Search Console; theo dõi lỗi 404 vài tuần sau khi chuyển.</li>
 </ul>
 <h2>6. Lộ trình (4 giai đoạn, ~17–19 tuần)</h2>
 <p>Mỗi giai đoạn chạy thật được ngay khi bàn giao. Giá từng giai đoạn: <a href="03-bao-gia.html">03 · Báo giá</a>.</p>
 <div class="table-scroll"><table class="data">
 <thead><tr><th>Giai đoạn</th><th>Việc</th><th>Thời gian</th><th>Cần trước</th></tr></thead>
 <tbody>
-<tr><td><strong>GĐ1</strong> · Website &amp; đơn hàng</td><td>Tuần 1: chốt prototype, dựng VPS, nhập thử 500 SP · Tuần 2–3: website + quản trị đơn, sản phẩm + tìm kiếm/bộ lọc · Tuần 4: nhập đủ 10.000 SP, SEO, 301 · Tuần 5: khách kiểm thử, chuyển tên miền, bàn giao</td><td>~5 tuần</td><td>File xuất Haravan, logo, thông tin showroom</td></tr>
-<tr><td><strong>GĐ2</strong> · Kho thành phẩm &amp; MISA</td><td>Nhiều kho, tồn theo kho, giữ hàng, đóng gói &amp; xuất kho, chuyển kho, kiểm kê, bán tại quầy, đổi trả, đẩy chứng từ MISA, đối soát COD</td><td>~4–5 tuần</td><td>GĐ1 · MISA duyệt ClientID</td></tr>
-<tr><td><strong>GĐ3</strong> · Nguyên liệu &amp; sản xuất</td><td>Nguyên liệu, nhà cung cấp, nhập mua, định mức, lệnh sản xuất, KCS, giá vốn, đối chiếu tồn MISA</td><td>~4 tuần</td><td>GĐ2 · định mức da từng mẫu</td></tr>
-<tr><td><strong>GĐ4</strong> · Nhân sự &amp; lương</td><td>Hồ sơ, xếp ca, chấm công trên điện thoại, đơn từ, lương khoán, hoa hồng, bảng lương, phiếu lương</td><td>~4–5 tuần</td><td>GĐ3 (lương khoán lấy sản lượng từ lệnh sản xuất) · đơn giá khoán</td></tr>
+<tr><td><strong>GĐ1</strong> · Website &amp; đơn hàng</td><td>Tuần 1: chốt prototype, dựng VPS, nhập thử 500 mã · Tuần 2–3: website + quản trị đơn, báo giá, sản phẩm + tìm kiếm/bộ lọc · Tuần 4: nhập đủ ~10.000 mã, SEO, 301 · Tuần 5: Techhomes kiểm thử, chuyển tên miền, bàn giao</td><td>~5 tuần</td><td>Dữ liệu sản phẩm (web cũ hoặc Excel), bảng giá theo nhóm khách, logo gốc, thông tin 3 showroom</td></tr>
+<tr><td><strong>GĐ2</strong> · Kho &amp; MISA</td><td>3 kho, tồn theo kho, giữ hàng, nhập mua từ nhà phân phối, xuất kho, chuyển kho, kiểm kê, số serial, bán tại showroom, đổi trả, đẩy chứng từ MISA, đối soát thu tiền</td><td>~4–5 tuần</td><td>GĐ1 · MISA duyệt ClientID</td></tr>
+<tr><td><strong>GĐ3</strong> · Lắp đặt &amp; bảo hành</td><td>Lịch lắp đặt, phân thợ, phiếu lắp đặt trên điện thoại có ảnh nghiệm thu, biểu phí lắp đặt, phiếu bảo hành theo serial, tiếp nhận và theo dõi yêu cầu bảo hành</td><td>~4 tuần</td><td>GĐ2 (serial ghi lúc xuất kho) · biểu phí lắp đặt, chính sách bảo hành</td></tr>
+<tr><td><strong>GĐ4</strong> · Nhân sự &amp; lương</td><td>Hồ sơ, xếp ca, chấm công trên điện thoại, đơn từ, hoa hồng bán hàng, công lắp đặt theo phiếu, bảng lương, phiếu lương</td><td>~4–5 tuần</td><td>GĐ3 (công lắp đặt lấy từ phiếu lắp đặt) · quy chế hoa hồng, đơn giá công lắp</td></tr>
 </tbody>
 </table></div>
-<p>GĐ2 làm trước GĐ3 vì đẩy chứng từ sang MISA chỉ cần tồn thành phẩm, chưa cần nguyên liệu. Nếu cần chấm công sớm, có thể tách phần hồ sơ, xếp ca, chấm công của GĐ4 làm trước.</p>
+<p>GĐ2 làm trước GĐ3 vì phiếu bảo hành cần số serial ghi lúc xuất kho. Nếu cần chấm công sớm, có thể tách phần hồ sơ, xếp ca, chấm công của GĐ4 làm trước.</p>
 <h2>7. Rủi ro &amp; cách giảm</h2>
 <div class="table-scroll"><table class="data">
 <thead><tr><th>Rủi ro</th><th>Cách giảm</th></tr></thead>
 <tbody>
-<tr><td>Phạm vi lớn, dễ phình</td><td>Chia 4 giai đoạn, chốt danh sách chức năng ở tài liệu v0.3; phát sinh tính riêng</td></tr>
+<tr><td>Phạm vi lớn, dễ phình</td><td>Chia 4 giai đoạn, chốt danh sách chức năng ở tài liệu chức năng; phát sinh tính riêng</td></tr>
+<tr><td>Web cũ tự viết, không xuất được dữ liệu</td><td>Hỏi sớm người giữ mã nguồn, cơ sở dữ liệu. Dự phòng: dùng bảng giá Excel của hãng + lấy ảnh, mô tả từ trang web cũ</td></tr>
+<tr><td>Số mã thực tế lớn hơn ước tính, nhiều mã thiếu ảnh hoặc thông số</td><td>Nhập theo ngành hàng ưu tiên; mã thiếu dữ liệu để ẩn, bổ sung dần</td></tr>
 <tr><td>Gói MISA không mở API, hoặc duyệt ClientID chậm</td><td>GĐ1 không phụ thuộc MISA. Hỏi MISA ngay khi ký. Phương án dự phòng: xuất Excel đúng mẫu nhập của MISA theo ngày</td></tr>
-<tr><td>Tồn hệ thống lệch tồn thực</td><td>Sổ kho chỉ ghi thêm, mọi lần nhập/xuất có người bấm; kiểm kê định kỳ; bán tại quầy bắt buộc qua hệ thống</td></tr>
-<tr><td>Dữ liệu lương, giá vốn nhạy cảm</td><td>Phân quyền theo vai trò, nhật ký thao tác, mã truy cập MISA lưu mã hoá</td></tr>
-<tr><td>Rớt thứ hạng khi rời Haravan</td><td>Map 301 đầy đủ, giữ tiêu đề/mô tả SEO cũ</td></tr>
-<tr><td>VPS nhỏ quá tải mùa sale hoặc dữ liệu lớn dần</td><td>Cloudflare cache trang + ảnh; theo dõi dung lượng; nâng gói VPS khi cần</td></tr>
+<tr><td>Tồn hệ thống lệch tồn thực ở 3 kho</td><td>Sổ kho chỉ ghi thêm, mọi lần nhập/xuất có người bấm; kiểm kê định kỳ; bán tại showroom bắt buộc qua hệ thống</td></tr>
+<tr><td>Thiếu serial → không tra được bảo hành</td><td>Bắt buộc nhập/quét serial khi xuất kho các nhóm thiết bị có serial</td></tr>
+<tr><td>Dữ liệu lương, giá vốn, chiết khấu đại lý nhạy cảm</td><td>Phân quyền theo vai trò, nhật ký thao tác, mã truy cập MISA lưu mã hoá</td></tr>
+<tr><td>Rớt thứ hạng khi thay web cũ</td><td>Map 301 đầy đủ từ link cũ techhomes.vn, giữ tiêu đề/mô tả SEO cũ, theo dõi Search Console sau khi chuyển</td></tr>
+<tr><td>VPS nhỏ quá tải mùa khuyến mãi hoặc dữ liệu lớn dần</td><td>Cloudflare cache trang + ảnh; theo dõi dung lượng; nâng gói VPS khi cần</td></tr>
 </tbody>
 </table></div>
 </article></main>

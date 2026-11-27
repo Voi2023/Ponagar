@@ -5,7 +5,7 @@
 <script src="../gate.js"></script>
 <title>Quản trị — Sản phẩm & nhập Excel (prototype)</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="assets/ponagar.css">
+<link rel="stylesheet" href="assets/techhomes.css">
 <link rel="stylesheet" href="assets/admin.css">
 <script src="assets/proto.js"></script>
 <script src="assets/admin.js"></script>
@@ -24,26 +24,26 @@
     </header>
     <main class="app-content">
       <div class="stat-grid">
-        <div class="stat-card"><div class="label">Tổng mẫu</div><div class="value">10.284</div><div class="kpi-trend">31.906 biến thể (màu da × size)</div></div>
+        <div class="stat-card"><div class="label">Tổng mẫu</div><div class="value">10.284</div><div class="kpi-trend">12.630 biến thể (màu, kích thước)</div></div>
         <div class="stat-card"><div class="label">Đang bán</div><div class="value">9.870</div><div class="kpi-trend">Hiện trên website</div></div>
-        <div class="stat-card"><div class="label">Hết hàng mọi kho</div><div class="value">414</div><div class="kpi-trend">Web hiện "Đặt làm 7–10 ngày"</div></div>
+        <div class="stat-card"><div class="label">Hết hàng mọi kho</div><div class="value">414</div><div class="kpi-trend">Web hiện "Đặt hàng từ hãng 3–5 ngày"</div></div>
         <div class="stat-card bad" onclick="pick(true)"><div class="label">Chưa khớp MISA</div><div class="value">3</div><div class="kpi-trend">Bấm để lọc</div></div>
       </div>
 
       <div class="toolbar">
-        <input type="search" placeholder="Tìm tên, SKU, chủ đề tranh…">
+        <input type="search" placeholder="Tìm tên, mã hàng (533.09.989 hoặc 53309989)…">
         <select><option>Mọi danh mục</option></select>
-        <select><option>Mọi chủ đề</option><option>Đồng quê</option><option>Phố Hội</option><option>Sen Hồ</option></select>
+        <select><option>Mọi thương hiệu</option><option>Häfele</option><option>Blum</option><option>GEZE</option><option>Bosch</option></select>
         <select id="fMisa" onchange="pick(this.value==='1')"><option value="">Mọi trạng thái MISA</option><option value="1">Chưa khớp MISA</option></select>
       </div>
 
       <div class="panel" style="padding:6px 8px" id="misa">
         <div class="table-scroll"><table class="data wide">
-          <thead><tr><th>Sản phẩm</th><th>Danh mục</th><th>Màu da</th><th class="right">Giá</th><th>Tồn theo kho</th><th>Mã hàng MISA</th><th>Trạng thái</th></tr></thead>
+          <thead><tr><th>Sản phẩm</th><th>Danh mục</th><th>Thương hiệu</th><th class="right">Giá</th><th>Tồn theo kho</th><th>Mã hàng MISA</th><th>Trạng thái</th></tr></thead>
           <tbody id="rows"></tbody>
         </table></div>
       </div>
-      <div class="box-note">Tồn không nhập tay ở đây: con số lấy từ sổ kho (nhập, xuất, chuyển, kiểm kê). Mã hàng MISA = SKU; mẫu mới tự gửi sang MISA khi tạo. Mã nào chưa khớp sẽ chặn đơn sang MISA và hiện đỏ ở cột này.</div>
+      <div class="box-note">Tồn không nhập tay ở đây: con số lấy từ sổ kho (nhập, xuất, chuyển, kiểm kê). Mã hàng MISA = mã hãng (Häfele 533.09.989, Blum 22F1809); mã mới tự gửi sang MISA khi tạo. Mã nào chưa khớp sẽ chặn đơn sang MISA và hiện đỏ ở cột này.</div>
     </main>
   </div>
 </div>
@@ -51,23 +51,23 @@
 <div class="modal-overlay" id="imp" style="display:none" onclick="if(event.target===this)this.style.display='none'">
   <div class="modal modal-lg" style="max-height:90vh;overflow:auto">
     <h3>Nhập sản phẩm từ Excel</h3>
-    <p class="sub">Dùng file xuất sản phẩm từ Haravan, hoặc file mẫu của Ponagar. Dòng lỗi không chặn các dòng đúng.</p>
-    <div class="drop"><i class="ti ti-file-spreadsheet"></i><br><b style="color:var(--ink)">haravan_products_export_2026-11-20.xlsx</b><br>10.284 dòng · 12,4 MB</div>
+    <p class="sub">Dùng file dữ liệu lấy từ web cũ techhomes.vn, bảng giá của hãng, hoặc file mẫu của hệ thống. Dòng lỗi không chặn các dòng đúng.</p>
+    <div class="drop"><i class="ti ti-file-spreadsheet"></i><br><b style="color:var(--ink)">techhomes_san-pham_2026-11-20.xlsx</b><br>10.284 dòng · 12,4 MB</div>
     <div style="margin:14px 0 6px" class="row-flex"><b>Đã đọc 10.284 dòng</b><span class="badge green">10.246 hợp lệ</span><span class="badge red">38 lỗi</span></div>
     <div class="progress-bar"><div style="width:99.6%"></div></div>
     <div class="table-scroll" style="margin-top:14px"><table class="data">
       <thead><tr><th>Dòng</th><th>Cột</th><th>Lỗi</th><th>Gợi ý sửa</th></tr></thead>
       <tbody>
-        <tr><td class="mono">214</td><td>Màu da</td><td>"nâu bo" không có trong danh sách chuẩn</td><td><span class="chip">Nâu bò</span></td></tr>
-        <tr><td class="mono">1.057</td><td>Chủ đề</td><td>"Dong que" viết không dấu</td><td><span class="chip">Đồng quê</span></td></tr>
+        <tr><td class="mono">214</td><td>Thương hiệu</td><td>"Hafel" không có trong danh sách chuẩn</td><td><span class="chip">Häfele</span></td></tr>
+        <tr><td class="mono">1.057</td><td>Mã hàng</td><td>"53309989" thiếu dấu chấm</td><td><span class="chip">533.09.989</span></td></tr>
         <tr><td class="mono">3.402</td><td>Ảnh</td><td>Đường dẫn ảnh không tải được (404)</td><td class="muted">Bỏ ảnh, nhập sau</td></tr>
-        <tr><td class="mono">6.918</td><td>SKU</td><td>Trùng với dòng 6.917</td><td class="muted">Gộp thành biến thể size</td></tr>
+        <tr><td class="mono">6.918</td><td>SKU</td><td>Trùng với dòng 6.917</td><td class="muted">Gộp thành biến thể màu</td></tr>
         <tr><td class="mono">…</td><td colspan="3" class="muted">34 dòng khác — tải file lỗi để xem đủ</td></tr>
       </tbody>
     </table></div>
     <div class="field" style="margin-top:14px">
       <label style="text-transform:none;letter-spacing:0;font-size:13.3px;color:var(--ink);font-weight:600"><input type="checkbox" checked> Tải ảnh về, nén WebP 3 cỡ (400/800/1600px)</label>
-      <label style="text-transform:none;letter-spacing:0;font-size:13.3px;color:var(--ink);font-weight:600"><input type="checkbox" checked> Tạo chuyển hướng 301 từ đường dẫn Haravan cũ</label>
+      <label style="text-transform:none;letter-spacing:0;font-size:13.3px;color:var(--ink);font-weight:600"><input type="checkbox" checked> Tạo chuyển hướng 301 từ đường dẫn techhomes.vn cũ</label>
       <label style="text-transform:none;letter-spacing:0;font-size:13.3px;color:var(--ink);font-weight:600"><input type="checkbox" checked> Gửi mã hàng mới sang MISA theo lô</label>
     </div>
     <div class="actions">
@@ -81,21 +81,21 @@
 renderAdmin('admin-products.html');
 document.querySelector('.toolbar select').innerHTML = '<option>Mọi danh mục</option>' + CATS.map(c => `<option>${c.name}</option>`).join('');
 
-const UNMATCHED = [26, 27, 30];          // mẫu mới chưa có bên MISA
-const stock = p => [[('HL'), (p.id * 3) % 5], ['Xưởng', (p.id * 7) % 9], ['Sân bay', p.id % 3]];
+const UNMATCHED = [83, 3, 99];          // mã mới chưa có bên MISA (id sản phẩm)
+const stock = p => [['P.Nhuận', (p.id * 3) % 5], ['Q.10', (p.id * 7) % 9], ['T.Đức', p.id % 3]];
 let onlyBad = false;
 function pick(b) { onlyBad = b; document.getElementById('fMisa').value = b ? '1' : ''; draw(); }
 function draw() {
   document.getElementById('rows').innerHTML = PRODUCTS.filter(p => !onlyBad || UNMATCHED.includes(p.id)).map(p => {
     const st = stock(p), sum = st.reduce((a, [, n]) => a + n, 0), bad = UNMATCHED.includes(p.id);
     return `<tr class="row-link" onclick="toast('Mở sửa: ${p.name}')">
-      <td><div class="row-flex" style="flex-wrap:nowrap"><span class="th-sw" style="--sw:${p.sw}"><i class="ti ${p.ic}"></i></span><span><b>${p.name}</b><span class="sub-muted">${p.theme} · SKU ${sku(p)}</span></span></div></td>
-      <td>${p.cat}</td>
-      <td><span class="dots">${p.sws.map(k => `<span style="--sw:${LEATHER[k]}"></span>`).join('')}</span></td>
+      <td><div class="row-flex" style="flex-wrap:nowrap"><img class="th-img" src="${p.img}" alt=""><span><b>${p.name}</b><span class="sub-muted">${p.type} · Mã ${sku(p)}</span></span></div></td>
+      <td>${CATS.find(c => c.key === p.cat).name}</td>
+      <td>${p.brand}</td>
       <td class="right"><b>${fmt(p.price)}</b>${p.old ? `<span class="sub-muted"><s>${fmt(p.old)}</s></span>` : ''}</td>
       <td>${st.map(([k, n]) => `<span class="chip" style="margin:1px;display:inline-block;white-space:nowrap">${k} ${n}</span>`).join('')}</td>
       <td>${bad ? `<span class="mono" style="color:var(--danger)">${sku(p)}</span><span class="sub-err">Chưa có bên MISA</span>` : `<span class="mono">${sku(p)}</span> <i class="ti ti-check" style="color:var(--ok)"></i>`}</td>
-      <td>${sum ? '<span class="badge green">Đang bán</span>' : '<span class="badge amber">Đặt làm</span>'}</td>
+      <td>${sum ? '<span class="badge green">Đang bán</span>' : '<span class="badge amber">Đặt từ hãng</span>'}</td>
     </tr>`;
   }).join('');
 }

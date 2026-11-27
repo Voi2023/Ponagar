@@ -1,20 +1,21 @@
 /* ============================================================
-   Ponagar UI — bộ giao diện của Ponagar (website + quản trị).
-   Màu và font lấy từ logo PONAGAR. Không hard-code màu trong trang: luôn dùng var().
-   Đổi --brand là cả họ màu brand (dark/deeper/tint) tự đổi theo.
+   Techhomes UI — bộ giao diện của Techhomes (website + quản trị).
+   Màu lấy từ logo TECHHOMES (đỏ + xám), font Be Vietnam Pro như ponagar.co.
+   Không hard-code màu trong trang: luôn dùng var(). Đổi --brand là cả họ màu brand tự đổi theo.
    ============================================================ */
-@import url("https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap");
 
 :root{
   /* Màu gốc */
-  --brand:#BB2E30;            /* đỏ logo PONAGAR */
-  --accent:#F3E6CF;           /* kem da thuộc */
-  --ink:#231F1C;              /* chữ chính, nâu đen */
-  --muted:#76695E;            /* chữ phụ */
-  --bg:#FAF7F2;               /* nền giấy ấm */
+  --brand:#DB2717;            /* đỏ Techhomes, đậm hơn đỏ logo một chút để chữ trên nền trắng đủ tương phản */
+  --brand-logo:#FE321F;       /* đỏ đúng logo — chỉ dùng cho mảng màu lớn, không dùng cho chữ nhỏ */
+  --accent:#798585;           /* xám ô vuông trong logo */
+  --ink:#282C34;              /* chữ chính, theo dòng HOME SOLUTIONS */
+  --muted:#6B7378;            /* chữ phụ */
+  --bg:#F7F7F5;               /* nền sáng trung tính */
   --surface:#FFFFFF;
-  --border:#ECE4D8;
-  --gray-bg:#F2ECE3;
+  --border:#E6E6E2;
+  --gray-bg:#EFEFEC;
 
   /* Trạng thái */
   --ok:#0a7d3c;     --ok-bg:#e6f4ea;
@@ -23,23 +24,23 @@
   --info:#1a5fb4;   --info-bg:#e8f0fb;
 
   /* Hình khối */
-  --radius-sm:8px; --radius:12px; --radius-full:999px;
-  --shadow:0 1px 2px rgba(35,31,28,.04), 0 8px 20px rgba(35,31,28,.06);
+  --radius-sm:6px; --radius:10px; --radius-full:999px;
+  --shadow:0 1px 2px rgba(40,44,52,.04), 0 8px 20px rgba(40,44,52,.06);
   --sidebar-w:250px;
 
-  /* Font: Chakra Petch — dáng vuông giống chữ logo, có đủ dấu tiếng Việt */
-  --font-display:"Chakra Petch","Segoe UI",system-ui,sans-serif;
-  --font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  /* Font: Be Vietnam Pro — font của ponagar.co, đủ dấu tiếng Việt */
+  --font-display:"Be Vietnam Pro","Segoe UI",system-ui,sans-serif;
+  --font-family:"Be Vietnam Pro","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
   --font-mono:"SF Mono",Consolas,Menlo,monospace;
 
   /* Họ màu brand tự suy từ --brand */
-  --brand-dark:   color-mix(in srgb, #000 27%, var(--brand));
-  --brand-deeper: color-mix(in srgb, #000 48%, var(--brand));
-  --brand-tint:   color-mix(in srgb, var(--brand) 9%, #fff);
+  --brand-dark:   color-mix(in srgb, #000 22%, var(--brand));
+  --brand-deeper: color-mix(in srgb, #000 45%, var(--brand));
+  --brand-tint:   color-mix(in srgb, var(--brand) 8%, #fff);
   --accent-ink:var(--brand-dark);
 }
 
-/* Logo chữ PONAGAR (assets/logo.png, màu đỏ). Trên nền đỏ dùng .logo-w để thành chữ trắng. */
+/* Logo (assets/logo.svg) màu đỏ-xám. Trên nền tối dùng .logo-w để thành trắng. */
 .logo-w{filter:brightness(0) invert(1)}
 
 *,*::before,*::after{box-sizing:border-box}
